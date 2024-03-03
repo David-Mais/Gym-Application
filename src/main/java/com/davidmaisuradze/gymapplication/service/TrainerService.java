@@ -1,6 +1,6 @@
 package com.davidmaisuradze.gymapplication.service;
 
-import com.davidmaisuradze.gymapplication.model.Trainer;
+import com.davidmaisuradze.gymapplication.entity.Trainer;
 
 import java.util.List;
 

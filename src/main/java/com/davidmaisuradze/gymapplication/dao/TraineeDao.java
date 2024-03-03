@@ -1,6 +1,6 @@
 package com.davidmaisuradze.gymapplication.dao;
 
-import com.davidmaisuradze.gymapplication.model.Trainee;
+import com.davidmaisuradze.gymapplication.entity.Trainee;
 
 import java.util.List;
 

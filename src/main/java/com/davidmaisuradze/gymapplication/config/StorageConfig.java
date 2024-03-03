@@ -1,35 +1,40 @@
 package com.davidmaisuradze.gymapplication.config;
 
-import com.davidmaisuradze.gymapplication.model.Trainee;
-import com.davidmaisuradze.gymapplication.model.Trainer;
-import com.davidmaisuradze.gymapplication.model.Training;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.davidmaisuradze.gymapplication.entity.Trainee;
+import com.davidmaisuradze.gymapplication.entity.Trainer;
+import com.davidmaisuradze.gymapplication.entity.Training;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
+@PropertySource("classpath:application.properties")
+@ComponentScan(basePackages = "com.davidmaisuradze.gymapplication")
 public class StorageConfig {
-    Logger logger = LoggerFactory.getLogger(StorageConfig.class);
 
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertyPlaceholderConfigurer() {
+
+        return new PropertySourcesPlaceholderConfigurer();
+    }
     @Bean(name = "traineeMap")
     public Map<Long, Trainee> traineeMap() {
-        logger.info("Trainee map bean created successfully");
         return new HashMap<>();
     }
 
     @Bean(name = "trainerMap")
     public Map<Long, Trainer> trainerMap() {
-        logger.info("Trainer map bean created successfully");
         return new HashMap<>();
     }
 
     @Bean(name = "trainingMap")
     public Map<String, Training> trainingMap() {
-        logger.info("Training map bean created successfully");
         return new HashMap<>();
     }
+
 }

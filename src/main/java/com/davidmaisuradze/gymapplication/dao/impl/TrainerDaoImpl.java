@@ -1,7 +1,7 @@
-package com.davidmaisuradze.gymapplication.daoimpl;
+package com.davidmaisuradze.gymapplication.dao.impl;
 
 import com.davidmaisuradze.gymapplication.dao.TrainerDao;
-import com.davidmaisuradze.gymapplication.model.Trainer;
+import com.davidmaisuradze.gymapplication.entity.Trainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,41 +14,44 @@ import java.util.Map;
 
 @Repository
 public class TrainerDaoImpl implements TrainerDao {
-    Logger logger = LoggerFactory.getLogger(TrainerDaoImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(TrainerDaoImpl.class);
     private Map<Long, Trainer> trainerMap;
 
     @Autowired
     public void setTrainerMap(@Qualifier("trainerMap") Map<Long, Trainer> trainerMap) {
         this.trainerMap = trainerMap;
-        logger.info("Trainer Map Created Successfully");
+        logger.info("Trainer map injected");
     }
 
     @Override
     public void create(Trainer trainer) {
         long id = trainer.getUserId();
         if (trainerMap.containsKey(id)) {
-            logger.warn("Trainer already exists");
+            logger.warn("Trainer with id: {} already exists", id);
             return;
         }
         trainerMap.put(id, trainer);
+        logger.info("Created trainer: {}", trainer);
     }
 
     @Override
     public void update(Trainer trainer) {
         long id = trainer.getUserId();
         if (!trainerMap.containsKey(id)) {
-            logger.error("Trainer does not exist");
+            logger.warn("No trainer found with id: {}", id);
             return;
         }
         trainerMap.put(id, trainer);
+        logger.info("Trainer with id {} updated", id);
     }
 
     @Override
     public Trainer select(long id) {
         if (!trainerMap.containsKey(id)) {
-            logger.warn("No such user");
+            logger.info("No trainer with id: {}", id);
             return null;
         }
+        logger.info("Returned trainer with id: {}", id);
         return trainerMap.get(id);
     }
 
