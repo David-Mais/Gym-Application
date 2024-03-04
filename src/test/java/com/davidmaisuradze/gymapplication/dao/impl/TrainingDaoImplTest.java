@@ -1,6 +1,5 @@
 package com.davidmaisuradze.gymapplication.dao.impl;
 
-import com.davidmaisuradze.gymapplication.entity.Trainer;
 import com.davidmaisuradze.gymapplication.entity.Training;
 import com.davidmaisuradze.gymapplication.entity.TrainingType;
 import org.junit.jupiter.api.BeforeEach;
