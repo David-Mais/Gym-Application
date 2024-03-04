@@ -49,7 +49,7 @@ class TraineeDaoImplTest {
     }
 
     @Test
-    void update() {
+    void testUpdateExistingTrainee() {
         Trainee trainee = new Trainee(
                 "first",
                 "last",
@@ -61,8 +61,8 @@ class TraineeDaoImplTest {
                 1234);
         long id = trainee.getUserId();
         when(traineeMap.containsKey(id)).thenReturn(true);
-        traineeDao.create(trainee);
-        verify(traineeMap, never()).put(eq(id), any(Trainee.class));
+        traineeDao.update(trainee);
+        verify(traineeMap, times(1)).put(id, trainee);
     }
 
     @Test

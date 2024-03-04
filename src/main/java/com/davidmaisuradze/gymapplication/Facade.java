@@ -9,9 +9,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class Facade {
 
-    private TraineeService traineeService;
-    private TrainerService trainerService;
-    private TrainingService trainingService;
+    private final TraineeService traineeService;
+    private final TrainerService trainerService;
+    private final TrainingService trainingService;
 
     @Autowired
     public Facade(TraineeService traineeService, TrainerService trainerService, TrainingService trainingService) {
