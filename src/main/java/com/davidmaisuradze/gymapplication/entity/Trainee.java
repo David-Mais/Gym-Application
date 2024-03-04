@@ -14,7 +14,7 @@ import java.time.LocalDate;
 public class Trainee extends User {
     private LocalDate dateOfBirth;
     private String address;
-    private long userId;
+    private Long userId;
 
     public Trainee(String firstName, String lastName, String userName, String password, boolean isActive, LocalDate dateOfBirth, String address, long userId) {
         super(firstName, lastName, userName, password, isActive);

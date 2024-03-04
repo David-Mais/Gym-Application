@@ -6,8 +6,7 @@ import com.davidmaisuradze.gymapplication.entity.Training;
 import com.davidmaisuradze.gymapplication.entity.TrainingType;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,8 +22,8 @@ import java.util.List;
 import java.util.Map;
 
 @Component
+@Slf4j
 public class EntityInitializer {
-    private static final Logger logger = LoggerFactory.getLogger(EntityInitializer.class);
     @Getter
     private Map<Long, Trainee> traineeMap;
     @Getter
@@ -48,7 +47,7 @@ public class EntityInitializer {
         this.traineeMap = traineeMap;
         this.trainerMap = trainerMap;
         this.trainingMap = trainingMap;
-        logger.info("Entity maps injected");
+        log.info("Entity maps injected");
     }
 
     @PostConstruct
@@ -56,16 +55,16 @@ public class EntityInitializer {
         initializeTrainees();
         initializeTrainers();
         initializeTrainings();
-        logger.info("All data initialized");
+        log.info("All data initialized");
     }
 
     public void initializeTrainees() {
-        logger.info("Initializing trainees from file: {}", traineeDataPath);
+        log.info("Initializing trainees from file: {}", traineeDataPath);
         ClassPathResource resource = new ClassPathResource(traineeDataPath);
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream()))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                logger.debug("Processing trainee line: {}", line);
+                log.debug("Processing trainee line: {}", line);
                 String[] attributes = line.split(" ");
                 String firstName = attributes[0];
                 String lastName = attributes[1];
@@ -86,20 +85,20 @@ public class EntityInitializer {
                         userId
                 );
                 traineeMap.put(userId, trainee);
-                logger.info("Trainee added: {} {}", firstName, lastName);
+                log.info("Trainee added: {} {}", firstName, lastName);
             }
         } catch (IOException e) {
-            logger.error("Error reading trainee data from file: {}", traineeDataPath, e);
+            log.error("Error reading trainee data from file: {}", traineeDataPath, e);
         }
     }
 
     public void initializeTrainings() {
-        logger.info("Initializing trainings from file: {}", trainingDataPath);
+        log.info("Initializing trainings from file: {}", trainingDataPath);
         ClassPathResource resource = new ClassPathResource(trainingDataPath);
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream()))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                logger.debug("Processing training line: {}", line);
+                log.debug("Processing training line: {}", line);
                 String[] attributes = line.split(" ");
                 long traineeId = Long.parseLong(attributes[0]);
                 long trainerId = Long.parseLong(attributes[1]);
@@ -117,20 +116,20 @@ public class EntityInitializer {
                         duration
                 );
                 trainingMap.put(trainingName, training);
-                logger.info("Training added: {}", trainingName);
+                log.info("Training added: {}", trainingName);
             }
         } catch (IOException e) {
-            logger.error("Error reading training data from file: {}", trainingDataPath, e);
+            log.error("Error reading training data from file: {}", trainingDataPath, e);
         }
     }
 
     public void initializeTrainers() {
-        logger.info("Initializing trainers from file: {}", trainerDataPath);
+        log.info("Initializing trainers from file: {}", trainerDataPath);
         ClassPathResource resource = new ClassPathResource(trainerDataPath);
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream()))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                logger.debug("Processing trainer line: {}", line);
+                log.debug("Processing trainer line: {}", line);
                 String[] attributes = line.split(" ");
                 String firstName = attributes[0];
                 String lastName = attributes[1];
@@ -149,10 +148,10 @@ public class EntityInitializer {
                         userId
                 );
                 trainerMap.put(userId, trainer);
-                logger.info("Trainer added: {} {}", firstName, lastName);
+                log.info("Trainer added: {} {}", firstName, lastName);
             }
         } catch (IOException e) {
-            logger.error("Error reading trainer data from file: {}", trainerDataPath, e);
+            log.error("Error reading trainer data from file: {}", trainerDataPath, e);
         }
     }
     private String usernameGenerator(String first, String last) {

@@ -32,7 +32,7 @@ class TrainingServiceImplTest {
                 "spar",
                 new TrainingType("Box"),
                 LocalDate.parse("1992-05-13"),
-                2
+                2.0
         );
         trainingService.crete(training);
         verify(trainingDao).create(training);
@@ -47,7 +47,7 @@ class TrainingServiceImplTest {
                 "spar",
                 new TrainingType("Box"),
                 LocalDate.parse("1992-05-13"),
-                2
+                2.0
         );
         when(trainingDao.select(id)).thenReturn(training);
 
@@ -65,7 +65,7 @@ class TrainingServiceImplTest {
                 "spar",
                 new TrainingType("Box"),
                 LocalDate.parse("1992-05-13"),
-                2
+                2.0
         );
         Training training2 = new Training(
                 3333L,
@@ -73,7 +73,7 @@ class TrainingServiceImplTest {
                 "stretch",
                 new TrainingType("Yoga"),
                 LocalDate.parse("2005-02-20"),
-                2
+                2.0
         );
         List<Training> expectedTrainers = Arrays.asList(training1, training2);
         when(trainingDao.findAll()).thenReturn(expectedTrainers);

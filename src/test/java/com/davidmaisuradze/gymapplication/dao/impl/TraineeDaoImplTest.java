@@ -1,11 +1,11 @@
 package com.davidmaisuradze.gymapplication.dao.impl;
 
 import com.davidmaisuradze.gymapplication.entity.Trainee;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -18,17 +18,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class TraineeDaoImplTest {
     @Mock
     private Map<Long, Trainee> traineeMap;
 
     @InjectMocks
     private TraineeDaoImpl traineeDao;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
     @Test
     void testCreateNewTrainee() {
         Trainee trainee = new Trainee(

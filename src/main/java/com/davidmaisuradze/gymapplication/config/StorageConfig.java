@@ -19,7 +19,6 @@ public class StorageConfig {
 
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertyPlaceholderConfigurer() {
-
         return new PropertySourcesPlaceholderConfigurer();
     }
     @Bean(name = "traineeMap")

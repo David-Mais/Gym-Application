@@ -2,11 +2,11 @@ package com.davidmaisuradze.gymapplication.dao.impl;
 
 import com.davidmaisuradze.gymapplication.entity.Training;
 import com.davidmaisuradze.gymapplication.entity.TrainingType;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -18,17 +18,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class TrainingDaoImplTest {
     @Mock
     private Map<String, Training> trainingMap;
 
     @InjectMocks
     private TrainingDaoImpl trainingDao;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
 
     @Test
     void testCreateNewTraining() {
@@ -38,7 +34,7 @@ class TrainingDaoImplTest {
                 "spar",
                 new TrainingType("Box"),
                 LocalDate.parse("1992-05-13"),
-                2
+                2.0
         );
         when(trainingMap.containsKey(training.getTrainingName())).thenReturn(false);
 
@@ -55,7 +51,7 @@ class TrainingDaoImplTest {
                 "spar",
                 new TrainingType("Box"),
                 LocalDate.parse("1992-05-13"),
-                2
+                2.0
         );
         when(trainingMap.containsKey(training.getTrainingName())).thenReturn(true);
 
@@ -73,7 +69,7 @@ class TrainingDaoImplTest {
                 "spar",
                 new TrainingType("Box"),
                 LocalDate.parse("1992-05-13"),
-                2
+                2.0
         );
         when(trainingMap.containsKey(name)).thenReturn(true);
         when(trainingMap.get(name)).thenReturn(training);
@@ -103,7 +99,7 @@ class TrainingDaoImplTest {
                 "spar",
                 new TrainingType("Box"),
                 LocalDate.parse("1992-05-13"),
-                2
+                2.0
         );
         Training training2 = new Training(
                 3333L,
@@ -111,7 +107,7 @@ class TrainingDaoImplTest {
                 "stretch",
                 new TrainingType("Yoga"),
                 LocalDate.parse("2005-02-20"),
-                2
+                2.0
         );
         when(trainingMap.values()).thenReturn(List.of(training1, training2));
 
