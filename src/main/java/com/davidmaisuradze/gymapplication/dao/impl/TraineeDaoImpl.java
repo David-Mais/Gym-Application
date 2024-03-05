@@ -8,8 +8,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 
 @Repository
@@ -18,31 +21,33 @@ public class TraineeDaoImpl  implements TraineeDao {
     private Map<Long, Trainee> traineeMap;
 
     @Autowired
-    public void setTraineeMap(@Qualifier("traineeMap") Map<Long, Trainee> traineeMap) {
+    public void setTraineeMap(@Qualifier("traineeStorage") Map<Long, Trainee> traineeMap) {
         this.traineeMap = traineeMap;
         log.info("Trainee map injected");
     }
 
     @Override
-    public void create(Trainee trainee) {
+    public Trainee create(Trainee trainee) {
         long id = trainee.getUserId();
         if (traineeMap.containsKey(id)) {
             log.warn("Trainee already exists");
-            return;
+            return null;
         }
         traineeMap.put(id, trainee);
         log.info("Created Trainee: {}", trainee);
+        return trainee;
     }
 
     @Override
-    public void update(Trainee trainee) {
+    public Trainee update(Trainee trainee) {
         long id = trainee.getUserId();
         if (!traineeMap.containsKey(id)) {
             log.warn("Trainee does not exist");
-            return;
+            return null;
         }
         traineeMap.put(id, trainee);
         log.info("Trainee {} updated", trainee);
+        return trainee;
     }
 
     @Override
@@ -57,7 +62,7 @@ public class TraineeDaoImpl  implements TraineeDao {
     }
 
     @Override
-    public Trainee select(long id) {
+    public Trainee select(Long id) {
         if (!traineeMap.containsKey(id)) {
             log.warn("No such trainee");
             return null;
@@ -71,5 +76,19 @@ public class TraineeDaoImpl  implements TraineeDao {
         List<Trainee> trainees = new ArrayList<>(traineeMap.values());
         log.info("Returned all trainees");
         return trainees;
+    }
+
+    private Long correctIdMatcher() {
+        Set<Long> idNumbers = traineeMap.keySet();
+
+        Optional<Long> maxId = idNumbers
+                .stream()
+                .max(Comparator.naturalOrder());
+
+        long id = 0L;
+        if (maxId.isPresent()) {
+            id = maxId.get();
+        }
+        return id + 1;
     }
 }

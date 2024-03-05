@@ -5,9 +5,9 @@ import com.davidmaisuradze.gymapplication.entity.Trainee;
 import java.util.List;
 
 public interface TraineeDao {
-    void create(Trainee trainee);
-    void update(Trainee trainee);
+    Trainee create(Trainee trainee);
+    Trainee update(Trainee trainee);
     void delete(Trainee trainee);
-    Trainee select(long id);
+    Trainee select(Long id);
     List<Trainee> findAll();
 }

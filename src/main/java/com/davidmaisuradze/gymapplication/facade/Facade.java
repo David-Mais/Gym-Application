@@ -1,4 +1,4 @@
-package com.davidmaisuradze.gymapplication;
+package com.davidmaisuradze.gymapplication.facade;
 
 import com.davidmaisuradze.gymapplication.entity.Trainee;
 import com.davidmaisuradze.gymapplication.entity.Trainer;
@@ -22,12 +22,12 @@ public class Facade {
 
 
     //Trainee methods
-    public void createTrainee(Trainee trainee) {
-        traineeService.create(trainee);
+    public Trainee createTrainee(Trainee trainee) {
+        return traineeService.create(trainee);
     }
 
-    public void updateTrainee(Trainee trainee) {
-        traineeService.update(trainee);
+    public Trainee updateTrainee(Trainee trainee) {
+        return traineeService.update(trainee);
     }
 
     public void deleteTrainee(Trainee trainee) {
@@ -43,12 +43,12 @@ public class Facade {
     }
 
     //Trainer methods
-    public void createTrainer(Trainer trainer) {
-        trainerService.create(trainer);
+    public Trainer createTrainer(Trainer trainer) {
+        return trainerService.create(trainer);
     }
 
-    public void updateTrainer(Trainer trainer) {
-        trainerService.update(trainer);
+    public Trainer updateTrainer(Trainer trainer) {
+        return trainerService.update(trainer);
     }
 
     public Trainer selectTrainer(long id) {
@@ -60,8 +60,8 @@ public class Facade {
     }
 
     //Training methods
-    public void createTraining(Training training) {
-        trainingService.crete(training);
+    public Training createTraining(Training training) {
+        return trainingService.crete(training);
     }
 
     public Training selectTraining(String name) {

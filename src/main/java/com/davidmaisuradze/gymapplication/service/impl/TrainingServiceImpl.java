@@ -21,9 +21,10 @@ public class TrainingServiceImpl implements TrainingService {
     }
 
     @Override
-    public void crete(Training training) {
+    public Training crete(Training training) {
         log.info("Creating training: {}", training.getTrainingName());
         trainingDao.create(training);
+        return training;
     }
 
     @Override

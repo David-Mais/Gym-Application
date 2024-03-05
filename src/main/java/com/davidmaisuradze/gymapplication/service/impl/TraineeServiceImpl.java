@@ -21,15 +21,17 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Override
-    public void create(Trainee trainee) {
+    public Trainee create(Trainee trainee) {
         log.info("Creating trainee: {}", trainee.getFirstName());
         traineeDao.create(trainee);
+        return trainee;
     }
 
     @Override
-    public void update(Trainee trainee) {
+    public Trainee update(Trainee trainee) {
         log.info("Updating trainee: {}", trainee.getFirstName());
         traineeDao.update(trainee);
+        return trainee;
     }
 
     @Override

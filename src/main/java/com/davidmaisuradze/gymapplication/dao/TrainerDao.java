@@ -5,8 +5,8 @@ import com.davidmaisuradze.gymapplication.entity.Trainer;
 import java.util.List;
 
 public interface TrainerDao {
-    void create(Trainer trainer);
-    void update(Trainer trainer);
-    Trainer select(long id);
+    Trainer create(Trainer trainer);
+    Trainer update(Trainer trainer);
+    Trainer select(Long id);
     List<Trainer> findAll();
 }

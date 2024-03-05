@@ -17,37 +17,39 @@ public class TrainerDaoImpl implements TrainerDao {
     private Map<Long, Trainer> trainerMap;
 
     @Autowired
-    public void setTrainerMap(@Qualifier("trainerMap") Map<Long, Trainer> trainerMap) {
+    public void setTrainerMap(@Qualifier("trainerStorage") Map<Long, Trainer> trainerMap) {
         this.trainerMap = trainerMap;
         log.info("Trainer map injected");
     }
 
     @Override
-    public void create(Trainer trainer) {
+    public Trainer create(Trainer trainer) {
         long id = trainer.getUserId();
         if (trainerMap.containsKey(id)) {
             log.warn("Trainer with id: {} already exists", id);
-            return;
+            return null;
         }
         trainerMap.put(id, trainer);
         log.info("Created trainer: {}", trainer);
+        return trainer;
     }
 
     @Override
-    public void update(Trainer trainer) {
+    public Trainer update(Trainer trainer) {
         long id = trainer.getUserId();
         if (!trainerMap.containsKey(id)) {
             log.warn("No trainer found with id: {}", id);
-            return;
+            return null;
         }
         trainerMap.put(id, trainer);
         log.info("Trainer with id {} updated", id);
+        return trainer;
     }
 
     @Override
-    public Trainer select(long id) {
+    public Trainer select(Long id) {
         if (!trainerMap.containsKey(id)) {
-            log.info("No trainer with id: {}", id);
+            log.warn("No trainer with id: {}", id);
             return null;
         }
         log.info("Returned trainer with id: {}", id);

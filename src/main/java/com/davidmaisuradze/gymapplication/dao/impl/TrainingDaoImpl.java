@@ -4,6 +4,7 @@ import com.davidmaisuradze.gymapplication.dao.TrainingDao;
 import com.davidmaisuradze.gymapplication.entity.Training;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -16,20 +17,21 @@ public class TrainingDaoImpl implements TrainingDao {
     private Map<String, Training> trainingMap;
 
     @Autowired
-    public void setTrainingMap(Map<String, Training> trainingMap) {
+    public void setTrainingMap(@Qualifier("trainingStorage") Map<String, Training> trainingMap) {
         this.trainingMap = trainingMap;
         log.info("Training Map injected");
     }
 
     @Override
-    public void create(Training training) {
+    public Training create(Training training) {
         String name = training.getTrainingName();
         if (trainingMap.containsKey(name)) {
             log.warn("Training already exists");
-            return;
+            return null;
         }
         trainingMap.put(name, training);
         log.info("Created Training {}", training);
+        return training;
     }
 
     @Override

@@ -21,15 +21,17 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    public void create(Trainer trainer) {
+    public Trainer create(Trainer trainer) {
         trainerDao.create(trainer);
         log.info("Created trainer {}", trainer);
+        return trainer;
     }
 
     @Override
-    public void update(Trainer trainer) {
+    public Trainer update(Trainer trainer) {
         trainerDao.update(trainer);
         log.info("Updated trainer {}", trainer);
+        return trainer;
     }
 
     @Override

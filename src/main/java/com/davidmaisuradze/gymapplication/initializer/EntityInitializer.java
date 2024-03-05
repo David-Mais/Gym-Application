@@ -40,9 +40,9 @@ public class EntityInitializer {
 
     @Autowired
     public void setTrainingMap(
-            @Qualifier("traineeMap") Map<Long, Trainee> traineeMap,
-            @Qualifier("trainerMap") Map<Long, Trainer> trainerMap,
-            @Qualifier("trainingMap") Map<String, Training> trainingMap
+            @Qualifier("traineeStorage") Map<Long, Trainee> traineeMap,
+            @Qualifier("trainerStorage") Map<Long, Trainer> trainerMap,
+            @Qualifier("trainingStorage") Map<String, Training> trainingMap
     ) {
         this.traineeMap = traineeMap;
         this.trainerMap = trainerMap;
@@ -74,16 +74,18 @@ public class EntityInitializer {
                 LocalDate dateOfBirth = LocalDate.parse(attributes[2]);
                 String address = attributes[3];
                 long userId = Long.parseLong(attributes[4]);
-                Trainee trainee = new Trainee(
-                        firstName,
-                        lastName,
-                        userName,
-                        password,
-                        isActive,
-                        dateOfBirth,
-                        address,
-                        userId
-                );
+                Trainee trainee = Trainee
+                        .builder()
+                        .firstName(firstName)
+                        .lastName(lastName)
+                        .username(userName)
+                        .password(password)
+                        .isActive(isActive)
+                        .dateOfBirth(dateOfBirth)
+                        .address(address)
+                        .userId(userId)
+                        .build();
+
                 traineeMap.put(userId, trainee);
                 log.info("Trainee added: {} {}", firstName, lastName);
             }
@@ -138,15 +140,16 @@ public class EntityInitializer {
                 boolean isActive = true;
                 String specialization = attributes[2];
                 long userId = Long.parseLong(attributes[3]);
-                Trainer trainer = new Trainer(
-                        firstName,
-                        lastName,
-                        userName,
-                        password,
-                        isActive,
-                        specialization,
-                        userId
-                );
+                Trainer trainer = Trainer
+                        .builder()
+                        .firstName(firstName)
+                        .lastName(lastName)
+                        .username(userName)
+                        .password(password)
+                        .isActive(isActive)
+                        .specialization(specialization)
+                        .userId(userId)
+                        .build();
                 trainerMap.put(userId, trainer);
                 log.info("Trainer added: {} {}", firstName, lastName);
             }
@@ -160,10 +163,10 @@ public class EntityInitializer {
         builder.append(first).append(".").append(last);
         List<String> usernames = new ArrayList<>();
         for (Trainee t : traineeMap.values()) {
-            usernames.add(t.getUserName());
+            usernames.add(t.getUsername());
         }
         for (Trainer t : trainerMap.values()) {
-            usernames.add(t.getUserName());
+            usernames.add(t.getUsername());
         }
         while (true) {
             int counterBefore = counter;
