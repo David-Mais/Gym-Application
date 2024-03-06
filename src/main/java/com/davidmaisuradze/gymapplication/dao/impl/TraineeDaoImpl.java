@@ -8,17 +8,16 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 
 @Repository
 @Slf4j
 public class TraineeDaoImpl  implements TraineeDao {
     private Map<Long, Trainee> traineeMap;
+    private final AtomicLong idGenerator = new AtomicLong();
 
     @Autowired
     public void setTraineeMap(@Qualifier("traineeStorage") Map<Long, Trainee> traineeMap) {
@@ -33,6 +32,8 @@ public class TraineeDaoImpl  implements TraineeDao {
             log.warn("Trainee already exists");
             return null;
         }
+        id = idGenerator.incrementAndGet();
+        trainee.setUserId(id);
         traineeMap.put(id, trainee);
         log.info("Created Trainee: {}", trainee);
         return trainee;
@@ -76,19 +77,5 @@ public class TraineeDaoImpl  implements TraineeDao {
         List<Trainee> trainees = new ArrayList<>(traineeMap.values());
         log.info("Returned all trainees");
         return trainees;
-    }
-
-    private Long correctIdMatcher() {
-        Set<Long> idNumbers = traineeMap.keySet();
-
-        Optional<Long> maxId = idNumbers
-                .stream()
-                .max(Comparator.naturalOrder());
-
-        long id = 0L;
-        if (maxId.isPresent()) {
-            id = maxId.get();
-        }
-        return id + 1;
     }
 }

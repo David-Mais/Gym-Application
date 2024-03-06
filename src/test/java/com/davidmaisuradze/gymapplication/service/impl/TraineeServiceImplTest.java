@@ -25,45 +25,21 @@ class TraineeServiceImplTest {
 
     @Test
     void testCreate() {
-        Trainee trainee = new Trainee(
-                "first",
-                "last",
-                "username",
-                "pass",
-                true,
-                LocalDate.parse("2004-09-20"),
-                "addr",
-                1234);
+        Trainee trainee = generateTrainee(1L);
         traineeService.create(trainee);
         verify(traineeDao).create(trainee);
     }
 
     @Test
     void testUpdate() {
-        Trainee trainee = new Trainee(
-                "first",
-                "last",
-                "username",
-                "pass",
-                true,
-                LocalDate.parse("2004-09-20"),
-                "addr",
-                1234);
+        Trainee trainee = generateTrainee(1L);
         traineeService.update(trainee);
         verify(traineeDao).update(trainee);
     }
 
     @Test
     void testDelete() {
-        Trainee trainee = new Trainee(
-                "first",
-                "last",
-                "username",
-                "pass",
-                true,
-                LocalDate.parse("2004-09-20"),
-                "addr",
-                1234);
+        Trainee trainee = generateTrainee(1L);
         traineeService.delete(trainee);
         verify(traineeDao).delete(trainee);
     }
@@ -71,15 +47,7 @@ class TraineeServiceImplTest {
     @Test
     void testSelect() {
         long id = 1L;
-        Trainee trainee = new Trainee(
-                "first",
-                "last",
-                "username",
-                "pass",
-                true,
-                LocalDate.parse("2004-09-20"),
-                "addr",
-                1234);
+        Trainee trainee = generateTrainee(1L);
         when(traineeDao.select(id)).thenReturn(trainee);
 
         Trainee result = traineeService.select(id);
@@ -90,24 +58,8 @@ class TraineeServiceImplTest {
 
     @Test
     void testSelectAll() {
-        Trainee trainee1 = new Trainee(
-                "first 1",
-                "last 1",
-                "username 1",
-                "pass 1",
-                true,
-                LocalDate.parse("2004-09-20"),
-                "addr 1",
-                1L);
-        Trainee trainee2 = new Trainee(
-                "first 2",
-                "last 2",
-                "username 2",
-                "pass 2",
-                false,
-                LocalDate.parse("2009-01-23"),
-                "addr 2",
-                2L);
+        Trainee trainee1 = generateTrainee(1L);
+        Trainee trainee2 = generateTrainee(2L);
         List<Trainee> expectedTrainees = Arrays.asList(trainee1, trainee2);
         when(traineeDao.findAll()).thenReturn(expectedTrainees);
 
@@ -115,5 +67,19 @@ class TraineeServiceImplTest {
 
         verify(traineeDao).findAll();
         assertEquals(expectedTrainees, result);
+    }
+
+    private Trainee generateTrainee(Long id) {
+        return Trainee
+                .builder()
+                .firstName("first")
+                .lastName("last")
+                .username("username")
+                .password("pass")
+                .isActive(true)
+                .dateOfBirth(LocalDate.parse("2004-09-20"))
+                .address("addr")
+                .userId(id)
+                .build();
     }
 }

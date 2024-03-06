@@ -10,11 +10,13 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
 @Slf4j
 public class TrainerDaoImpl implements TrainerDao {
     private Map<Long, Trainer> trainerMap;
+    private final AtomicLong atomicLong = new AtomicLong();
 
     @Autowired
     public void setTrainerMap(@Qualifier("trainerStorage") Map<Long, Trainer> trainerMap) {
@@ -29,6 +31,8 @@ public class TrainerDaoImpl implements TrainerDao {
             log.warn("Trainer with id: {} already exists", id);
             return null;
         }
+        id = atomicLong.incrementAndGet();
+        trainer.setUserId(id);
         trainerMap.put(id, trainer);
         log.info("Created trainer: {}", trainer);
         return trainer;

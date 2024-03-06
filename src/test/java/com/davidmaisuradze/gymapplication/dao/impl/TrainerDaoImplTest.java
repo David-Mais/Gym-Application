@@ -27,30 +27,17 @@ class TrainerDaoImplTest {
 
     @Test
     void testCreateNewTrainer() {
-        Trainer trainer = new Trainer(
-                "first",
-                "last",
-                "username",
-                "pass",
-                true,
-                "spec",
-                1234);
+        Trainer trainer = generateTrainer(1L);
         long id = trainer.getUserId();
         when(trainerMap.containsKey(id)).thenReturn(false);
         trainerDao.create(trainer);
+        id = trainer.getUserId();
         verify(trainerMap, times(1)).put(id, trainer);
     }
 
     @Test
     void testUpdateExistingTrainer() {
-        Trainer trainer = new Trainer(
-                "first",
-                "last",
-                "username",
-                "pass",
-                true,
-                "spec",
-                1234);
+        Trainer trainer = generateTrainer(1L);
         long id = trainer.getUserId();
         when(trainerMap.containsKey(id)).thenReturn(true);
         trainerDao.update(trainer);
@@ -60,14 +47,7 @@ class TrainerDaoImplTest {
     @Test
     void testSelectExistingTrainer() {
         long id = 1;
-        Trainer trainer = new Trainer(
-                "first",
-                "last",
-                "username",
-                "pass",
-                true,
-                "spec",
-                1234L);
+        Trainer trainer = generateTrainer(1L);
         when(trainerMap.containsKey(id)).thenReturn(true);
         when(trainerMap.get(id)).thenReturn(trainer);
 
@@ -90,27 +70,26 @@ class TrainerDaoImplTest {
 
     @Test
     void testFindAll() {
-        Trainer trainer1 = new Trainer(
-                "first",
-                "last",
-                "username",
-                "pass",
-                true,
-                "spec",
-                1111L);
-        Trainer trainer2 = new Trainer(
-                "first2",
-                "last2",
-                "username2",
-                "pass2",
-                false,
-                "spec2",
-                2222L);
+        Trainer trainer1 = generateTrainer(1L);
+        Trainer trainer2 = generateTrainer(2L);
         when(trainerMap.values()).thenReturn(Arrays.asList(trainer1, trainer2));
 
         List<Trainer> result = trainerDao.findAll();
 
         assertEquals(2, result.size());
         assertTrue(result.containsAll(Arrays.asList(trainer1, trainer2)));
+    }
+
+    private Trainer generateTrainer(Long id) {
+        return Trainer
+                .builder()
+                .firstName("first")
+                .lastName("last")
+                .username("username")
+                .password("password")
+                .isActive(true)
+                .specialization("spec")
+                .userId(id)
+                .build();
     }
 }

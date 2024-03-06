@@ -27,32 +27,17 @@ class TraineeDaoImplTest {
     private TraineeDaoImpl traineeDao;
     @Test
     void testCreateNewTrainee() {
-        Trainee trainee = new Trainee(
-                "first",
-                "last",
-                "username",
-                "pass",
-                true,
-                LocalDate.parse("2004-09-20"),
-                "addr",
-                1234);
+        Trainee trainee = generateTrainee(1L);
         long id = trainee.getUserId();
         when(traineeMap.containsKey(id)).thenReturn(false);
         traineeDao.create(trainee);
+        id = trainee.getUserId();
         verify(traineeMap, times(1)).put(id, trainee);
     }
 
     @Test
     void testUpdateExistingTrainee() {
-        Trainee trainee = new Trainee(
-                "first",
-                "last",
-                "username",
-                "pass",
-                true,
-                LocalDate.parse("2004-09-20"),
-                "addr",
-                1234);
+        Trainee trainee = generateTrainee(1L);
         long id = trainee.getUserId();
         when(traineeMap.containsKey(id)).thenReturn(true);
         traineeDao.update(trainee);
@@ -61,15 +46,7 @@ class TraineeDaoImplTest {
 
     @Test
     void testDeleteExistingTrainee() {
-        Trainee trainee = new Trainee(
-                "first",
-                "last",
-                "username",
-                "pass",
-                true,
-                LocalDate.parse("2004-09-20"),
-                "addr",
-                1234);
+        Trainee trainee = generateTrainee(1L);
         trainee.setUserId(1234L);
         long id = trainee.getUserId();
 
@@ -82,15 +59,7 @@ class TraineeDaoImplTest {
 
     @Test
     void testDeleteNonExistingTrainee() {
-        Trainee trainee = new Trainee(
-                "first",
-                "last",
-                "username",
-                "pass",
-                true,
-                LocalDate.parse("2004-09-20"),
-                "addr",
-                1234);
+        Trainee trainee = generateTrainee(1L);
         trainee.setUserId(1234L);
         long id = trainee.getUserId();
 
@@ -104,22 +73,14 @@ class TraineeDaoImplTest {
     @Test
     void testSelectExistingTrainee() {
         long id = 1;
-        Trainee expectedTrainee = new Trainee(
-                "first",
-                "last",
-                "username",
-                "pass",
-                true,
-                LocalDate.parse("2004-09-20"),
-                "addr",
-                1L);
+        Trainee trainee = generateTrainee(1L);
         when(traineeMap.containsKey(id)).thenReturn(true);
-        when(traineeMap.get(id)).thenReturn(expectedTrainee);
+        when(traineeMap.get(id)).thenReturn(trainee);
 
         Trainee result = traineeDao.select(id);
 
         verify(traineeMap, times(1)).get(id);
-        assertEquals(expectedTrainee, result);
+        assertEquals(trainee, result);
     }
 
     @Test
@@ -135,29 +96,27 @@ class TraineeDaoImplTest {
 
     @Test
     void testFindAll() {
-        Trainee trainee1 = new Trainee(
-                "first 1",
-                "last 1",
-                "username 1",
-                "pass 1",
-                true,
-                LocalDate.parse("2004-09-20"),
-                "addr 1",
-                1L);
-        Trainee trainee2 = new Trainee(
-                "first 2",
-                "last 2",
-                "username 2",
-                "pass 2",
-                false,
-                LocalDate.parse("2009-01-23"),
-                "addr 2",
-                2L);
+        Trainee trainee1 = generateTrainee(1L);
+        Trainee trainee2 = generateTrainee(2L);
         when(traineeMap.values()).thenReturn(Arrays.asList(trainee1, trainee2));
 
         List<Trainee> result = traineeDao.findAll();
 
         assertEquals(2, result.size());
         assertTrue(result.containsAll(Arrays.asList(trainee1, trainee2)));
+    }
+
+    private Trainee generateTrainee(Long id) {
+        return Trainee
+                .builder()
+                .firstName("first")
+                .lastName("last")
+                .username("username")
+                .password("pass")
+                .isActive(true)
+                .dateOfBirth(LocalDate.parse("2004-09-20"))
+                .address("addr")
+                .userId(id)
+                .build();
     }
 }

@@ -26,14 +26,7 @@ class TrainingServiceImplTest {
 
     @Test
     void testCreate() {
-        Training training = new Training(
-                1111L,
-                2222L,
-                "spar",
-                new TrainingType("Box"),
-                LocalDate.parse("1992-05-13"),
-                2.0
-        );
+        Training training = generateTraining(1L, 2L);
         trainingService.crete(training);
         verify(trainingDao).create(training);
     }
@@ -41,14 +34,7 @@ class TrainingServiceImplTest {
     @Test
     void testSelect() {
         String id = "spar";
-        Training training = new Training(
-                1111L,
-                2222L,
-                "spar",
-                new TrainingType("Box"),
-                LocalDate.parse("1992-05-13"),
-                2.0
-        );
+        Training training = generateTraining(1L, 2L);
         when(trainingDao.select(id)).thenReturn(training);
 
         Training result = trainingService.select(id);
@@ -59,22 +45,8 @@ class TrainingServiceImplTest {
 
     @Test
     void testSelectAll() {
-        Training training1 = new Training(
-                1111L,
-                2222L,
-                "spar",
-                new TrainingType("Box"),
-                LocalDate.parse("1992-05-13"),
-                2.0
-        );
-        Training training2 = new Training(
-                3333L,
-                4444L,
-                "stretch",
-                new TrainingType("Yoga"),
-                LocalDate.parse("2005-02-20"),
-                2.0
-        );
+        Training training1 = generateTraining(1L, 2L);
+        Training training2 = generateTraining(3L, 4L);
         List<Training> expectedTrainers = Arrays.asList(training1, training2);
         when(trainingDao.findAll()).thenReturn(expectedTrainers);
 
@@ -82,5 +54,16 @@ class TrainingServiceImplTest {
 
         verify(trainingDao).findAll();
         assertEquals(expectedTrainers, result);
+    }
+
+    private Training generateTraining(Long id1, Long id2) {
+        return new Training(
+                id1,
+                id2,
+                "spar",
+                new TrainingType("Box"),
+                LocalDate.parse("1992-05-13"),
+                2.0
+        );
     }
 }

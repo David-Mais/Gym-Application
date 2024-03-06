@@ -28,14 +28,7 @@ class TrainingDaoImplTest {
 
     @Test
     void testCreateNewTraining() {
-        Training training = new Training(
-                1111L,
-                2222L,
-                "spar",
-                new TrainingType("Box"),
-                LocalDate.parse("1992-05-13"),
-                2.0
-        );
+        Training training = generateTraining(1111L, 2222L);
         when(trainingMap.containsKey(training.getTrainingName())).thenReturn(false);
 
         trainingDao.create(training);
@@ -45,14 +38,7 @@ class TrainingDaoImplTest {
 
     @Test
     void testCreateExistingTraining() {
-        Training training = new Training(
-                1111L,
-                2222L,
-                "spar",
-                new TrainingType("Box"),
-                LocalDate.parse("1992-05-13"),
-                2.0
-        );
+        Training training = generateTraining(1111L, 2222L);
         when(trainingMap.containsKey(training.getTrainingName())).thenReturn(true);
 
         trainingDao.create(training);
@@ -63,14 +49,7 @@ class TrainingDaoImplTest {
     @Test
     void testSelectExistingTraining() {
         String name = "ExistingTraining";
-        Training training = new Training(
-                1111L,
-                2222L,
-                "spar",
-                new TrainingType("Box"),
-                LocalDate.parse("1992-05-13"),
-                2.0
-        );
+        Training training = generateTraining(1111L, 2222L);
         when(trainingMap.containsKey(name)).thenReturn(true);
         when(trainingMap.get(name)).thenReturn(training);
 
@@ -93,27 +72,24 @@ class TrainingDaoImplTest {
 
     @Test
     void testFindAll() {
-        Training training1 = new Training(
-                1111L,
-                2222L,
-                "spar",
-                new TrainingType("Box"),
-                LocalDate.parse("1992-05-13"),
-                2.0
-        );
-        Training training2 = new Training(
-                3333L,
-                4444L,
-                "stretch",
-                new TrainingType("Yoga"),
-                LocalDate.parse("2005-02-20"),
-                2.0
-        );
+        Training training1 = generateTraining(1111L, 2222L);
+        Training training2 = generateTraining(3333L, 4444L);
         when(trainingMap.values()).thenReturn(List.of(training1, training2));
 
         List<Training> result = trainingDao.findAll();
 
         assertEquals(2, result.size(), "The result list should contain two training instances.");
         assertTrue(result.containsAll(List.of(training1, training2)), "The result list should contain the expected training instances.");
+    }
+
+    private Training generateTraining(Long id1, Long id2) {
+        return new Training(
+                id1,
+                id2,
+                "spar",
+                new TrainingType("Box"),
+                LocalDate.parse("1992-05-13"),
+                2.0
+        );
     }
 }

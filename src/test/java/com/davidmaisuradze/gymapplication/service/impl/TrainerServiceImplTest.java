@@ -1,6 +1,7 @@
 package com.davidmaisuradze.gymapplication.service.impl;
 
 import com.davidmaisuradze.gymapplication.dao.TrainerDao;
+import com.davidmaisuradze.gymapplication.entity.Trainee;
 import com.davidmaisuradze.gymapplication.entity.Trainer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
@@ -24,28 +26,14 @@ class TrainerServiceImplTest {
 
     @Test
     void testCreate() {
-        Trainer trainer = new Trainer(
-                "first",
-                "last",
-                "username",
-                "pass",
-                true,
-                "spec",
-                1234L);
+        Trainer trainer = generateTrainer(1L);
         trainerService.create(trainer);
         verify(trainerDao).create(trainer);
     }
 
     @Test
     void testUpdate() {
-        Trainer trainer = new Trainer(
-                "first",
-                "last",
-                "username",
-                "pass",
-                true,
-                "spec",
-                1234L);
+        Trainer trainer = generateTrainer(1L);
         trainerService.update(trainer);
         verify(trainerDao).update(trainer);
     }
@@ -53,14 +41,7 @@ class TrainerServiceImplTest {
     @Test
     void testSelect() {
         long id = 1L;
-        Trainer trainer = new Trainer(
-                "first",
-                "last",
-                "username",
-                "pass",
-                true,
-                "spec",
-                1234L);
+        Trainer trainer = generateTrainer(1L);
         when(trainerDao.select(id)).thenReturn(trainer);
 
         Trainer result = trainerService.select(id);
@@ -71,22 +52,8 @@ class TrainerServiceImplTest {
 
     @Test
     void testSelectAll() {
-        Trainer trainer1 = new Trainer(
-                "first",
-                "last",
-                "username",
-                "pass",
-                true,
-                "spec",
-                1111L);
-        Trainer trainer2 = new Trainer(
-                "first2",
-                "last2",
-                "username2",
-                "pass2",
-                false,
-                "spec2",
-                2222L);
+        Trainer trainer1 = generateTrainer(1L);
+        Trainer trainer2 = generateTrainer(2L);
         List<Trainer> expectedTrainers = Arrays.asList(trainer1, trainer2);
         when(trainerDao.findAll()).thenReturn(expectedTrainers);
 
@@ -94,5 +61,18 @@ class TrainerServiceImplTest {
 
         verify(trainerDao).findAll();
         assertEquals(expectedTrainers, result);
+    }
+
+    private Trainer generateTrainer(Long id) {
+        return Trainer
+                .builder()
+                .firstName("first")
+                .lastName("last")
+                .username("username")
+                .password("password")
+                .isActive(true)
+                .specialization("spec")
+                .userId(id)
+                .build();
     }
 }
