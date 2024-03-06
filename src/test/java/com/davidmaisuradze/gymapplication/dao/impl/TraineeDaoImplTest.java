@@ -28,10 +28,8 @@ class TraineeDaoImplTest {
     @Test
     void testCreateNewTrainee() {
         Trainee trainee = generateTrainee(1L);
-        long id = trainee.getUserId();
-        when(traineeMap.containsKey(id)).thenReturn(false);
         traineeDao.create(trainee);
-        id = trainee.getUserId();
+        Long id = trainee.getUserId();
         verify(traineeMap, times(1)).put(id, trainee);
     }
 
@@ -77,7 +75,7 @@ class TraineeDaoImplTest {
         when(traineeMap.containsKey(id)).thenReturn(true);
         when(traineeMap.get(id)).thenReturn(trainee);
 
-        Trainee result = traineeDao.select(id);
+        Trainee result = traineeDao.findById(id);
 
         verify(traineeMap, times(1)).get(id);
         assertEquals(trainee, result);
@@ -88,7 +86,7 @@ class TraineeDaoImplTest {
         long id = 1L;
         when(traineeMap.containsKey(id)).thenReturn(false);
 
-        Trainee result = traineeDao.select(id);
+        Trainee result = traineeDao.findById(id);
 
         verify(traineeMap, never()).get(id);
         assertNull(result);

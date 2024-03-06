@@ -8,6 +8,6 @@ public interface TraineeDao {
     Trainee create(Trainee trainee);
     Trainee update(Trainee trainee);
     void delete(Trainee trainee);
-    Trainee select(Long id);
+    Trainee findById(Long id);
     List<Trainee> findAll();
 }

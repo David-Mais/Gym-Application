@@ -35,11 +35,11 @@ class TrainingServiceImplTest {
     void testSelect() {
         String id = "spar";
         Training training = generateTraining(1L, 2L);
-        when(trainingDao.select(id)).thenReturn(training);
+        when(trainingDao.findByName(id)).thenReturn(training);
 
-        Training result = trainingService.select(id);
+        Training result = trainingService.findByName(id);
 
-        verify(trainingDao).select(id);
+        verify(trainingDao).findByName(id);
         assertEquals(training, result);
     }
 
@@ -57,13 +57,14 @@ class TrainingServiceImplTest {
     }
 
     private Training generateTraining(Long id1, Long id2) {
-        return new Training(
-                id1,
-                id2,
-                "spar",
-                new TrainingType("Box"),
-                LocalDate.parse("1992-05-13"),
-                2.0
-        );
+        return Training
+                .builder()
+                .traineeId(id1)
+                .trainerId(id2)
+                .trainingName("spar")
+                .trainingType(TrainingType.builder().trainingTypeName("Box").build())
+                .trainingDate(LocalDate.parse("1992-05-13"))
+                .duration(2.0)
+                .build();
     }
 }

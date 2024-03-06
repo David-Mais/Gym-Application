@@ -7,6 +7,6 @@ import java.util.List;
 public interface TrainerService {
     Trainer create(Trainer trainer);
     Trainer update(Trainer trainer);
-    Trainer select(long id);
+    Trainer findById(Long id);
     List<Trainer> selectAll();
 }

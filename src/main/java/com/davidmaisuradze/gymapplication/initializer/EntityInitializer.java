@@ -85,7 +85,6 @@ public class EntityInitializer {
                 User user = userInfo(line);
                 LocalDate dateOfBirth = LocalDate.parse(line.split(" ")[2]);
                 String address = line.split(" ")[3];
-                long userId = Long.parseLong(line.split(" ")[4]);
                 Trainee trainee = Trainee
                         .builder()
                         .firstName(user.getFirstName())
@@ -95,7 +94,6 @@ public class EntityInitializer {
                         .isActive(user.isActive())
                         .dateOfBirth(dateOfBirth)
                         .address(address)
-                        .userId(userId)
                         .build();
 
                 traineeDao.create(trainee);
@@ -114,21 +112,25 @@ public class EntityInitializer {
             while ((line = reader.readLine()) != null) {
                 log.debug("Processing training line: {}", line);
                 String[] attributes = line.split(" ");
-                long traineeId = Long.parseLong(attributes[0]);
-                long trainerId = Long.parseLong(attributes[1]);
+                Long traineeId = Long.parseLong(attributes[0]);
+                Long trainerId = Long.parseLong(attributes[1]);
                 String trainingName = attributes[2];
-                TrainingType trainingType = new TrainingType(attributes[3]);
+                TrainingType trainingType = TrainingType
+                        .builder()
+                        .trainingTypeName(attributes[3])
+                        .build();
                 LocalDate trainingDate = LocalDate.parse(attributes[4]);
                 double duration = Double.parseDouble(attributes[5]);
 
-                Training training = new Training(
-                        traineeId,
-                        trainerId,
-                        trainingName,
-                        trainingType,
-                        trainingDate,
-                        duration
-                );
+                Training training = Training
+                        .builder()
+                        .traineeId(traineeId)
+                        .trainerId(trainerId)
+                        .trainingName(trainingName)
+                        .trainingType(trainingType)
+                        .trainingDate(trainingDate)
+                        .duration(duration)
+                        .build();
                 trainingMap.put(trainingName, training);
                 log.info("Training added: {}", trainingName);
             }
@@ -145,7 +147,6 @@ public class EntityInitializer {
             while ((line = reader.readLine()) != null) {
                 User user = userInfo(line);
                 String specialization = line.split(" ")[2];
-                long userId = Long.parseLong(line.split(" ")[3]);
                 Trainer trainer = Trainer
                         .builder()
                         .firstName(user.getFirstName())
@@ -154,7 +155,6 @@ public class EntityInitializer {
                         .password(user.getPassword())
                         .isActive(user.isActive())
                         .specialization(specialization)
-                        .userId(userId)
                         .build();
                 trainerDao.create(trainer);
                 log.info("Trainer added: {} {}", user.getFirstName(), user.getLastName());

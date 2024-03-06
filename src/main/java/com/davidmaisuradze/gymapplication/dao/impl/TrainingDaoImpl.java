@@ -35,7 +35,7 @@ public class TrainingDaoImpl implements TrainingDao {
     }
 
     @Override
-    public Training select(String name) {
+    public Training findByName(String name) {
         if (!trainingMap.containsKey(name)) {
             log.warn("No training with name {}", name);
             return null;

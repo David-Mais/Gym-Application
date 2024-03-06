@@ -53,7 +53,7 @@ class TrainingDaoImplTest {
         when(trainingMap.containsKey(name)).thenReturn(true);
         when(trainingMap.get(name)).thenReturn(training);
 
-        Training result = trainingDao.select(name);
+        Training result = trainingDao.findByName(name);
 
         verify(trainingMap, times(1)).get(name);
         assertEquals(training, result);
@@ -64,7 +64,7 @@ class TrainingDaoImplTest {
         String name = "NonExistingTraining";
         when(trainingMap.containsKey(name)).thenReturn(false);
 
-        Training result = trainingDao.select(name);
+        Training result = trainingDao.findByName(name);
 
         verify(trainingMap, never()).get(name);
         assertNull(result);
@@ -83,13 +83,14 @@ class TrainingDaoImplTest {
     }
 
     private Training generateTraining(Long id1, Long id2) {
-        return new Training(
-                id1,
-                id2,
-                "spar",
-                new TrainingType("Box"),
-                LocalDate.parse("1992-05-13"),
-                2.0
-        );
+        return Training
+                .builder()
+                .traineeId(id1)
+                .trainerId(id2)
+                .trainingName("spar")
+                .trainingType(TrainingType.builder().trainingTypeName("Box").build())
+                .trainingDate(LocalDate.parse("1992-05-13"))
+                .duration(2.0)
+                .build();
     }
 }

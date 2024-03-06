@@ -1,6 +1,5 @@
 package com.davidmaisuradze.gymapplication.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,7 +9,6 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @ToString
-@AllArgsConstructor
 @EqualsAndHashCode
 @SuperBuilder
 public class User {

@@ -48,11 +48,11 @@ class TraineeServiceImplTest {
     void testSelect() {
         long id = 1L;
         Trainee trainee = generateTrainee(1L);
-        when(traineeDao.select(id)).thenReturn(trainee);
+        when(traineeDao.findById(id)).thenReturn(trainee);
 
-        Trainee result = traineeService.select(id);
+        Trainee result = traineeService.findById(id);
 
-        verify(traineeDao).select(id);
+        verify(traineeDao).findById(id);
         assertEquals(trainee, result);
     }
 

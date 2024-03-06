@@ -26,12 +26,11 @@ public class TrainerDaoImpl implements TrainerDao {
 
     @Override
     public Trainer create(Trainer trainer) {
-        long id = trainer.getUserId();
-        if (trainerMap.containsKey(id)) {
-            log.warn("Trainer with id: {} already exists", id);
+        if (checkUniqueUsername(trainer.getUsername())) {
+            log.warn("Trainer {} already exists", trainer);
             return null;
         }
-        id = atomicLong.incrementAndGet();
+        Long id = atomicLong.incrementAndGet();
         trainer.setUserId(id);
         trainerMap.put(id, trainer);
         log.info("Created trainer: {}", trainer);
@@ -40,7 +39,7 @@ public class TrainerDaoImpl implements TrainerDao {
 
     @Override
     public Trainer update(Trainer trainer) {
-        long id = trainer.getUserId();
+        Long id = trainer.getUserId();
         if (!trainerMap.containsKey(id)) {
             log.warn("No trainer found with id: {}", id);
             return null;
@@ -51,7 +50,7 @@ public class TrainerDaoImpl implements TrainerDao {
     }
 
     @Override
-    public Trainer select(Long id) {
+    public Trainer findById(Long id) {
         if (!trainerMap.containsKey(id)) {
             log.warn("No trainer with id: {}", id);
             return null;
@@ -63,7 +62,14 @@ public class TrainerDaoImpl implements TrainerDao {
     @Override
     public List<Trainer> findAll() {
         List<Trainer> trainees = new ArrayList<>(trainerMap.values());
-        log.info("Returning all trainers");
+        log.info("Returned all trainers");
         return trainees;
+    }
+
+    private boolean checkUniqueUsername(String username) {
+        return trainerMap
+                .values()
+                .stream()
+                .anyMatch(trainer -> trainer.getUsername().equals(username));
     }
 }

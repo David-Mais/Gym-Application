@@ -34,8 +34,8 @@ public class Facade {
         traineeService.update(trainee);
     }
 
-    public Trainee selectTrainee(long id) {
-        return traineeService.select(id);
+    public Trainee selectTrainee(Long id) {
+        return traineeService.findById(id);
     }
 
     public List<Trainee> selectAllTrainees() {
@@ -51,8 +51,8 @@ public class Facade {
         return trainerService.update(trainer);
     }
 
-    public Trainer selectTrainer(long id) {
-        return trainerService.select(id);
+    public Trainer selectTrainer(Long id) {
+        return trainerService.findById(id);
     }
 
     public List<Trainer> selectAllTrainers() {
@@ -65,7 +65,7 @@ public class Facade {
     }
 
     public Training selectTraining(String name) {
-        return trainingService.select(name);
+        return trainingService.findByName(name);
     }
 
     public List<Training> selectAllTrainings() {

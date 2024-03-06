@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface TrainingService {
     Training crete(Training training);
-    Training select(String name);
+    Training findByName(String name);
     List<Training> findAll();
 }

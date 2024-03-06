@@ -28,9 +28,9 @@ public class TrainingServiceImpl implements TrainingService {
     }
 
     @Override
-    public Training select(String name) {
+    public Training findByName(String name) {
         log.info("Selecting training with name: {}", name);
-        return trainingDao.select(name);
+        return trainingDao.findByName(name);
     }
 
     @Override

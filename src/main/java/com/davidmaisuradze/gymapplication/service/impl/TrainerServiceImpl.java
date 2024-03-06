@@ -35,9 +35,9 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    public Trainer select(long id) {
+    public Trainer findById(Long id) {
         log.info("Selecting trainer with id: {}", id);
-        return trainerDao.select(id);
+        return trainerDao.findById(id);
     }
 
     @Override

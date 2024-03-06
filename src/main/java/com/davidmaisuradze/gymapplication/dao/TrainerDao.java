@@ -7,6 +7,6 @@ import java.util.List;
 public interface TrainerDao {
     Trainer create(Trainer trainer);
     Trainer update(Trainer trainer);
-    Trainer select(Long id);
+    Trainer findById(Long id);
     List<Trainer> findAll();
 }

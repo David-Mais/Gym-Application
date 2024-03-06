@@ -1,6 +1,6 @@
 package com.davidmaisuradze.gymapplication.entity;
 
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,8 +11,8 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @ToString
-@AllArgsConstructor
 @EqualsAndHashCode
+@Builder
 public class Training {
     private Long traineeId;
     private Long trainerId;

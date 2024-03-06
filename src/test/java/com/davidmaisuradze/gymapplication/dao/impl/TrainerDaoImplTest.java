@@ -28,10 +28,8 @@ class TrainerDaoImplTest {
     @Test
     void testCreateNewTrainer() {
         Trainer trainer = generateTrainer(1L);
-        long id = trainer.getUserId();
-        when(trainerMap.containsKey(id)).thenReturn(false);
         trainerDao.create(trainer);
-        id = trainer.getUserId();
+        Long id = trainer.getUserId();
         verify(trainerMap, times(1)).put(id, trainer);
     }
 
@@ -51,7 +49,7 @@ class TrainerDaoImplTest {
         when(trainerMap.containsKey(id)).thenReturn(true);
         when(trainerMap.get(id)).thenReturn(trainer);
 
-        Trainer result = trainerDao.select(id);
+        Trainer result = trainerDao.findById(id);
 
         verify(trainerMap, times(1)).get(id);
         assertEquals(trainer, result);
@@ -62,7 +60,7 @@ class TrainerDaoImplTest {
         long id = 1L;
         when(trainerMap.containsKey(id)).thenReturn(false);
 
-        Trainer result = trainerDao.select(id);
+        Trainer result = trainerDao.findById(id);
 
         verify(trainerMap, never()).get(id);
         assertNull(result);

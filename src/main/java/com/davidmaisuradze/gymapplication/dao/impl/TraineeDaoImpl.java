@@ -27,12 +27,11 @@ public class TraineeDaoImpl  implements TraineeDao {
 
     @Override
     public Trainee create(Trainee trainee) {
-        long id = trainee.getUserId();
-        if (traineeMap.containsKey(id)) {
-            log.warn("Trainee already exists");
+        if (checkUniqueUsername(trainee.getUsername())) {
+            log.warn("Trainee {} already exists", trainee);
             return null;
         }
-        id = idGenerator.incrementAndGet();
+        Long id = idGenerator.incrementAndGet();
         trainee.setUserId(id);
         traineeMap.put(id, trainee);
         log.info("Created Trainee: {}", trainee);
@@ -41,9 +40,9 @@ public class TraineeDaoImpl  implements TraineeDao {
 
     @Override
     public Trainee update(Trainee trainee) {
-        long id = trainee.getUserId();
+        Long id = trainee.getUserId();
         if (!traineeMap.containsKey(id)) {
-            log.warn("Trainee does not exist");
+            log.warn("Trainee {} does not exist", trainee);
             return null;
         }
         traineeMap.put(id, trainee);
@@ -53,7 +52,7 @@ public class TraineeDaoImpl  implements TraineeDao {
 
     @Override
     public void delete(Trainee trainee) {
-        long id = trainee.getUserId();
+        Long id = trainee.getUserId();
         if (!traineeMap.containsKey(id)) {
             log.warn("Trainee {} does not exist", trainee);
             return;
@@ -63,9 +62,9 @@ public class TraineeDaoImpl  implements TraineeDao {
     }
 
     @Override
-    public Trainee select(Long id) {
+    public Trainee findById(Long id) {
         if (!traineeMap.containsKey(id)) {
-            log.warn("No such trainee");
+            log.warn("No trainee with id {}", id);
             return null;
         }
         log.info("Trainee with id {} returned", id);
@@ -75,7 +74,14 @@ public class TraineeDaoImpl  implements TraineeDao {
     @Override
     public List<Trainee> findAll() {
         List<Trainee> trainees = new ArrayList<>(traineeMap.values());
-        log.info("Returned all trainees");
+        log.info("Returned all trainees {}", trainees);
         return trainees;
+    }
+
+    private boolean checkUniqueUsername(String username) {
+        return traineeMap
+                .values()
+                .stream()
+                .anyMatch(trainee -> trainee.getUsername().equals(username));
     }
 }

@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface TrainingDao {
     Training create(Training training);
-    Training select(String name);
+    Training findByName(String name);
     List<Training> findAll();
 }

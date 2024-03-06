@@ -1,7 +1,6 @@
 package com.davidmaisuradze.gymapplication.service.impl;
 
 import com.davidmaisuradze.gymapplication.dao.TrainerDao;
-import com.davidmaisuradze.gymapplication.entity.Trainee;
 import com.davidmaisuradze.gymapplication.entity.Trainer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,7 +8,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
@@ -42,11 +40,11 @@ class TrainerServiceImplTest {
     void testSelect() {
         long id = 1L;
         Trainer trainer = generateTrainer(1L);
-        when(trainerDao.select(id)).thenReturn(trainer);
+        when(trainerDao.findById(id)).thenReturn(trainer);
 
-        Trainer result = trainerService.select(id);
+        Trainer result = trainerService.findById(id);
 
-        verify(trainerDao).select(id);
+        verify(trainerDao).findById(id);
         assertEquals(trainer, result);
     }
 

@@ -8,6 +8,6 @@ public interface TraineeService {
     Trainee create(Trainee trainee);
     Trainee update(Trainee trainee);
     void delete(Trainee trainee);
-    Trainee select(long id);
+    Trainee findById(Long id);
     List<Trainee> selectAll();
 }
