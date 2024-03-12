@@ -80,7 +80,7 @@ public class TrainerServiceImpl implements TrainerService {
     public Boolean activate(String username, String password) {
         if (authenticator.checkCredentials(username, password)) {
             Trainer trainer = trainerDao.findByUsername(username);
-            trainer.setActive(true);
+            trainer.setIsActive(true);
             return true;
         }
         return false;
@@ -91,7 +91,7 @@ public class TrainerServiceImpl implements TrainerService {
     public Boolean deactivate(String username, String password) {
         if (authenticator.checkCredentials(username, password)) {
             Trainer trainer = trainerDao.findByUsername(username);
-            trainer.setActive(false);
+            trainer.setIsActive(false);
             return true;
         }
         return false;

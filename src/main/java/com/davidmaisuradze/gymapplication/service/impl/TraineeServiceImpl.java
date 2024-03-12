@@ -89,7 +89,7 @@ public class TraineeServiceImpl implements TraineeService {
     public Boolean activate(String username, String password) {
         if (authenticator.checkCredentials(username, password)) {
             Trainee trainee = traineeDao.findByUsername(username);
-            trainee.setActive(true);
+            trainee.setIsActive(true);
             return true;
         }
         return false;
@@ -100,7 +100,7 @@ public class TraineeServiceImpl implements TraineeService {
     public Boolean deactivate(String username, String password) {
         if (authenticator.checkCredentials(username, password)) {
             Trainee trainee = traineeDao.findByUsername(username);
-            trainee.setActive(false);
+            trainee.setIsActive(false);
             return true;
         }
         return false;

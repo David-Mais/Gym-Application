@@ -1,5 +1,6 @@
 package com.davidmaisuradze.gymapplication.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -35,7 +36,7 @@ public class Training {
     @Column(name = "training_id")
     private Long trainingId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "trainee_id")
     @ToString.Exclude
     private Trainee trainee;
