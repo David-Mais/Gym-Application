@@ -1,4 +1,4 @@
-package com.davidmaisuradze.gymapplication.dao.config;
+package com.davidmaisuradze.gymapplication.config;
 
 import jakarta.persistence.EntityManagerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,30 +19,30 @@ import java.util.Properties;
 @PropertySource("classpath:application.properties")
 @EnableTransactionManagement
 public class HibernateConfig {
-    @Value("${spring.jpa.hibernate.dialect}")
-    private String hibernateDialect;
-
     @Value("${spring.jpa.show-sql}")
     private String showSql;
 
     @Value("${spring.jpa.hibernate.ddl-auto}")
     private String ddlAuto;
 
+    private final DataSource dataSource;
+
     @Autowired
-    private DataSource dataSource;
+    public HibernateConfig(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
 
     @Bean()
     public LocalContainerEntityManagerFactoryBean entityManagerFactoryBean() {
         LocalContainerEntityManagerFactoryBean entityManager =
                 new LocalContainerEntityManagerFactoryBean();
-        entityManager.setDataSource(dataSource);
         entityManager.setPackagesToScan("com.davidmaisuradze.gymapplication.entity");
+        entityManager.setDataSource(dataSource);
 
         JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         entityManager.setJpaVendorAdapter(vendorAdapter);
 
         Properties properties = new Properties();
-        properties.put("hibernate.dialect", hibernateDialect);
         properties.put("hibernate.show_sql", showSql);
         properties.put("hibernate.hbn2ddl.auto", ddlAuto);
 

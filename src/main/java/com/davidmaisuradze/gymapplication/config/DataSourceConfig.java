@@ -1,4 +1,4 @@
-package com.davidmaisuradze.gymapplication.dao.config;
+package com.davidmaisuradze.gymapplication.config;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;

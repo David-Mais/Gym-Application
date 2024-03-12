@@ -19,7 +19,7 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "users")
 @Getter
 @Setter
-@ToString
+@ToString(exclude = {"trainee", "trainer"})
 @EqualsAndHashCode
 @SuperBuilder
 @NoArgsConstructor

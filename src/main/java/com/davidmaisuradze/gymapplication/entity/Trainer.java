@@ -27,7 +27,7 @@ import java.util.Set;
 @Table(name = "trainers")
 @Getter
 @Setter
-@ToString(callSuper = true)
+@ToString(exclude = {"trainings", "trainees"})
 @EqualsAndHashCode(callSuper = false)
 @SuperBuilder
 @NoArgsConstructor
@@ -43,7 +43,7 @@ public class Trainer {
 
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "user_id", unique = true)
-    private User userId;
+    private User user;
 
     @OneToMany(mappedBy = "trainer")
     private Set<Training> trainings = new HashSet<>();
