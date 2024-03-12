@@ -1,14 +1,14 @@
 package com.davidmaisuradze.gymapplication.entity;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
 import jakarta.persistence.Table;
-import lombok.EqualsAndHashCode;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,36 +17,34 @@ import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(name = "users")
+@Inheritance(strategy = InheritanceType.JOINED)
 @Getter
 @Setter
-@ToString(exclude = {"trainee", "trainer"})
-@EqualsAndHashCode
-@SuperBuilder
 @NoArgsConstructor
-public class User {
+@SuperBuilder
+@ToString()
+public abstract class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long id;
 
+    @NotBlank
     @Column(name = "first_name", nullable = false)
     private String firstName;
 
+    @NotBlank
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
+    @NotBlank
     @Column(nullable = false, unique = true)
     private String username;
 
+    @NotBlank
     @Column(nullable = false)
     private String password;
 
     @Column(name = "is_active", nullable = false)
     private boolean isActive;
-
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private Trainee trainee;
-
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private Trainer trainer;
 }

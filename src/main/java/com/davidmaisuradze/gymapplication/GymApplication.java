@@ -1,24 +1,18 @@
 package com.davidmaisuradze.gymapplication;
 
+import com.davidmaisuradze.gymapplication.config.ApplicationConfig;
 import com.davidmaisuradze.gymapplication.config.DataSourceConfig;
 import com.davidmaisuradze.gymapplication.config.HibernateConfig;
-import com.davidmaisuradze.gymapplication.dao.TraineeDao;
-import com.davidmaisuradze.gymapplication.dao.TrainerDao;
-import com.davidmaisuradze.gymapplication.dao.UserDao;
-import com.zaxxer.hikari.HikariDataSource;
-import jakarta.persistence.EntityManagerFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
-import javax.sql.DataSource;
 
 
 @Slf4j
 public class GymApplication {
 
     public static void main(String[] args) {
-//        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
-//                DataSourceConfig.class, HibernateConfig.class);
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
+                DataSourceConfig.class, HibernateConfig.class, ApplicationConfig.class);
 
 //        DataSource dataSource = context.getBean(DataSource.class);
 //
@@ -43,10 +37,31 @@ public class GymApplication {
 
 //        Trainee trainee = dao.findByUsername("Davit.Maisuradze");
 //        System.out.println(trainee);
-//        System.out.println(dao.findByUsername("Mariam.Katamashvili"));
+
+
+
+//        Trainee trainee = Trainee
+//                .builder()
+//                .firstName("Davit")
+//                .lastName("Maisuradze")
+//                .isActive(true)
+//                .address("KIU Dorm")
+//                .dateOfBirth(Date.valueOf("2004-09-20"))
+//                .build();
+//
+//        TraineeService service = context.getBean(TraineeService.class);
+//        Trainee createdTrainee = service.create(trainee);
+//        System.out.println(createdTrainee);
+
+
+
 
 //        Trainer trainer = trainerDao.findByUsername("Mariam.Katamashvili1");
 //        System.out.println(trainer);
+
+
+//        Authenticator authenticator = context.getBean(Authenticator.class);
+//        System.out.println(authenticator.checkCredentials("Davit.Maissuradze", "newPass"));
     }
 
 }

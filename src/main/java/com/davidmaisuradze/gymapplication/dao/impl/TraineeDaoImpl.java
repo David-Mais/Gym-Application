@@ -2,12 +2,15 @@ package com.davidmaisuradze.gymapplication.dao.impl;
 
 import com.davidmaisuradze.gymapplication.dao.TraineeDao;
 import com.davidmaisuradze.gymapplication.entity.Trainee;
-import com.davidmaisuradze.gymapplication.entity.User;
+import com.davidmaisuradze.gymapplication.entity.Training;
+import com.davidmaisuradze.gymapplication.entity.TrainingType;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.sql.Date;
+import java.util.List;
 
 
 @Repository
@@ -17,40 +20,57 @@ public class TraineeDaoImpl  implements TraineeDao {
     @PersistenceContext
     private EntityManager entityManager;
     @Override
-    @Transactional
     public Trainee create(Trainee trainee) {
         entityManager.persist(trainee);
         return trainee;
     }
 
     @Override
-    @Transactional
     public Trainee findByUsername(String username) {
-        User user = getUserByUsername(username);
-        return user.getTrainee();
+        Trainee trainee = entityManager
+                .createQuery("select t from Trainee t where t.username = :username", Trainee.class)
+                .setParameter("username", username)
+                .getSingleResult();
+        if (trainee == null) {
+            log.warn("Trainee with username: {} does not exits", username);
+            return null;
+        }
+        log.info("Trainee with username: {} found", username);
+        return trainee;
     }
 
     @Override
-    @Transactional
     public Trainee update(Trainee trainee) {
         entityManager.merge(trainee);
         return trainee;
     }
 
     @Override
-    @Transactional
     public Trainee deleteByUsername(String username) {
-        User user = getUserByUsername(username);
-        Trainee trainee = user.getTrainee();
-        entityManager.remove(trainee);
-        entityManager.remove(user);
-        return trainee;
-    }
-
-    private User getUserByUsername(String username) {
-        return entityManager
-                .createQuery("select  u from User u where u.username = :username", User.class)
+        Trainee traineeToDelete = entityManager
+                .createQuery("select t from Trainee t where t.username = :username", Trainee.class)
                 .setParameter("username", username)
                 .getSingleResult();
+        if (traineeToDelete == null) {
+            log.warn("Trainee with username: {} does not exits", username);
+            return null;
+        }
+        entityManager.remove(traineeToDelete);
+        log.info("Trainee with username: {} deleted", username);
+        return traineeToDelete;
+    }
+
+    @Override
+    public List<Training> getTrainingsList(Date from, Date to, String trainerName, TrainingType trainingType) {
+        List<Training> trainings = entityManager
+                .createQuery("select t from Training t", Training.class)
+                .getResultList();
+        return trainings
+                .stream()
+                .filter(t -> t.getTrainingDate().compareTo(from) > 0)
+                .filter(t -> t.getTrainingDate().compareTo(to) < 0)
+                .filter(t -> t.getTrainer().getFirstName().equals(trainerName))
+                .filter(t -> t.getTrainingType().equals(trainingType))
+                .toList();
     }
 }
