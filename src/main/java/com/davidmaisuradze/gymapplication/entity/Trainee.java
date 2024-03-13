@@ -10,7 +10,7 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "trainees")
@@ -22,7 +22,7 @@ import java.sql.Date;
 @NoArgsConstructor
 public class Trainee extends UserEntity {
     @Column(name = "date_of_birth", nullable = false)
-    private Date dateOfBirth;
+    private LocalDate dateOfBirth;
 
     @Column(name = "address")
     private String address;

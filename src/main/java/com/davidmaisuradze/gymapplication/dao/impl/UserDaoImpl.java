@@ -1,17 +1,37 @@
-package com.davidmaisuradze.gymapplication.utils;
+package com.davidmaisuradze.gymapplication.dao.impl;
 
+import com.davidmaisuradze.gymapplication.dao.UserDao;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
-import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.UUID;
 
-@Component
-public class Generator {
+@Repository
+@Slf4j
+public class UserDaoImpl implements UserDao {
     @PersistenceContext
     private EntityManager entityManager;
 
+    @Override
+    public boolean checkCredentials(String username, String password) {
+        try {
+            String actualPassword = (String) entityManager
+                    .createQuery("select u.password from UserEntity u where username = :username")
+                    .setParameter("username", username)
+                    .getSingleResult();
+            log.info("Checking credentials");
+            return password.equals(actualPassword);
+        }catch (NoResultException e) {
+            log.warn(e.toString());
+            return false;
+        }
+    }
+
+    @Override
     public String generateUsername(String firstName, String lastname) {
         List<String> usernames = entityManager
                 .createQuery("select u.username from UserEntity u", String.class)
@@ -38,10 +58,13 @@ public class Generator {
                 break;
             }
         }
+        log.info("Username generated");
         return builder.toString();
     }
 
+    @Override
     public String generatePassword() {
+        log.info("Random password generated");
         return UUID.randomUUID().toString().substring(0, 8);
     }
 }

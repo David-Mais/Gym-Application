@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "trainings")
@@ -55,7 +55,7 @@ public class Training {
 
     @NotNull
     @Column(name = "training_date")
-    private Date trainingDate;
+    private LocalDate trainingDate;
 
     @NotNull
     @Column(name = "duration")

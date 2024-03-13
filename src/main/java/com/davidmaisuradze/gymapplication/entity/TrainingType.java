@@ -33,7 +33,7 @@ import java.util.Set;
 public class TrainingType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "training_type_id")
+    @Column(name = "id")
     private Long id;
 
     @Column(name = "training_type_name", nullable = false, unique = true)

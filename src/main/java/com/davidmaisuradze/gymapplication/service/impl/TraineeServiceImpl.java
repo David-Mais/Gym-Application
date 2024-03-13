@@ -1,42 +1,37 @@
 package com.davidmaisuradze.gymapplication.service.impl;
 
 import com.davidmaisuradze.gymapplication.dao.TraineeDao;
+import com.davidmaisuradze.gymapplication.dao.UserDao;
 import com.davidmaisuradze.gymapplication.entity.Trainee;
 import com.davidmaisuradze.gymapplication.entity.Training;
-import com.davidmaisuradze.gymapplication.entity.TrainingType;
+import com.davidmaisuradze.gymapplication.entity.TrainingSearchCriteria;
 import com.davidmaisuradze.gymapplication.service.TraineeService;
-import com.davidmaisuradze.gymapplication.utils.Authenticator;
-import com.davidmaisuradze.gymapplication.utils.Generator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Date;
 import java.util.List;
 
 @Service
 @Slf4j
 public class TraineeServiceImpl implements TraineeService {
     private final TraineeDao traineeDao;
-    private final Generator generator;
-    private final Authenticator authenticator;
+    private final UserDao userDao;
 
     @Autowired
     public TraineeServiceImpl(
             TraineeDao traineeDao,
-            Generator generator,
-            Authenticator authenticator) {
+            UserDao userDao) {
         this.traineeDao = traineeDao;
-        this.generator = generator;
-        this.authenticator = authenticator;
+        this.userDao = userDao;
     }
 
     @Override
     @Transactional
     public Trainee create(Trainee trainee) {
-        String password = generator.generatePassword();
-        String username = generator.generateUsername(
+        String password = userDao.generatePassword();
+        String username = userDao.generateUsername(
                 trainee.getFirstName(),
                 trainee.getLastName()
         );
@@ -49,16 +44,22 @@ public class TraineeServiceImpl implements TraineeService {
     @Override
     @Transactional
     public Trainee findByUsername(String username, String password) {
-        if (authenticator.checkCredentials(username, password)) {
-            return traineeDao.findByUsername(username);
+        if (userDao.checkCredentials(username, password)) {
+            Trainee trainee = traineeDao.findByUsername(username);
+            if (trainee == null) {
+                log.warn("Trainee with username: {} not found", username);
+                return null;
+            }
+            return trainee;
         }
+        log.warn("Username: {} and Password: {} does not match", username, password);
         return null;
     }
 
     @Override
     @Transactional
     public Trainee update(Trainee trainee) {
-        if (authenticator.checkCredentials(trainee.getUsername(), trainee.getPassword())) {
+        if (userDao.checkCredentials(trainee.getUsername(), trainee.getPassword())) {
             return traineeDao.update(trainee);
         }
         return null;
@@ -66,17 +67,21 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     @Transactional
-    public Trainee deleteByUsername(String username, String password) {
-        if (authenticator.checkCredentials(username, password)) {
-            return traineeDao.deleteByUsername(username);
+    public void deleteByUsername(String username, String password) {
+        if (userDao.checkCredentials(username, password)) {
+            Trainee traineeToDelete = traineeDao.findByUsername(username);
+            if (traineeToDelete == null) {
+                log.warn("Trainee with username {} does not exist", username);
+                return;
+            }
+            traineeDao.delete(traineeToDelete);
         }
-        return null;
     }
 
     @Override
     @Transactional
     public Trainee changePassword(String username, String currentPassword, String newPassword) {
-        if (authenticator.checkCredentials(username, currentPassword)) {
+        if (userDao.checkCredentials(username, currentPassword)) {
             Trainee trainee = traineeDao.findByUsername(username);
             trainee.setPassword(newPassword);
             return traineeDao.update(trainee);
@@ -87,7 +92,7 @@ public class TraineeServiceImpl implements TraineeService {
     @Override
     @Transactional
     public Boolean activate(String username, String password) {
-        if (authenticator.checkCredentials(username, password)) {
+        if (userDao.checkCredentials(username, password)) {
             Trainee trainee = traineeDao.findByUsername(username);
             trainee.setIsActive(true);
             return true;
@@ -98,7 +103,7 @@ public class TraineeServiceImpl implements TraineeService {
     @Override
     @Transactional
     public Boolean deactivate(String username, String password) {
-        if (authenticator.checkCredentials(username, password)) {
+        if (userDao.checkCredentials(username, password)) {
             Trainee trainee = traineeDao.findByUsername(username);
             trainee.setIsActive(false);
             return true;
@@ -108,7 +113,7 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     @Transactional
-    public List<Training> getTrainingsList(Date from, Date to, String trainerName, TrainingType trainingType) {
-        return traineeDao.getTrainingsList(from, to, trainerName, trainingType);
+    public List<Training> getTrainingsList(TrainingSearchCriteria criteria) {
+        return traineeDao.getTrainingsList(criteria);
     }
 }

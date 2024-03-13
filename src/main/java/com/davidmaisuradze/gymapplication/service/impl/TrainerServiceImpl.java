@@ -1,42 +1,38 @@
 package com.davidmaisuradze.gymapplication.service.impl;
 
 import com.davidmaisuradze.gymapplication.dao.TrainerDao;
+import com.davidmaisuradze.gymapplication.dao.UserDao;
 import com.davidmaisuradze.gymapplication.entity.Trainer;
 import com.davidmaisuradze.gymapplication.entity.Training;
+import com.davidmaisuradze.gymapplication.entity.TrainingSearchCriteria;
 import com.davidmaisuradze.gymapplication.service.TrainerService;
-import com.davidmaisuradze.gymapplication.utils.Authenticator;
-import com.davidmaisuradze.gymapplication.utils.Generator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Date;
 import java.util.List;
 
 @Service
 @Slf4j
 public class TrainerServiceImpl implements TrainerService {
     private final TrainerDao trainerDao;
-    private final Generator generator;
-    private final Authenticator authenticator;
+    private final UserDao userDao;
 
     @Autowired
     public TrainerServiceImpl(
             TrainerDao trainerDao,
-            Generator generator,
-            Authenticator authenticator
+            UserDao userDao
     ) {
         this.trainerDao = trainerDao;
-        this.generator = generator;
-        this.authenticator = authenticator;
+        this.userDao = userDao;
     }
 
     @Override
     @Transactional
     public Trainer create(Trainer trainer) {
-        String password = generator.generatePassword();
-        String username = generator.generateUsername(
+        String password = userDao.generatePassword();
+        String username = userDao.generateUsername(
                 trainer.getFirstName(),
                 trainer.getLastName()
         );
@@ -49,16 +45,22 @@ public class TrainerServiceImpl implements TrainerService {
     @Override
     @Transactional
     public Trainer findByUsername(String username, String password) {
-        if (authenticator.checkCredentials(username, password)) {
-            return trainerDao.findByUsername(username);
+        if (userDao.checkCredentials(username, password)) {
+            Trainer trainer = trainerDao.findByUsername(username);
+            if (trainer == null) {
+                log.warn("Trainer with username: {} not found", username);
+                return null;
+            }
+            return trainer;
         }
+        log.warn("Username: {} and Password: {} does not match", username, password);
         return null;
     }
 
     @Override
     @Transactional
     public Trainer update(Trainer trainer) {
-        if (authenticator.checkCredentials(trainer.getUsername(), trainer.getPassword())) {
+        if (userDao.checkCredentials(trainer.getUsername(), trainer.getPassword())) {
             return trainerDao.update(trainer);
         }
         return null;
@@ -67,7 +69,7 @@ public class TrainerServiceImpl implements TrainerService {
     @Override
     @Transactional
     public Trainer changePassword(String username, String currentPassword, String newPassword) {
-        if (authenticator.checkCredentials(username, currentPassword)) {
+        if (userDao.checkCredentials(username, currentPassword)) {
             Trainer trainer = trainerDao.findByUsername(username);
             trainer.setPassword(newPassword);
             return trainerDao.update(trainer);
@@ -78,7 +80,7 @@ public class TrainerServiceImpl implements TrainerService {
     @Override
     @Transactional
     public Boolean activate(String username, String password) {
-        if (authenticator.checkCredentials(username, password)) {
+        if (userDao.checkCredentials(username, password)) {
             Trainer trainer = trainerDao.findByUsername(username);
             trainer.setIsActive(true);
             return true;
@@ -89,7 +91,7 @@ public class TrainerServiceImpl implements TrainerService {
     @Override
     @Transactional
     public Boolean deactivate(String username, String password) {
-        if (authenticator.checkCredentials(username, password)) {
+        if (userDao.checkCredentials(username, password)) {
             Trainer trainer = trainerDao.findByUsername(username);
             trainer.setIsActive(false);
             return true;
@@ -105,7 +107,7 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     @Transactional
-    public List<Training> getTrainingsList(Date from, Date to, String traineeName) {
-        return trainerDao.getTrainingsList(from, to, traineeName);
+    public List<Training> getTrainingsList(TrainingSearchCriteria criteria) {
+        return trainerDao.getTrainingsList(criteria);
     }
 }

@@ -2,8 +2,8 @@ package com.davidmaisuradze.gymapplication.service;
 
 import com.davidmaisuradze.gymapplication.entity.Trainer;
 import com.davidmaisuradze.gymapplication.entity.Training;
+import com.davidmaisuradze.gymapplication.entity.TrainingSearchCriteria;
 
-import java.sql.Date;
 import java.util.List;
 
 public interface TrainerService {
@@ -14,5 +14,5 @@ public interface TrainerService {
     Boolean activate(String username, String password);
     Boolean deactivate(String username, String password);
     List<Trainer> getTrainersNotAssigned(String username);
-    List<Training> getTrainingsList(Date from, Date to, String traineeName);
+    List<Training> getTrainingsList(TrainingSearchCriteria criteria);
 }

@@ -42,11 +42,11 @@ public class GymApplication {
 
 //        Trainee trainee = Trainee
 //                .builder()
-//                .firstName("Davit")
-//                .lastName("Maisuradze")
+//                .firstName("Givi")
+//                .lastName("Sikharulidze")
 //                .isActive(true)
-//                .address("KIU Dorm")
-//                .dateOfBirth(Date.valueOf("2004-09-20"))
+//                .address("Tbilisi")
+//                .dateOfBirth(LocalDate.parse("1999-10-10"))
 //                .build();
 //
 //        TraineeService service = context.getBean(TraineeService.class);
@@ -62,6 +62,17 @@ public class GymApplication {
 
 //        Authenticator authenticator = context.getBean(Authenticator.class);
 //        System.out.println(authenticator.checkCredentials("Davit.Maissuradze", "newPass"));
+
+
+//        TrainingService trainingService = context.getBean(TrainingService.class);
+//        trainingService.create(
+//                Training
+//                        .builder()
+//                        .trainingName("someTrining")
+//                        .trainingDate(Date.valueOf("1990-01-10"))
+//                        .duration(55)
+//                        .build()
+//        );
     }
 
 }

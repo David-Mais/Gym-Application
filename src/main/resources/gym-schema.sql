@@ -47,24 +47,24 @@ CREATE TABLE IF NOT EXISTS trainings
     );
 
 
-INSERT INTO gym.users (user_id, first_name, is_active, last_name, password, username) VALUES (1, 'Davit', true, 'Maisuradze', 'newPass', 'Davit.Maisuradze');
-INSERT INTO gym.users (user_id, first_name, is_active, last_name, password, username) VALUES (2, 'Mariam', true, 'Katamashvili', 'marimagaria', 'Mariam.Katamashvili');
-INSERT INTO gym.users (user_id, first_name, is_active, last_name, password, username) VALUES (3, 'Mariam', true, 'Katamashvili', 'hA5`2S!H!X', 'Mariam.Katamashvili1');
-INSERT INTO gym.users (user_id, first_name, is_active, last_name, password, username) VALUES (5, 'Mariam', true, 'Katamashvili', '42~bx~NW?/', 'Mariam.Katamashvili3');
-INSERT INTO gym.users (user_id, first_name, is_active, last_name, password, username) VALUES (8, 'Davit', true, 'Maisuradze', 'l_7A}%Gkcm', 'Davit.Maisuradze1');
+INSERT INTO gym.users (id, first_name, is_active, last_name, password, username) VALUES (1, 'Davit', true, 'Maisuradze', 'newPass', 'Davit.Maisuradze');
+INSERT INTO gym.users (id, first_name, is_active, last_name, password, username) VALUES (2, 'Mariam', true, 'Katamashvili', 'marimagaria', 'Mariam.Katamashvili');
+INSERT INTO gym.users (id, first_name, is_active, last_name, password, username) VALUES (3, 'Mariam', true, 'Katamashvili', 'hA5`2S!H!X', 'Mariam.Katamashvili1');
+INSERT INTO gym.users (id, first_name, is_active, last_name, password, username) VALUES (5, 'Mariam', true, 'Katamashvili', '42~bx~NW?/', 'Mariam.Katamashvili3');
+INSERT INTO gym.users (id, first_name, is_active, last_name, password, username) VALUES (8, 'Davit', true, 'Maisuradze', 'l_7A}%Gkcm', 'Davit.Maisuradze1');
 
 
-INSERT INTO gym.training_types (training_type_id, training_type_name) VALUES (5, 'ballet');
-INSERT INTO gym.training_types (training_type_id, training_type_name) VALUES (1, 'box');
-INSERT INTO gym.training_types (training_type_id, training_type_name) VALUES (4, 'cardio');
-INSERT INTO gym.training_types (training_type_id, training_type_name) VALUES (3, 'dance');
-INSERT INTO gym.training_types (training_type_id, training_type_name) VALUES (2, 'yoga');
+INSERT INTO gym.training_types (id, training_type_name) VALUES (5, 'ballet');
+INSERT INTO gym.training_types (id, training_type_name) VALUES (1, 'box');
+INSERT INTO gym.training_types (id, training_type_name) VALUES (4, 'cardio');
+INSERT INTO gym.training_types (id, training_type_name) VALUES (3, 'dance');
+INSERT INTO gym.training_types (id, training_type_name) VALUES (2, 'yoga');
 
-INSERT INTO gym.trainers (trainer_id, specialization, user_id) VALUES (1, 1, 1);
-INSERT INTO gym.trainers (trainer_id, specialization, user_id) VALUES (2, 2, 2);
-INSERT INTO gym.trainers (trainer_id, specialization, user_id) VALUES (3, 4, 3);
+INSERT INTO gym.trainers (trainer_id, specialization, id) VALUES (1, 1, 1);
+INSERT INTO gym.trainers (trainer_id, specialization, id) VALUES (2, 2, 2);
+INSERT INTO gym.trainers (trainer_id, specialization, id) VALUES (3, 4, 3);
 
-INSERT INTO gym.trainees (trainee_id, address, date_of_birth, user_id) VALUES (1, 'kiu', '2004-09-20', 1);
-INSERT INTO gym.trainees (trainee_id, address, date_of_birth, user_id) VALUES (3, 'Tbilisi', '2013-03-08', 2);
-INSERT INTO gym.trainees (trainee_id, address, date_of_birth, user_id) VALUES (4, 'Batumi', '2007-07-18', 3);
-INSERT INTO gym.trainees (trainee_id, address, date_of_birth, user_id) VALUES (5, 'Kutaisi', '2000-08-17', 5);
+INSERT INTO gym.trainees (trainee_id, address, date_of_birth, id) VALUES (1, 'kiu', '2004-09-20', 1);
+INSERT INTO gym.trainees (trainee_id, address, date_of_birth, id) VALUES (3, 'Tbilisi', '2013-03-08', 2);
+INSERT INTO gym.trainees (trainee_id, address, date_of_birth, id) VALUES (4, 'Batumi', '2007-07-18', 3);
+INSERT INTO gym.trainees (trainee_id, address, date_of_birth, id) VALUES (5, 'Kutaisi', '2000-08-17', 5);

@@ -22,6 +22,6 @@ import lombok.experimental.SuperBuilder;
 public class Trainer extends UserEntity {
 
     @ManyToOne
-    @JoinColumn(name = "specialization", referencedColumnName = "training_type_id")
+    @JoinColumn(name = "specialization", referencedColumnName = "id")
     private TrainingType specialization;
 }

@@ -16,6 +16,7 @@ public class TrainingDaoImpl implements TrainingDao {
     @Override
     public Training create(Training training) {
         entityManager.persist(training);
+        log.info("Training {} created successfully", training);
         return training;
     }
 }

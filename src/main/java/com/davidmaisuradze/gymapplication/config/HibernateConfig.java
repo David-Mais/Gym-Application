@@ -1,6 +1,7 @@
 package com.davidmaisuradze.gymapplication.config;
 
 import jakarta.persistence.EntityManagerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -18,6 +19,7 @@ import java.util.Properties;
 @Configuration
 @PropertySource("classpath:application.properties")
 @EnableTransactionManagement
+@Slf4j
 public class HibernateConfig {
     @Value("${spring.jpa.show-sql}")
     private String showSql;
@@ -47,6 +49,7 @@ public class HibernateConfig {
         properties.put("hibernate.hbn2ddl.auto", ddlAuto);
 
         entityManager.setJpaProperties(properties);
+        log.info("Entity manager properties configured");
         return entityManager;
     }
 
@@ -56,6 +59,7 @@ public class HibernateConfig {
                 = new JpaTransactionManager();
         transactionManager.setEntityManagerFactory(emf);
 
+        log.info("Transaction manager configured");
         return transactionManager;
     }
 }

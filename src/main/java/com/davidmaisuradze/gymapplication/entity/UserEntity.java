@@ -26,7 +26,7 @@ import lombok.experimental.SuperBuilder;
 public abstract class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
+    @Column(name = "id")
     private Long id;
 
     @NotBlank
