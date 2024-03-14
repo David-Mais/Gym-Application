@@ -1,7 +1,9 @@
+CREATE DATABASE IF NOT EXISTS gym;
+USE gym;
+
 create table if not exists training_types
 (
-    training_type_id   bigint auto_increment
-    primary key,
+    id   bigint auto_increment primary key,
     training_type_name varchar(255) not null,
     constraint UK_8oq1i4b9q9bxv4p6tw05na3lq
     unique (training_type_name)
@@ -9,7 +11,7 @@ create table if not exists training_types
 
 CREATE TABLE users
 (
-    user_id         BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(255) NOT NULL,
     last_name  VARCHAR(255) NOT NULL,
     username   VARCHAR(255) NOT NULL UNIQUE,
@@ -19,17 +21,17 @@ CREATE TABLE users
 
 CREATE TABLE trainees
 (
-    trainee_id            BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id            BIGINT AUTO_INCREMENT PRIMARY KEY,
     date_of_birth DATE NOT NULL,
     address       VARCHAR(255),
-    FOREIGN KEY (trainee_id) REFERENCES users (user_id)
+    FOREIGN KEY (id) REFERENCES users (id)
 );
 
 CREATE TABLE trainers
 (
-    trainer_id            BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id            BIGINT AUTO_INCREMENT PRIMARY KEY,
     specialization       BIGINT,
-    FOREIGN KEY (specialization) REFERENCES training_types (training_type_id)
+    FOREIGN KEY (specialization) REFERENCES training_types (id)
 );
 
 
@@ -38,12 +40,13 @@ CREATE TABLE IF NOT EXISTS trainings
     id                BIGINT AUTO_INCREMENT PRIMARY KEY,
     trainee_id        BIGINT NOT NULL,
     trainer_id        BIGINT NOT NULL,
+    training_name     VARCHAR(255),
     training_type_id  BIGINT NOT NULL,
     training_date     DATE   NOT NULL,
     training_duration INT    NOT NULL,
-    FOREIGN KEY (trainee_id) REFERENCES trainees (trainee_id),
-    FOREIGN KEY (trainer_id) REFERENCES trainers (trainer_id),
-    FOREIGN KEY (training_type_id) REFERENCES training_types (training_type_id)
+    FOREIGN KEY (trainee_id) REFERENCES trainees (id),
+    FOREIGN KEY (trainer_id) REFERENCES trainers (id),
+    FOREIGN KEY (training_type_id) REFERENCES training_types (id)
     );
 
 

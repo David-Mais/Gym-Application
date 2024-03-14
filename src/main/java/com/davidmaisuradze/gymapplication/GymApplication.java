@@ -3,8 +3,12 @@ package com.davidmaisuradze.gymapplication;
 import com.davidmaisuradze.gymapplication.config.ApplicationConfig;
 import com.davidmaisuradze.gymapplication.config.DataSourceConfig;
 import com.davidmaisuradze.gymapplication.config.HibernateConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import jakarta.persistence.EntityManagerFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import javax.sql.DataSource;
 
 
 @Slf4j

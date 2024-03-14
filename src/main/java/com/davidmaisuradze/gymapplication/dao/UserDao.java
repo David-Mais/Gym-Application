@@ -1,7 +1,8 @@
 package com.davidmaisuradze.gymapplication.dao;
 
+import java.util.List;
+
 public interface UserDao {
     boolean checkCredentials(String username, String password);
-    String generateUsername(String firstName, String lastname);
-    String generatePassword();
+    List<String> getAllUsernames();
 }

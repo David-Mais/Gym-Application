@@ -33,7 +33,7 @@ import java.time.LocalDate;
 public class Training {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "training_id")
+    @Column(name = "id")
     private Long trainingId;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
@@ -58,6 +58,6 @@ public class Training {
     private LocalDate trainingDate;
 
     @NotNull
-    @Column(name = "duration")
+    @Column(name = "training_duration")
     private Integer duration;
 }

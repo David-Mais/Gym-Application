@@ -4,8 +4,9 @@ import com.davidmaisuradze.gymapplication.dao.TraineeDao;
 import com.davidmaisuradze.gymapplication.dao.UserDao;
 import com.davidmaisuradze.gymapplication.entity.Trainee;
 import com.davidmaisuradze.gymapplication.entity.Training;
-import com.davidmaisuradze.gymapplication.entity.TrainingSearchCriteria;
+import com.davidmaisuradze.gymapplication.model.TrainingSearchCriteria;
 import com.davidmaisuradze.gymapplication.service.TraineeService;
+import com.davidmaisuradze.gymapplication.service.util.Generator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,20 +19,23 @@ import java.util.List;
 public class TraineeServiceImpl implements TraineeService {
     private final TraineeDao traineeDao;
     private final UserDao userDao;
+    private final Generator generator;
 
     @Autowired
     public TraineeServiceImpl(
             TraineeDao traineeDao,
-            UserDao userDao) {
+            UserDao userDao,
+            Generator generator) {
         this.traineeDao = traineeDao;
         this.userDao = userDao;
+        this.generator = generator;
     }
 
     @Override
     @Transactional
     public Trainee create(Trainee trainee) {
-        String password = userDao.generatePassword();
-        String username = userDao.generateUsername(
+        String password = generator.generatePassword();
+        String username = generator.generateUsername(
                 trainee.getFirstName(),
                 trainee.getLastName()
         );
@@ -42,7 +46,6 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Override
-    @Transactional
     public Trainee findByUsername(String username, String password) {
         if (userDao.checkCredentials(username, password)) {
             Trainee trainee = traineeDao.findByUsername(username);
@@ -112,7 +115,6 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Override
-    @Transactional
     public List<Training> getTrainingsList(TrainingSearchCriteria criteria) {
         return traineeDao.getTrainingsList(criteria);
     }

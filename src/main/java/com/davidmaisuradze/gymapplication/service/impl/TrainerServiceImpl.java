@@ -4,8 +4,9 @@ import com.davidmaisuradze.gymapplication.dao.TrainerDao;
 import com.davidmaisuradze.gymapplication.dao.UserDao;
 import com.davidmaisuradze.gymapplication.entity.Trainer;
 import com.davidmaisuradze.gymapplication.entity.Training;
-import com.davidmaisuradze.gymapplication.entity.TrainingSearchCriteria;
+import com.davidmaisuradze.gymapplication.model.TrainingSearchCriteria;
 import com.davidmaisuradze.gymapplication.service.TrainerService;
+import com.davidmaisuradze.gymapplication.service.util.Generator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,21 +19,24 @@ import java.util.List;
 public class TrainerServiceImpl implements TrainerService {
     private final TrainerDao trainerDao;
     private final UserDao userDao;
+    private final Generator generator;
 
     @Autowired
     public TrainerServiceImpl(
             TrainerDao trainerDao,
-            UserDao userDao
+            UserDao userDao,
+            Generator generator
     ) {
         this.trainerDao = trainerDao;
         this.userDao = userDao;
+        this.generator = generator;
     }
 
     @Override
     @Transactional
     public Trainer create(Trainer trainer) {
-        String password = userDao.generatePassword();
-        String username = userDao.generateUsername(
+        String password = generator.generatePassword();
+        String username = generator.generateUsername(
                 trainer.getFirstName(),
                 trainer.getLastName()
         );
@@ -43,7 +47,6 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    @Transactional
     public Trainer findByUsername(String username, String password) {
         if (userDao.checkCredentials(username, password)) {
             Trainer trainer = trainerDao.findByUsername(username);
@@ -100,13 +103,11 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    @Transactional
     public List<Trainer> getTrainersNotAssigned(String username) {
         return trainerDao.getTrainersNotAssigned(username);
     }
 
     @Override
-    @Transactional
     public List<Training> getTrainingsList(TrainingSearchCriteria criteria) {
         return trainerDao.getTrainingsList(criteria);
     }
