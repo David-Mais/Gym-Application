@@ -3,7 +3,6 @@ package com.davidmaisuradze.gymapplication.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,7 +16,6 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = false)
 @SuperBuilder
 @NoArgsConstructor
 public class Trainee extends UserEntity {

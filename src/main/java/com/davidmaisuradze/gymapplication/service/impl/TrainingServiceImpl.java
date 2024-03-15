@@ -16,11 +16,13 @@ public class TrainingServiceImpl implements TrainingService {
     @Autowired
     public TrainingServiceImpl(TrainingDao trainingDao) {
         this.trainingDao = trainingDao;
+        log.info("All dependencies injected");
     }
 
     @Override
     @Transactional
     public Training create(Training training) {
+        log.info("Trainer Created");
         return trainingDao.create(training);
     }
 }

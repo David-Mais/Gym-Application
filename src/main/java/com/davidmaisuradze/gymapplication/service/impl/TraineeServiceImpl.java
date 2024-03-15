@@ -6,7 +6,7 @@ import com.davidmaisuradze.gymapplication.entity.Trainee;
 import com.davidmaisuradze.gymapplication.entity.Training;
 import com.davidmaisuradze.gymapplication.model.TrainingSearchCriteria;
 import com.davidmaisuradze.gymapplication.service.TraineeService;
-import com.davidmaisuradze.gymapplication.service.util.Generator;
+import com.davidmaisuradze.gymapplication.service.util.DetailsGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,35 +19,41 @@ import java.util.List;
 public class TraineeServiceImpl implements TraineeService {
     private final TraineeDao traineeDao;
     private final UserDao userDao;
-    private final Generator generator;
+    private final DetailsGenerator detailsGenerator;
+    private static final String CREDENTIAL_MATCH = "Credentials checked username and password matched";
+    private static final String CREDENTIAL_MISMATCH = "Username and password not matched";
 
     @Autowired
     public TraineeServiceImpl(
             TraineeDao traineeDao,
             UserDao userDao,
-            Generator generator) {
+            DetailsGenerator detailsGenerator) {
         this.traineeDao = traineeDao;
         this.userDao = userDao;
-        this.generator = generator;
+        this.detailsGenerator = detailsGenerator;
+        log.info("All dependencies injected");
     }
 
     @Override
     @Transactional
     public Trainee create(Trainee trainee) {
-        String password = generator.generatePassword();
-        String username = generator.generateUsername(
+        String password = detailsGenerator.generatePassword();
+        String username = detailsGenerator.generateUsername(
                 trainee.getFirstName(),
                 trainee.getLastName()
         );
+        log.info("Username and password generated for Trainee: {}", trainee);
         trainee.setPassword(password);
         trainee.setUsername(username);
         traineeDao.create(trainee);
+        log.info("Trainee Created");
         return trainee;
     }
 
     @Override
     public Trainee findByUsername(String username, String password) {
         if (userDao.checkCredentials(username, password)) {
+            log.info(CREDENTIAL_MATCH);
             Trainee trainee = traineeDao.findByUsername(username);
             if (trainee == null) {
                 log.warn("Trainee with username: {} not found", username);
@@ -55,7 +61,7 @@ public class TraineeServiceImpl implements TraineeService {
             }
             return trainee;
         }
-        log.warn("Username: {} and Password: {} does not match", username, password);
+        log.warn(CREDENTIAL_MISMATCH);
         return null;
     }
 
@@ -63,8 +69,10 @@ public class TraineeServiceImpl implements TraineeService {
     @Transactional
     public Trainee update(Trainee trainee) {
         if (userDao.checkCredentials(trainee.getUsername(), trainee.getPassword())) {
+            log.info(CREDENTIAL_MATCH);
             return traineeDao.update(trainee);
         }
+        log.warn(CREDENTIAL_MISMATCH);
         return null;
     }
 
@@ -72,23 +80,29 @@ public class TraineeServiceImpl implements TraineeService {
     @Transactional
     public void deleteByUsername(String username, String password) {
         if (userDao.checkCredentials(username, password)) {
+            log.info(CREDENTIAL_MATCH);
             Trainee traineeToDelete = traineeDao.findByUsername(username);
             if (traineeToDelete == null) {
                 log.warn("Trainee with username {} does not exist", username);
                 return;
             }
             traineeDao.delete(traineeToDelete);
+            log.info("Trainee with username: {} deleted", username);
         }
+        log.warn(CREDENTIAL_MISMATCH);
     }
 
     @Override
     @Transactional
     public Trainee changePassword(String username, String currentPassword, String newPassword) {
         if (userDao.checkCredentials(username, currentPassword)) {
+            log.info(CREDENTIAL_MATCH);
             Trainee trainee = traineeDao.findByUsername(username);
             trainee.setPassword(newPassword);
+            log.info("Trainee password updated");
             return traineeDao.update(trainee);
         }
+        log.warn(CREDENTIAL_MISMATCH);
         return null;
     }
 
@@ -96,10 +110,13 @@ public class TraineeServiceImpl implements TraineeService {
     @Transactional
     public Boolean activate(String username, String password) {
         if (userDao.checkCredentials(username, password)) {
+            log.info(CREDENTIAL_MATCH);
             Trainee trainee = traineeDao.findByUsername(username);
             trainee.setIsActive(true);
+            log.info("Trainee with username: {} activated", username);
             return true;
         }
+        log.warn(CREDENTIAL_MISMATCH);
         return false;
     }
 
@@ -107,15 +124,19 @@ public class TraineeServiceImpl implements TraineeService {
     @Transactional
     public Boolean deactivate(String username, String password) {
         if (userDao.checkCredentials(username, password)) {
+            log.info(CREDENTIAL_MATCH);
             Trainee trainee = traineeDao.findByUsername(username);
             trainee.setIsActive(false);
+            log.info("Trainee with username: {} deactivated", username);
             return true;
         }
+        log.warn(CREDENTIAL_MISMATCH);
         return false;
     }
 
     @Override
     public List<Training> getTrainingsList(TrainingSearchCriteria criteria) {
+        log.info("Returning trainings filtered by criteria: {}", criteria);
         return traineeDao.getTrainingsList(criteria);
     }
 }

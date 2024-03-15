@@ -32,6 +32,7 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public List<String> getAllUsernames() {
+        log.info("Returning all usernames");
         return entityManager
                 .createQuery("select u.username from UserEntity u", String.class)
                 .getResultList();

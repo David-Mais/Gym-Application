@@ -3,8 +3,8 @@ USE gym;
 
 create table if not exists training_types
 (
-    id   bigint auto_increment primary key,
-    training_type_name varchar(255) not null,
+    id   BIGINT AUTO_INCREMENT PRIMARY KEY,
+    training_type_name VARCHAR(255) NOT NULL,
     constraint UK_8oq1i4b9q9bxv4p6tw05na3lq
     unique (training_type_name)
     );
@@ -24,14 +24,17 @@ CREATE TABLE trainees
     id            BIGINT AUTO_INCREMENT PRIMARY KEY,
     date_of_birth DATE NOT NULL,
     address       VARCHAR(255),
-    FOREIGN KEY (id) REFERENCES users (id)
+    user_id       bigint null,
+    FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
 CREATE TABLE trainers
 (
     id            BIGINT AUTO_INCREMENT PRIMARY KEY,
     specialization       BIGINT,
-    FOREIGN KEY (specialization) REFERENCES training_types (id)
+    user_id              BIGINT,
+    FOREIGN KEY (specialization) REFERENCES training_types (id),
+    FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
 
@@ -50,24 +53,74 @@ CREATE TABLE IF NOT EXISTS trainings
     );
 
 
-INSERT INTO gym.users (id, first_name, is_active, last_name, password, username) VALUES (1, 'Davit', true, 'Maisuradze', 'newPass', 'Davit.Maisuradze');
-INSERT INTO gym.users (id, first_name, is_active, last_name, password, username) VALUES (2, 'Mariam', true, 'Katamashvili', 'marimagaria', 'Mariam.Katamashvili');
-INSERT INTO gym.users (id, first_name, is_active, last_name, password, username) VALUES (3, 'Mariam', true, 'Katamashvili', 'hA5`2S!H!X', 'Mariam.Katamashvili1');
-INSERT INTO gym.users (id, first_name, is_active, last_name, password, username) VALUES (5, 'Mariam', true, 'Katamashvili', '42~bx~NW?/', 'Mariam.Katamashvili3');
-INSERT INTO gym.users (id, first_name, is_active, last_name, password, username) VALUES (8, 'Davit', true, 'Maisuradze', 'l_7A}%Gkcm', 'Davit.Maisuradze1');
+INSERT INTO gym.users (first_name, is_active, last_name, password, username) VALUES ('Davit', true, 'Maisuradze', 'newPass', 'Davit.Maisuradze');
+INSERT INTO gym.users (first_name, is_active, last_name, password, username) VALUES ('Mariam', true, 'Katamashvili', 'marimagaria', 'Mariam.Katamashvili');
+INSERT INTO gym.users (first_name, is_active, last_name, password, username) VALUES ('Merab', true, 'Dvlaishvili', 'merabmerab', 'Merab.Dvalishvili');
+INSERT INTO gym.users (first_name, is_active, last_name, password, username) VALUES ('David', true, 'Kheladze', 'davdav', 'David.Kheladze');
+INSERT INTO gym.users (first_name, is_active, last_name, password, username) VALUES ('Salome', true, 'Chachua', 'salosalo', 'Salome.Chachua');
+INSERT INTO gym.users (first_name, is_active, last_name, password, username) VALUES ('John', false, 'Doe', 'johnny', 'John.Doe');
+INSERT INTO gym.users (first_name, is_active, last_name, password, username) VALUES ('Ilia', true, 'Topuria', 'ufcchamp', 'Ilia.Topuria');
+
+INSERT INTO gym.training_types (training_type_name) VALUES ('box');
+INSERT INTO gym.training_types (training_type_name) VALUES ('dance');
+INSERT INTO gym.training_types (training_type_name) VALUES ('mma');
 
 
-INSERT INTO gym.training_types (id, training_type_name) VALUES (5, 'ballet');
-INSERT INTO gym.training_types (id, training_type_name) VALUES (1, 'box');
-INSERT INTO gym.training_types (id, training_type_name) VALUES (4, 'cardio');
-INSERT INTO gym.training_types (id, training_type_name) VALUES (3, 'dance');
-INSERT INTO gym.training_types (id, training_type_name) VALUES (2, 'yoga');
+INSERT INTO gym.trainees (address, date_of_birth, user_id)
+VALUES ('Kutaisi',
+        '2024-09-20',
+        (select id from users where username = 'Davit.Maisuradze'));
+INSERT INTO gym.trainees (address, date_of_birth, user_id)
+VALUES ('Tbilisi',
+        '2004-03-01',
+        (select id from users where username = 'Mariam.Katamashvili'));
+INSERT INTO gym.trainees (address, date_of_birth, user_id)
+VALUES ('Batumi',
+        '2000-06-17',
+        (select id from users where username = 'David.Kheladze'));
+INSERT INTO gym.trainees (address, date_of_birth, user_id)
+VALUES ('Xashuri',
+        '1999-12-23',
+        (select id from users where username = 'John.Doe'));
 
-INSERT INTO gym.trainers (trainer_id, specialization, id) VALUES (1, 1, 1);
-INSERT INTO gym.trainers (trainer_id, specialization, id) VALUES (2, 2, 2);
-INSERT INTO gym.trainers (trainer_id, specialization, id) VALUES (3, 4, 3);
 
-INSERT INTO gym.trainees (trainee_id, address, date_of_birth, id) VALUES (1, 'kiu', '2004-09-20', 1);
-INSERT INTO gym.trainees (trainee_id, address, date_of_birth, id) VALUES (3, 'Tbilisi', '2013-03-08', 2);
-INSERT INTO gym.trainees (trainee_id, address, date_of_birth, id) VALUES (4, 'Batumi', '2007-07-18', 3);
-INSERT INTO gym.trainees (trainee_id, address, date_of_birth, id) VALUES (5, 'Kutaisi', '2000-08-17', 5);
+INSERT INTO gym.trainers (specialization, user_id)
+VALUES ((select id from training_types where training_type_name = 'box'),
+        (select u.id from users u where u.username = 'Merab.Dvalishvili'));
+INSERT INTO gym.trainers (specialization, user_id)
+VALUES ((select id from training_types where training_type_name = 'dance'),
+        (select u.id from users u where u.username = 'Salome.Chachua'));
+INSERT INTO gym.trainers (specialization, user_id)
+VALUES ((select id from training_types where training_type_name = 'mma'),
+        (select u.id from users u where u.username = 'Ilia.Topuria'));
+
+
+
+INSERT INTO gym.trainings (training_duration, training_date, training_name, trainee_id, trainer_id, training_type_id)
+VALUES (90,
+        '1999-11-05',
+        'Marathon Prep',
+        (select t.id from trainees t where date_of_birth = '2024-09-20'),
+        (select id from trainers where user_id = (select id from users where username = 'Merab.Dvalishvili')),
+        (select t.id from training_types t where training_type_name = 'box'));
+INSERT INTO gym.trainings (training_duration, training_date, training_name, trainee_id, trainer_id, training_type_id)
+VALUES (60,
+        '2010-12-15',
+        'Yoga Basics',
+        (select t.id from trainees t where date_of_birth = '2004-03-01'),
+        (select id from trainers where user_id = (select id from users where username = 'Salome.Chachua')),
+        (select t.id from training_types t where training_type_name = 'dance'));
+INSERT INTO gym.trainings (training_duration, training_date, training_name, trainee_id, trainer_id, training_type_id)
+VALUES (75,
+        '2020-04-10',
+        'Weightlifting 101',
+        (select t.id from trainees t where date_of_birth = '2000-06-17'),
+        (select id from trainers where user_id = (select id from users where username = 'Ilia.Topuria')),
+        (select t.id from training_types t where training_type_name = 'mma'));
+INSERT INTO gym.trainings (training_duration, training_date, training_name, trainee_id, trainer_id, training_type_id)
+VALUES (60,
+        '2024-08-12',
+        'Interval Training',
+        (select t.id from trainees t where date_of_birth = '1999-12-23'),
+        (select id from trainers where user_id = (select id from users where username = 'Merab.Dvalishvili')),
+        (select t.id from training_types t where training_type_name = 'box'));

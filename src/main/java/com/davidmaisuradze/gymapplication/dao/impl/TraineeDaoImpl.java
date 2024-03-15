@@ -24,6 +24,7 @@ public class TraineeDaoImpl  implements TraineeDao {
     @Override
     public Trainee create(Trainee trainee) {
         entityManager.persist(trainee);
+        log.info("Trainee: {} created successfully", trainee);
         return trainee;
     }
 
@@ -59,24 +60,29 @@ public class TraineeDaoImpl  implements TraineeDao {
         if (criteria.getFrom() != null) {
             jpql.append(" AND t.trainingDate > :from");
             parameters.put("from", criteria.getFrom());
+            log.info("From date criteria added");
         }
         if (criteria.getTo() != null) {
             jpql.append(" AND t.trainingDate < :to");
             parameters.put("to", criteria.getTo());
+            log.info("To date criteria added");
         }
         if (criteria.getName() != null && !criteria.getName().isEmpty()) {
             jpql.append(" AND t.trainer.firstName = :trainerName");
             parameters.put("trainerName", criteria.getName());
+            log.info("Name criteria added");
         }
         if (criteria.getTrainingType() != null) {
             jpql.append(" AND t.trainingType = :trainingType");
             parameters.put("trainingType", criteria.getTrainingType());
+            log.info("Training Type criteria added");
         }
 
-        log.info("Returning list of trainings filtered by {}", criteria);
         TypedQuery<Training> query = entityManager.createQuery(jpql.toString(), Training.class);
         parameters.forEach(query::setParameter);
+        log.info("All parameters set");
 
+        log.info("Returning list of trainings filtered by {}", criteria);
         return query.getResultList();
     }
 }

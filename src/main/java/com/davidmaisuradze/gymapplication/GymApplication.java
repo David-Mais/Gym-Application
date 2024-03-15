@@ -1,82 +1,155 @@
 package com.davidmaisuradze.gymapplication;
 
 import com.davidmaisuradze.gymapplication.config.ApplicationConfig;
-import com.davidmaisuradze.gymapplication.config.DataSourceConfig;
-import com.davidmaisuradze.gymapplication.config.HibernateConfig;
+import com.davidmaisuradze.gymapplication.entity.Trainee;
+import com.davidmaisuradze.gymapplication.entity.Trainer;
+import com.davidmaisuradze.gymapplication.entity.Training;
+import com.davidmaisuradze.gymapplication.entity.TrainingType;
+import com.davidmaisuradze.gymapplication.model.TrainingSearchCriteria;
+import com.davidmaisuradze.gymapplication.service.TraineeService;
+import com.davidmaisuradze.gymapplication.service.TrainerService;
+import com.davidmaisuradze.gymapplication.service.TrainingService;
+import com.davidmaisuradze.gymapplication.service.TrainingTypeService;
 import com.zaxxer.hikari.HikariDataSource;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import javax.sql.DataSource;
+import java.time.LocalDate;
+import java.util.List;
 
 
 @Slf4j
 public class GymApplication {
+    private static final String DAVID_KHELADZE = "David.Kheladze";
 
     public static void main(String[] args) {
-        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
-                DataSourceConfig.class, HibernateConfig.class, ApplicationConfig.class);
-
-//        DataSource dataSource = context.getBean(DataSource.class);
-//
-//        if (dataSource instanceof HikariDataSource) {
-//            HikariDataSource hikariDataSource = (HikariDataSource) dataSource;
-//
-//            String jdbcUrl = hikariDataSource.getJdbcUrl();
-//            System.out.println("DataSource JDBC URL: " + jdbcUrl);
-//        } else {
-//            System.out.println("DataSource is not an instance of HikariDataSource. Cannot retrieve JDBC URL directly.");
-//        }
-//
-//        EntityManagerFactory emf = context.getBean(EntityManagerFactory.class);
-//        System.out.println("EntityManagerFactory bean retrieved successfully: " + emf.toString());
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(ApplicationConfig.class);
 
 
-//        TraineeDao dao = context.getBean(TraineeDao.class);
-//        UserDao userDao = context.getBean(UserDao.class);
-//        TrainerDao trainerDao = context.getBean(TrainerDao.class);
-//        User user = userDao.findByUsername("Davit.Maisuradze");
-//        System.out.println(user.toString());
+        //DataSource and EntityManagerFactory demonstration
+        DataSource dataSource = context.getBean(DataSource.class);
 
-//        Trainee trainee = dao.findByUsername("Davit.Maisuradze");
-//        System.out.println(trainee);
+        if (dataSource instanceof HikariDataSource hikariDataSource) {
 
+            String jdbcUrl = hikariDataSource.getJdbcUrl();
+            log.info("DataSource JDBC URL: {}", jdbcUrl);
+        } else {
+            log.warn("DataSource is not an instance of HikariDataSource. Cannot retrieve JDBC URL directly.");
+        }
 
-
-//        Trainee trainee = Trainee
-//                .builder()
-//                .firstName("Givi")
-//                .lastName("Sikharulidze")
-//                .isActive(true)
-//                .address("Tbilisi")
-//                .dateOfBirth(LocalDate.parse("1999-10-10"))
-//                .build();
-//
-//        TraineeService service = context.getBean(TraineeService.class);
-//        Trainee createdTrainee = service.create(trainee);
-//        System.out.println(createdTrainee);
+        EntityManagerFactory emf = context.getBean(EntityManagerFactory.class);
+        log.info("EntityManagerFactory bean retrieved successfully: {}", emf);
 
 
+        //Creating Services
+        TraineeService traineeService = context.getBean(TraineeService.class);
+        TrainerService trainerService = context.getBean(TrainerService.class);
+        TrainingService trainingService = context.getBean(TrainingService.class);
+        TrainingTypeService trainingTypeService = context.getBean(TrainingTypeService.class);
 
 
-//        Trainer trainer = trainerDao.findByUsername("Mariam.Katamashvili1");
-//        System.out.println(trainer);
+        //Testing TraineeService methods
+        //create
+        Trainee trainee = Trainee.builder()
+                .firstName("Davit")
+                .lastName("Maisuradze")
+                .isActive(true)
+                .dateOfBirth(LocalDate.parse("2004-09-20"))
+                .address("Kutaisi")
+                .build();
+        traineeService.create(trainee);
 
 
-//        Authenticator authenticator = context.getBean(Authenticator.class);
-//        System.out.println(authenticator.checkCredentials("Davit.Maissuradze", "newPass"));
+        //Find by username
+        Trainee traineeByUsername = traineeService.findByUsername("Davit.Maisuradze", "newPass");
+        log.info(traineeByUsername.toString());
+
+        //update
+        trainee.setDateOfBirth(LocalDate.parse("2000-01-01"));
+        traineeService.update(trainee);
+
+        //delete by username
+        traineeService.deleteByUsername("Mariam.Katamashvili", "marimagaria");
+
+        //changePassword
+        traineeService.changePassword("Davit.Maisuradze", "newPass", "changedPass");
+
+        //deactivate
+        traineeService.deactivate(DAVID_KHELADZE, "davdav");
+
+        //activate
+        traineeService.activate(DAVID_KHELADZE, "davdav");
+
+        //get trainings
+        TrainingSearchCriteria traineeCriteria = TrainingSearchCriteria
+                .builder()
+                .from(LocalDate.parse("1990-05-19"))
+                .to(LocalDate.parse("2010-11-25"))
+                .name("Mariam")
+                .build();
+        List<Training> trainingsByCriteria = traineeService.getTrainingsList(traineeCriteria);
+        log.info(trainingsByCriteria.toString());
+
+        TrainingType trainingType = trainingTypeService.findTrainingTypeByName("yoga");
+        TrainingSearchCriteria criteriaWithType = TrainingSearchCriteria
+                .builder()
+                .from(LocalDate.parse("1990-05-19"))
+                .to(LocalDate.parse("2010-11-25"))
+                .trainingType(trainingType)
+                .build();
+        List<Training> trainingsByCriteriaWithType = traineeService.getTrainingsList(criteriaWithType);
+        log.info(trainingsByCriteriaWithType.toString());
 
 
-//        TrainingService trainingService = context.getBean(TrainingService.class);
-//        trainingService.create(
-//                Training
-//                        .builder()
-//                        .trainingName("someTrining")
-//                        .trainingDate(Date.valueOf("1990-01-10"))
-//                        .duration(55)
-//                        .build()
-//        );
+
+        //Trainer Service methods
+        //create
+        TrainingType box = trainingTypeService.findTrainingTypeByName("box");
+        Trainer trainer = Trainer.builder()
+                .firstName("Beka")
+                .lastName("Dumbadze")
+                .isActive(true)
+                .specialization(box)
+                .build();
+        trainerService.create(trainer);
+
+        //find by username
+        Trainer iliaTopuria = trainerService.findByUsername("Ilia.Topuria", "ufcchamp");
+        log.info(iliaTopuria.toString());
+
+        //update
+        TrainingType iliaBox = trainingTypeService.findTrainingTypeByName("box");
+        iliaTopuria.setSpecialization(iliaBox);
+        trainerService.update(iliaTopuria);
+
+        //change password
+        trainerService.changePassword("Salome.Chachua", "salosalo", "New Password");
+
+        //activate deactivate
+        trainerService.deactivate("Merab.Dvalishvili", "merabmerab");
+
+        trainerService.activate("Merab.Dvalishvili", "merabmerab");
+
+        //trainers not assigned
+        List<Trainer> trainersNotAssigned = trainerService.getTrainersNotAssigned(DAVID_KHELADZE);
+        log.info(trainersNotAssigned.toString());
+
+
+
+        //training service
+        //create
+        Training training = Training
+                .builder()
+                .trainee(trainee)
+                .trainer(iliaTopuria)
+                .trainingName("Created Training")
+                .trainingType(box)
+                .trainingDate(LocalDate.parse("2024-03-15"))
+                .duration(100)
+                .build();
+        trainingService.create(training);
     }
 
 }
