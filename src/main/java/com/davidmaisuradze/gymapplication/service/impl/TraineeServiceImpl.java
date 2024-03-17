@@ -109,34 +109,34 @@ public class TraineeServiceImpl implements TraineeService {
     @Override
     @Transactional
     public Boolean activate(String username, String password) {
-        if (userDao.checkCredentials(username, password)) {
-            log.info(CREDENTIAL_MATCH);
-            Trainee trainee = traineeDao.findByUsername(username);
-            trainee.setIsActive(true);
-            log.info("Trainee with username: {} activated", username);
-            return true;
-        }
-        log.warn(CREDENTIAL_MISMATCH);
-        return false;
+        boolean isActive = true;
+        return getaBoolean(username, password, isActive);
     }
+
 
     @Override
     @Transactional
     public Boolean deactivate(String username, String password) {
-        if (userDao.checkCredentials(username, password)) {
-            log.info(CREDENTIAL_MATCH);
-            Trainee trainee = traineeDao.findByUsername(username);
-            trainee.setIsActive(false);
-            log.info("Trainee with username: {} deactivated", username);
-            return true;
-        }
-        log.warn(CREDENTIAL_MISMATCH);
-        return false;
+        boolean isActive = false;
+        return getaBoolean(username, password, isActive);
     }
 
     @Override
     public List<Training> getTrainingsList(TrainingSearchCriteria criteria) {
         log.info("Returning trainings filtered by criteria: {}", criteria);
         return traineeDao.getTrainingsList(criteria);
+    }
+
+
+    private Boolean getaBoolean(String username, String password, boolean isActive) {
+        if (userDao.checkCredentials(username, password)) {
+            log.info(CREDENTIAL_MATCH);
+            Trainee trainee = traineeDao.findByUsername(username);
+            trainee.setIsActive(isActive);
+            log.info("Trainee={} isActive={}", username, isActive);
+            return true;
+        }
+        log.warn(CREDENTIAL_MISMATCH);
+        return false;
     }
 }

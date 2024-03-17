@@ -94,29 +94,15 @@ public class TrainerServiceImpl implements TrainerService {
     @Override
     @Transactional
     public Boolean activate(String username, String password) {
-        if (userDao.checkCredentials(username, password)) {
-            log.info(CREDENTIAL_MATCH);
-            Trainer trainer = trainerDao.findByUsername(username);
-            trainer.setIsActive(true);
-            log.info("Trainer with username: {} activated", username);
-            return true;
-        }
-        log.warn(CREDENTIAL_MISMATCH);
-        return false;
+        boolean isActive = true;
+        return getaBoolean(username, password, isActive);
     }
 
     @Override
     @Transactional
     public Boolean deactivate(String username, String password) {
-        if (userDao.checkCredentials(username, password)) {
-            log.info(CREDENTIAL_MATCH);
-            Trainer trainer = trainerDao.findByUsername(username);
-            trainer.setIsActive(false);
-            log.info("Trainer with username: {} deactivated", username);
-            return true;
-        }
-        log.warn(CREDENTIAL_MISMATCH);
-        return false;
+        boolean isActive = false;
+        return getaBoolean(username, password, isActive);
     }
 
     @Override
@@ -129,5 +115,17 @@ public class TrainerServiceImpl implements TrainerService {
     public List<Training> getTrainingsList(TrainingSearchCriteria criteria) {
         log.info("Returning trainings filtered by criteria: {}", criteria);
         return trainerDao.getTrainingsList(criteria);
+    }
+
+    private Boolean getaBoolean(String username, String password, boolean isActive) {
+        if (userDao.checkCredentials(username, password)) {
+            log.info(CREDENTIAL_MATCH);
+            Trainer trainer = trainerDao.findByUsername(username);
+            trainer.setIsActive(isActive);
+            log.info("Trainer={} isActive={}", username, isActive);
+            return true;
+        }
+        log.warn(CREDENTIAL_MISMATCH);
+        return false;
     }
 }

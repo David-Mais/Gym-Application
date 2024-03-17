@@ -46,7 +46,7 @@ public class TrainerDaoImpl implements TrainerDao {
         String jpql = "SELECT t FROM Training t WHERE t.trainingDate > :from AND t.trainingDate < :to " +
                 "AND t.trainee.firstName = :traineeName";
 
-        log.info("Returning list of trainings filtered by {}", criteria);
+        log.info("Fetching list of trainings filtered by {}", criteria);
         return entityManager.createQuery(jpql, Training.class)
                 .setParameter("from", criteria.getFrom())
                 .setParameter("to", criteria.getTo())
@@ -56,7 +56,7 @@ public class TrainerDaoImpl implements TrainerDao {
 
     @Override
     public List<Trainer> getTrainersNotAssigned(String username) {
-        log.info("Returning trainers not assigned to: {}", username);
+        log.info("Fetching trainers not assigned to: {}", username);
         return entityManager
                 .createQuery("select t from Trainer t " +
                         "where t not in " +

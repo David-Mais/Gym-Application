@@ -87,12 +87,11 @@ public class GymApplication {
                 .builder()
                 .from(LocalDate.parse("1990-05-19"))
                 .to(LocalDate.parse("2010-11-25"))
-                .name("Mariam")
                 .build();
         List<Training> trainingsByCriteria = traineeService.getTrainingsList(traineeCriteria);
         log.info(trainingsByCriteria.toString());
 
-        TrainingType trainingType = trainingTypeService.findTrainingTypeByName("yoga");
+        TrainingType trainingType = trainingTypeService.findTrainingTypeByName("box");
         TrainingSearchCriteria criteriaWithType = TrainingSearchCriteria
                 .builder()
                 .from(LocalDate.parse("1990-05-19"))
