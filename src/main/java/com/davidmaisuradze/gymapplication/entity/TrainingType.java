@@ -37,10 +37,10 @@ public class TrainingType {
     @Column(name = "training_type_name", nullable = false, unique = true)
     private String trainingTypeName;
 
-    @OneToMany(mappedBy = "trainingType", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "trainingType", fetch = FetchType.LAZY)
     private Set<Training> trainings = new HashSet<>();
 
-    @OneToMany(mappedBy = "specialization", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "specialization", fetch = FetchType.LAZY)
     private List<Trainer> trainers = new ArrayList<>();
 
 }

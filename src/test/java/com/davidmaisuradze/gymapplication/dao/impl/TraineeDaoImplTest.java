@@ -6,11 +6,9 @@ import com.davidmaisuradze.gymapplication.entity.Trainee;
 import com.davidmaisuradze.gymapplication.entity.Training;
 import com.davidmaisuradze.gymapplication.model.TrainingSearchCriteria;
 import jakarta.persistence.NoResultException;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -30,14 +28,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class TraineeDaoImplTest {
     @Autowired
     private TraineeDao traineeDao;
-
-    @Autowired
-    private JdbcTemplate template;
-
-    @AfterEach
-    public void resetDatabase() {
-        template.execute("drop all objects");
-    }
 
     @Test
     void testCreate() {

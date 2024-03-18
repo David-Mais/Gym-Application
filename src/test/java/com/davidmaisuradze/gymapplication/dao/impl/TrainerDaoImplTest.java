@@ -5,11 +5,9 @@ import com.davidmaisuradze.gymapplication.dao.TrainerDao;
 import com.davidmaisuradze.gymapplication.dao.TrainingTypeDao;
 import com.davidmaisuradze.gymapplication.entity.Trainer;
 import com.davidmaisuradze.gymapplication.entity.TrainingType;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -29,13 +27,6 @@ class TrainerDaoImplTest {
     private TrainerDao trainerDao;
     @Autowired
     private TrainingTypeDao trainingTypeDao;
-    @Autowired
-    private JdbcTemplate template;
-
-    @AfterEach
-    public void resetDatabase() {
-        template.execute("drop all objects");
-    }
 
     @Test
     void createTrainer() {
