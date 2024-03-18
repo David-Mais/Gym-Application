@@ -1,8 +1,5 @@
-drop table if exists trainings;
-drop table if exists trainers;
-drop table if exists trainees;
-drop table if exists users;
-drop table if exists training_types;
+CREATE DATABASE IF NOT EXISTS gym;
+USE gym;
 
 create table if not exists training_types
 (
@@ -10,7 +7,7 @@ create table if not exists training_types
     training_type_name VARCHAR(255) NOT NULL UNIQUE
 );
 
-CREATE TABLE users
+CREATE TABLE if not exists users
 (
     id         BIGINT AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(255) NOT NULL,
@@ -20,7 +17,7 @@ CREATE TABLE users
     is_active  BOOLEAN      NOT NULL
 );
 
-CREATE TABLE trainees
+CREATE TABLE if not exists trainees
 (
     id            BIGINT AUTO_INCREMENT PRIMARY KEY,
     date_of_birth DATE NOT NULL,
@@ -28,7 +25,7 @@ CREATE TABLE trainees
     FOREIGN KEY (id) REFERENCES users (id)
 );
 
-CREATE TABLE trainers
+CREATE TABLE if not exists trainers
 (
     id            BIGINT AUTO_INCREMENT PRIMARY KEY,
     specialization       BIGINT,
