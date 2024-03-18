@@ -1,6 +1,3 @@
-CREATE DATABASE IF NOT EXISTS gym;
-USE gym;
-
 create table if not exists training_types
 (
     id   BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -34,7 +31,6 @@ CREATE TABLE trainers
     FOREIGN KEY (specialization) REFERENCES training_types (id),
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
-
 
 CREATE TABLE IF NOT EXISTS trainings
 (

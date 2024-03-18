@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -31,9 +31,6 @@ public class DaoTestConfig {
     @Value("${spring.datasource.password}")
     private String dataPassword;
 
-//    @Value("${spring.datasource.driver-class-name}")
-//    private String driver;
-
     @Value("${spring.jpa.show-sql}")
     private String showSql;
 
@@ -44,8 +41,8 @@ public class DaoTestConfig {
     private DataSource dataSource;
 
     @Bean
-    public String test() {
-        return dataUrl;
+    public JdbcTemplate jdbcTemplate(DataSource dataSource) {
+        return new JdbcTemplate(dataSource);
     }
 
     @Bean
@@ -54,7 +51,6 @@ public class DaoTestConfig {
         config.setJdbcUrl(dataUrl);
         config.setUsername(dataUsername);
         config.setPassword(dataPassword);
-//        config.setDriverClassName(driver);
 
         log.info("Datasource configured");
         return new HikariDataSource(config);

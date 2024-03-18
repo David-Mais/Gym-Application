@@ -65,4 +65,12 @@ public class TrainerDaoImpl implements TrainerDao {
                 .setParameter("username", username)
                 .getResultList();
     }
+
+    @Override
+    public List<Trainer> findAll() {
+        return entityManager.createQuery(
+                "select t from Trainer t",
+                Trainer.class
+        ).getResultList();
+    }
 }

@@ -85,4 +85,11 @@ public class TraineeDaoImpl  implements TraineeDao {
         log.info("Returning list of trainings filtered by {}", criteria);
         return query.getResultList();
     }
+
+    @Override
+    public List<Trainee> findAll() {
+        return entityManager
+                .createQuery("select t from Trainee t", Trainee.class)
+                .getResultList();
+    }
 }

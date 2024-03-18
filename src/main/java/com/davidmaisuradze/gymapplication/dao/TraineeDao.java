@@ -12,4 +12,5 @@ public interface TraineeDao {
     Trainee update(Trainee trainee);
     void delete(Trainee trainee);
     List<Training> getTrainingsList(TrainingSearchCriteria criteria);
+    List<Trainee> findAll();
 }

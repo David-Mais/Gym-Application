@@ -12,4 +12,5 @@ public interface TrainerDao {
     Trainer update(Trainer trainer);
     List<Training> getTrainingsList(TrainingSearchCriteria criteria);
     List<Trainer> getTrainersNotAssigned(String username);
+    List<Trainer> findAll();
 }
