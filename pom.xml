@@ -18,6 +18,10 @@
         <java.version>17</java.version>
         <spring.version>6.1.4</spring.version>
 
+        <jakarta.servlet-api.version>6.1.0-M2</jakarta.servlet-api.version>
+        <jackson.databind.version>2.17.0</jackson.databind.version>
+        <tomcat.core.version>10.1.19</tomcat.core.version>
+
         <hibernate.version>6.4.4.Final</hibernate.version>
         <hikari.version>5.1.0</hikari.version>
         <mysql-connector-java.version>8.0.33</mysql-connector-java.version>
@@ -59,6 +63,31 @@
             <artifactId>spring-test</artifactId>
             <version>${spring.version}</version>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>${jakarta.servlet-api.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.databind.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-core</artifactId>
+            <version>${tomcat.core.version}</version>
         </dependency>
 
         <dependency>
