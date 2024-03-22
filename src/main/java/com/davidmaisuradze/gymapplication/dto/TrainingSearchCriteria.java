@@ -1,4 +1,4 @@
-package com.davidmaisuradze.gymapplication.model;
+package com.davidmaisuradze.gymapplication.dto;
 
 import com.davidmaisuradze.gymapplication.entity.TrainingType;
 import lombok.Builder;

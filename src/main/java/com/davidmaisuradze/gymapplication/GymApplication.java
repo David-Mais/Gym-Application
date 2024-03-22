@@ -5,7 +5,7 @@ import com.davidmaisuradze.gymapplication.entity.Trainee;
 import com.davidmaisuradze.gymapplication.entity.Trainer;
 import com.davidmaisuradze.gymapplication.entity.Training;
 import com.davidmaisuradze.gymapplication.entity.TrainingType;
-import com.davidmaisuradze.gymapplication.model.TrainingSearchCriteria;
+import com.davidmaisuradze.gymapplication.dto.TrainingSearchCriteria;
 import com.davidmaisuradze.gymapplication.service.TraineeService;
 import com.davidmaisuradze.gymapplication.service.TrainerService;
 import com.davidmaisuradze.gymapplication.service.TrainingService;

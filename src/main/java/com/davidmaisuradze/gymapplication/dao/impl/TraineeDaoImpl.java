@@ -3,7 +3,7 @@ package com.davidmaisuradze.gymapplication.dao.impl;
 import com.davidmaisuradze.gymapplication.dao.TraineeDao;
 import com.davidmaisuradze.gymapplication.entity.Trainee;
 import com.davidmaisuradze.gymapplication.entity.Training;
-import com.davidmaisuradze.gymapplication.model.TrainingSearchCriteria;
+import com.davidmaisuradze.gymapplication.dto.TrainingSearchCriteria;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;

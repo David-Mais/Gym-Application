@@ -4,7 +4,7 @@ import com.davidmaisuradze.gymapplication.dao.TraineeDao;
 import com.davidmaisuradze.gymapplication.dao.UserDao;
 import com.davidmaisuradze.gymapplication.entity.Trainee;
 import com.davidmaisuradze.gymapplication.entity.Training;
-import com.davidmaisuradze.gymapplication.model.TrainingSearchCriteria;
+import com.davidmaisuradze.gymapplication.dto.TrainingSearchCriteria;
 import com.davidmaisuradze.gymapplication.service.TraineeService;
 import com.davidmaisuradze.gymapplication.service.util.DetailsGenerator;
 import lombok.extern.slf4j.Slf4j;

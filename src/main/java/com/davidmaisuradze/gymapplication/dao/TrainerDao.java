@@ -2,7 +2,7 @@ package com.davidmaisuradze.gymapplication.dao;
 
 import com.davidmaisuradze.gymapplication.entity.Trainer;
 import com.davidmaisuradze.gymapplication.entity.Training;
-import com.davidmaisuradze.gymapplication.model.TrainingSearchCriteria;
+import com.davidmaisuradze.gymapplication.dto.TrainingSearchCriteria;
 
 import java.util.List;
 
