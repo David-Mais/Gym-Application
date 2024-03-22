@@ -25,7 +25,7 @@ public class TestController {
     }
 
     @GetMapping(value = "/trainees", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<TraineeDto>> traineeList() {
+    public ResponseEntity<TraineeDto> traineeList() {
         List<Trainee> fetched = traineeDao.findAll();
         List<TraineeDto> dtos = new ArrayList<>();
         for (Trainee t : fetched) {
@@ -42,6 +42,6 @@ public class TestController {
                     .build()
             );
         }
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(dtos);
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(dtos.get(0));
     }
 }

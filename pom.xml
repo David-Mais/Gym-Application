@@ -20,7 +20,7 @@
         <spring.version>6.1.4</spring.version>
 
         <jakarta.servlet-api.version>6.1.0-M2</jakarta.servlet-api.version>
-        <jackson.databind.version>2.17.0</jackson.databind.version>
+        <jackson.version>2.17.0</jackson.version>
         <tomcat.core.version>10.1.19</tomcat.core.version>
 
         <hibernate.version>6.4.4.Final</hibernate.version>
@@ -88,13 +88,19 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>${jackson.databind.version}</version>
+            <version>${jackson.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>${jackson.databind.version}</version>
+            <version>${jackson.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>${jackson.version}</version>
         </dependency>
 
         <dependency>

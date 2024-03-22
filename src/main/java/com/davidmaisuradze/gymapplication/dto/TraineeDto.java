@@ -1,5 +1,7 @@
 package com.davidmaisuradze.gymapplication.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,7 +16,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Getter
 @Setter
-@JsonView
 public class TraineeDto {
     private Long id;
     private String firstName;
@@ -22,6 +23,7 @@ public class TraineeDto {
     private String username;
     private String password;
     private Boolean isActive;
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dateOfBirth;
     private String address;
 }
