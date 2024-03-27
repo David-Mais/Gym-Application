@@ -4,7 +4,7 @@ import com.davidmaisuradze.gymapplication.config.DaoTestConfig;
 import com.davidmaisuradze.gymapplication.dao.TraineeDao;
 import com.davidmaisuradze.gymapplication.entity.Trainee;
 import com.davidmaisuradze.gymapplication.entity.Training;
-import com.davidmaisuradze.gymapplication.dto.TrainingSearchCriteria;
+import com.davidmaisuradze.gymapplication.dto.training.TrainingSearchCriteria;
 import jakarta.persistence.NoResultException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

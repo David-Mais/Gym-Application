@@ -1,7 +1,8 @@
 package com.davidmaisuradze.gymapplication.service;
 
-import com.davidmaisuradze.gymapplication.entity.Training;
+import com.davidmaisuradze.gymapplication.dto.training.CreateTrainingDto;
+import com.davidmaisuradze.gymapplication.dto.training.TrainingDto;
 
 public interface TrainingService {
-    Training create(Training training);
+    TrainingDto create(CreateTrainingDto createTrainingDto);
 }

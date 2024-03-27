@@ -1,5 +1,6 @@
 package com.davidmaisuradze.gymapplication.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -38,9 +39,11 @@ public class TrainingType {
     private String trainingTypeName;
 
     @OneToMany(mappedBy = "trainingType", fetch = FetchType.LAZY)
+    @JsonIgnore
     private Set<Training> trainings = new HashSet<>();
 
     @OneToMany(mappedBy = "specialization", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Trainer> trainers = new ArrayList<>();
 
 }

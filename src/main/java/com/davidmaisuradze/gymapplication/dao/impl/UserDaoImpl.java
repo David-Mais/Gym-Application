@@ -19,7 +19,7 @@ public class UserDaoImpl implements UserDao {
     public boolean checkCredentials(String username, String password) {
         try {
             String actualPassword = (String) entityManager
-                    .createQuery("select u.password from UserEntity u where username = :username")
+                    .createQuery("select u.password from UserEntity u where u.username = :username")
                     .setParameter("username", username)
                     .getSingleResult();
             log.info("Checking credentials");

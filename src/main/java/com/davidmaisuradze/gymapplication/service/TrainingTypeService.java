@@ -1,7 +1,10 @@
 package com.davidmaisuradze.gymapplication.service;
 
-import com.davidmaisuradze.gymapplication.entity.TrainingType;
+import com.davidmaisuradze.gymapplication.dto.trainingtype.TrainingTypeDto;
+
+import java.util.List;
 
 public interface TrainingTypeService {
-    TrainingType findTrainingTypeByName(String name);
+    TrainingTypeDto findTrainingTypeByName(String name);
+    List<TrainingTypeDto> findAll();
 }

@@ -32,14 +32,14 @@ public class Training {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long trainingId;
+    private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(name = "trainee_id")
     @ToString.Exclude
     private Trainee trainee;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "trainer_id")
     @ToString.Exclude
     private Trainer trainer;

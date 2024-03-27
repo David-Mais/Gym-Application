@@ -1,9 +1,10 @@
 package com.davidmaisuradze.gymapplication.dao.impl;
 
 import com.davidmaisuradze.gymapplication.dao.TraineeDao;
+import com.davidmaisuradze.gymapplication.dto.training.TrainingSearchCriteria;
 import com.davidmaisuradze.gymapplication.entity.Trainee;
+import com.davidmaisuradze.gymapplication.entity.Trainer;
 import com.davidmaisuradze.gymapplication.entity.Training;
-import com.davidmaisuradze.gymapplication.dto.TrainingSearchCriteria;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
@@ -84,6 +85,14 @@ public class TraineeDaoImpl  implements TraineeDao {
 
         log.info("Returning list of trainings filtered by {}", criteria);
         return query.getResultList();
+    }
+
+    @Override
+    public List<Trainer> getAllTrainers(String username) {
+        return entityManager
+                .createQuery("select t.trainer from Training t where t.trainee.username = :username", Trainer.class)
+                .setParameter("username", username)
+                .getResultList();
     }
 
     @Override

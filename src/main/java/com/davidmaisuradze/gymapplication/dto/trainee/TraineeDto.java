@@ -1,8 +1,6 @@
-package com.davidmaisuradze.gymapplication.dto;
+package com.davidmaisuradze.gymapplication.dto.trainee;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonView;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
