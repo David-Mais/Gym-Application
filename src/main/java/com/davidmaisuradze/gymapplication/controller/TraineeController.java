@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -96,5 +97,17 @@ public class TraineeController {
             @RequestBody CredentialsDto credentialsDto
     ) {
         return traineeService.getTrainingsList(credentialsDto, criteria);
+    }
+
+    @PatchMapping("/activate")
+    public ResponseEntity<String> activate(@RequestBody CredentialsDto credentialsDto) {
+        traineeService.activate(credentialsDto);
+        return ResponseEntity.ok("Trainee activated");
+    }
+
+    @PatchMapping("/deactivate")
+    public ResponseEntity<String> deactivate(@RequestBody CredentialsDto credentialsDto) {
+        traineeService.deactivate(credentialsDto);
+        return ResponseEntity.ok("Trainee deactivated");
     }
 }
