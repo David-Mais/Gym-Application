@@ -12,8 +12,8 @@ import com.davidmaisuradze.gymapplication.dto.trainer.TrainerInfoDto;
 import com.davidmaisuradze.gymapplication.dto.trainer.TrainerProfileDto;
 import com.davidmaisuradze.gymapplication.dto.trainer.TrainerProfileUpdateRequestDto;
 import com.davidmaisuradze.gymapplication.dto.trainer.TrainerProfileUpdateResponseDto;
+import com.davidmaisuradze.gymapplication.dto.trainer.TrainerTrainingSearchDto;
 import com.davidmaisuradze.gymapplication.dto.training.TrainingInfoDto;
-import com.davidmaisuradze.gymapplication.dto.training.TrainingSearchCriteria;
 import com.davidmaisuradze.gymapplication.entity.Trainer;
 import com.davidmaisuradze.gymapplication.entity.Training;
 import com.davidmaisuradze.gymapplication.entity.TrainingType;
@@ -83,65 +83,48 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    public TrainerProfileDto getProfile(CredentialsDto credentialsDto) {
-        String username = credentialsDto.getUsername();
-        String password = credentialsDto.getPassword();
+    public TrainerProfileDto getProfile(String username) {
+        Trainer trainer = trainerDao.findByUsername(username);
+        TrainerProfileDto trainerProfile = trainerMapper.trainerToTrainerProfileDto(trainer);
 
-        if (userDao.checkCredentials(username, password)) {
-            log.info(CREDENTIAL_MATCH);
+        trainerProfile.setTraineesList(getAllTraineeInfoDto(username));
 
-            Trainer trainer = trainerDao.findByUsername(username);
-            TrainerProfileDto trainerProfile = trainerMapper.trainerToTrainerProfileDto(trainer);
-
-            trainerProfile.setTraineesList(getAllTraineeInfoDto(username));
-
-            return trainerProfile;
-        }
-
-        log.warn(CREDENTIAL_MISMATCH);
-        return null;
+        return trainerProfile;
     }
 
     @Override
     @Transactional
-    public TrainerProfileUpdateResponseDto updateProfile(TrainerProfileUpdateRequestDto requestDto) {
-        String username = requestDto.getUsername();
-        String password = requestDto.getPassword();
+    public TrainerProfileUpdateResponseDto updateProfile(
+            String username,
+            TrainerProfileUpdateRequestDto requestDto
+    ) {
+        Trainer trainer = trainerDao.findByUsername(username);
 
-        if (userDao.checkCredentials(username, password)) {
-            log.info(CREDENTIAL_MATCH);
+        String firstName = requestDto.getFirstName();
+        String lastName = requestDto.getLastName();
+        TrainingType specialization = trainingTypeDao.findTrainingTypeByName(requestDto.getSpecialization().getTrainingTypeName());
+        Boolean isActive = requestDto.getIsActive();
 
-            Trainer trainer = trainerDao.findByUsername(username);
-
-            String firstName = requestDto.getFirstName();
-            String lastName = requestDto.getLastName();
-            TrainingType specialization = trainingTypeDao.findTrainingTypeByName(requestDto.getSpecialization().getTrainingTypeName());
-            Boolean isActive = requestDto.getIsActive();
-
-            if (firstName != null) {
-                trainer.setFirstName(firstName);
-            }
-            if (lastName != null) {
-                trainer.setLastName(lastName);
-            }
-            if (specialization != null) {
-                trainer.setSpecialization(specialization);
-            }
-            if (isActive != null) {
-                trainer.setIsActive(isActive);
-            }
-
-            trainerDao.update(trainer);
-
-            TrainerProfileUpdateResponseDto responseDto = trainerMapper.trainerToUpdateResponseDto(trainer);
-
-            responseDto.setTraineesList(getAllTraineeInfoDto(username));
-
-            return responseDto;
+        if (firstName != null) {
+            trainer.setFirstName(firstName);
+        }
+        if (lastName != null) {
+            trainer.setLastName(lastName);
+        }
+        if (specialization != null) {
+            trainer.setSpecialization(specialization);
+        }
+        if (isActive != null) {
+            trainer.setIsActive(isActive);
         }
 
-        log.warn(CREDENTIAL_MISMATCH);
-        return null;
+        trainerDao.update(trainer);
+
+        TrainerProfileUpdateResponseDto responseDto = trainerMapper.trainerToUpdateResponseDto(trainer);
+
+        responseDto.setTraineesList(getAllTraineeInfoDto(username));
+
+        return responseDto;
     }
 
     @Override
@@ -172,8 +155,7 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     @Transactional
-    public boolean changePassword(PasswordChangeDto passwordChangeDto) {
-        String username = passwordChangeDto.getUsername();
+    public boolean changePassword(String username, PasswordChangeDto passwordChangeDto) {
         String oldPassword = passwordChangeDto.getOldPassword();
         String newPassword = passwordChangeDto.getNewPassword();
         if (userDao.checkCredentials(username, oldPassword)) {
@@ -190,73 +172,48 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     @Transactional
-    public Boolean activate(CredentialsDto credentialsDto) {
-        String username = credentialsDto.getUsername();
-        String password = credentialsDto.getPassword();
-
-        boolean isActive = true;
-        return getaBoolean(username, password, isActive);
+    public void activate(String username) {
+        setActive(username, true);
     }
 
     @Override
     @Transactional
-    public Boolean deactivate(CredentialsDto credentialsDto) {
-        String username = credentialsDto.getUsername();
-        String password = credentialsDto.getPassword();
-
-        boolean isActive = false;
-        return getaBoolean(username, password, isActive);
+    public void deactivate(String username) {
+        setActive(username, false);
     }
 
     @Override
-    public List<TrainerInfoDto> getTrainersNotAssigned(CredentialsDto credentialsDto) {
-        String username = credentialsDto.getUsername();
-        String password = credentialsDto.getPassword();
-
-        if (userDao.checkCredentials(username, password)) {
-            log.info(CREDENTIAL_MATCH);
-
-            return trainerDao
-                    .getTrainersNotAssigned(username)
-                    .stream()
-                    .map(trainerMapper::trainerToTrainerInfoDto)
-                    .toList();
-        }
-        return new ArrayList<>();
+    public List<TrainerInfoDto> getTrainersNotAssigned(String username) {
+        return trainerDao
+                .getTrainersNotAssigned(username)
+                .stream()
+                .map(trainerMapper::trainerToTrainerInfoDto)
+                .toList();
     }
 
     @Override
-    public List<TrainingInfoDto> getTrainingsList(CredentialsDto credentialsDto, TrainingSearchCriteria criteria) {
-        String username = credentialsDto.getUsername();
-        String password = credentialsDto.getPassword();
+    public List<TrainingInfoDto> getTrainingsList(String username, TrainerTrainingSearchDto criteria) {
+        List<Training> trainings = trainerDao.getTrainingsList(criteria);
 
-        if (userDao.checkCredentials(username, password)) {
-            log.info(CREDENTIAL_MATCH);
+        List<TrainingInfoDto> trainingInfoDtos = new ArrayList<>();
 
-            List<Training> trainings = trainerDao.getTrainingsList(criteria);
-
-            List<TrainingInfoDto> trainingInfoDtos = new ArrayList<>();
-
-            for (Training t : trainings) {
+        for (Training t : trainings) {
+            if (t.getTrainer().getUsername().equals(username)) {
                 TrainingInfoDto trainingInfo = trainingMapper.trainingToTrainingInfoDto(t);
-                trainingInfo.setUsername(t.getTrainer().getUsername());
+                trainingInfo.setUsername(t.getTrainee().getUsername());
+                trainingInfo.setTrainingType(t.getTrainer().getSpecialization());
+                trainingInfoDtos.add(trainingInfo);
             }
-
-            return trainingInfoDtos;
         }
-        return new ArrayList<>();
+
+        return trainingInfoDtos;
     }
 
-    private Boolean getaBoolean(String username, String password, boolean isActive) {
-        if (userDao.checkCredentials(username, password)) {
-            log.info(CREDENTIAL_MATCH);
-            Trainer trainer = trainerDao.findByUsername(username);
-            trainer.setIsActive(isActive);
-            log.info("Trainer={} isActive={}", username, isActive);
-            return true;
-        }
-        log.warn(CREDENTIAL_MISMATCH);
-        return false;
+    private void setActive(String username, boolean isActive) {
+        Trainer trainer = trainerDao.findByUsername(username);
+        trainer.setIsActive(isActive);
+        trainerDao.update(trainer);
+        log.info("Trainer={} isActive={}", username, isActive);
     }
 
     private List<TraineeInfoDto> getAllTraineeInfoDto(String username) {

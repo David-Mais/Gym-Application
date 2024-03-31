@@ -34,7 +34,7 @@ public class Training {
     @Column(name = "id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.REMOVE, CascadeType.MERGE})
+    @ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(name = "trainee_id")
     @ToString.Exclude
     private Trainee trainee;
@@ -47,7 +47,7 @@ public class Training {
     @Column(name = "training_name")
     private String trainingName;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "training_type_id")
     private TrainingType trainingType;
 

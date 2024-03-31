@@ -16,13 +16,13 @@ import java.util.List;
 public interface TraineeService {
     CredentialsDto create(CreateTraineeDto traineeDto);
     TraineeDto login(CredentialsDto credentialsDto);
-    TraineeProfileDto getProfile(CredentialsDto credentialsDto);
-    TraineeProfileUpdateResponseDto updateProfile(TraineeProfileUpdateRequestDto updateRequestDto);
+    TraineeProfileDto getProfile(String username);
+    TraineeProfileUpdateResponseDto updateProfile(String username, TraineeProfileUpdateRequestDto updateRequestDto);
     Trainee findByUsername(String username, String password);
     Trainee update(Trainee trainee);
-    void deleteByUsername(CredentialsDto credentialsDto);
-    boolean changePassword(PasswordChangeDto passwordChangeDto);
-    Boolean activate(CredentialsDto credentialsDto);
-    Boolean deactivate(CredentialsDto credentialsDto);
-    List<TrainingInfoDto> getTrainingsList(CredentialsDto credentialsDto, TrainingSearchCriteria criteria);
+    void deleteByUsername(String username);
+    boolean changePassword(String username, PasswordChangeDto passwordChangeDto);
+    void activate(String username);
+    void deactivate(String username);
+    List<TrainingInfoDto> getTrainingsList(String username, TrainingSearchCriteria criteria);
 }

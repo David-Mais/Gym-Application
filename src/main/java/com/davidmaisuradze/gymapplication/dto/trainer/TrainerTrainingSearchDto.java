@@ -1,20 +1,20 @@
-package com.davidmaisuradze.gymapplication.dto.training;
+package com.davidmaisuradze.gymapplication.dto.trainer;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
-
-@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TrainingSearchCriteria {
+@Getter
+@Setter
+public class TrainerTrainingSearchDto {
     private LocalDate from;
     private LocalDate to;
     private String name;
-    private String trainingTypeName;
 }

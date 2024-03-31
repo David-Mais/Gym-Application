@@ -69,13 +69,13 @@ public class TraineeDaoImpl  implements TraineeDao {
             log.info("To date criteria added");
         }
         if (criteria.getName() != null && !criteria.getName().isEmpty()) {
-            jpql.append(" AND t.trainer.firstName = :trainerName");
+            jpql.append(" AND t.trainer.username = :trainerName");
             parameters.put("trainerName", criteria.getName());
             log.info("Name criteria added");
         }
-        if (criteria.getTrainingType() != null) {
-            jpql.append(" AND t.trainingType = :trainingType");
-            parameters.put("trainingType", criteria.getTrainingType());
+        if (criteria.getTrainingTypeName() != null) {
+            jpql.append(" AND t.trainingType.trainingTypeName = :trainingTypeName");
+            parameters.put("trainingTypeName", criteria.getTrainingTypeName());
             log.info("Training Type criteria added");
         }
 

@@ -1,5 +1,7 @@
 package com.davidmaisuradze.gymapplication.dto.trainee;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Past;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,8 +16,11 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class CreateTraineeDto {
+    @NotBlank(message = "First name should not be blank")
     private String firstName;
+    @NotBlank(message = "Last name should not be blank")
     private String lastName;
+    @Past(message = "No future people allowed")
     private LocalDate dateOfBirth;
     private String address;
 }
