@@ -1,17 +1,21 @@
 package com.davidmaisuradze.gymapplication.dao.impl;
 
 import com.davidmaisuradze.gymapplication.config.DaoTestConfig;
+import com.davidmaisuradze.gymapplication.config.WebTestConfig;
 import com.davidmaisuradze.gymapplication.dao.TraineeDao;
 import com.davidmaisuradze.gymapplication.entity.Trainee;
 import com.davidmaisuradze.gymapplication.entity.Training;
 import com.davidmaisuradze.gymapplication.dto.training.TrainingSearchCriteria;
 import jakarta.persistence.NoResultException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -22,13 +26,15 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = DaoTestConfig.class)
+@ContextConfiguration(classes = {
+        DaoTestConfig.class,
+        WebTestConfig.class
+})
 @Sql(scripts = "/gym-schema.sql")
 @Transactional
 class TraineeDaoImplTest {
     @Autowired
     private TraineeDao traineeDao;
-
     @Test
     void testCreate() {
         Trainee trainee = getTrainee();

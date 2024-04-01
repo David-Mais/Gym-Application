@@ -18,9 +18,9 @@ import java.util.Map;
 @Repository
 @Slf4j
 public class TrainerDaoImpl implements TrainerDao {
-
     @PersistenceContext
     private EntityManager entityManager;
+    private static final String USERNAME = "username";
     @Override
     public Trainer create(Trainer trainer) {
         entityManager.persist(trainer);
@@ -32,7 +32,7 @@ public class TrainerDaoImpl implements TrainerDao {
     public Trainer findByUsername(String username) {
         Trainer trainer = entityManager
                 .createQuery("select t from Trainer t where t.username = :username", Trainer.class)
-                .setParameter("username", username)
+                .setParameter(USERNAME, username)
                 .getSingleResult();
         log.info("Trainer with username: {} found", username);
         return trainer;
@@ -84,7 +84,7 @@ public class TrainerDaoImpl implements TrainerDao {
                         "(select tr.trainer from Training tr " +
                         "where tr.trainee.username = :username) " +
                         "and t.isActive = true", Trainer.class)
-                .setParameter("username", username)
+                .setParameter(USERNAME, username)
                 .getResultList();
     }
 
@@ -100,7 +100,7 @@ public class TrainerDaoImpl implements TrainerDao {
     public List<Trainee> getAllTrainees(String username) {
         return entityManager
                 .createQuery("select t.trainee from Training t where t.trainer.username = :username", Trainee.class)
-                .setParameter("username", username)
+                .setParameter(USERNAME, username)
                 .getResultList();
     }
 }
