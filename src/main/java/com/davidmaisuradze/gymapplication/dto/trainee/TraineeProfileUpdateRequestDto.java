@@ -1,6 +1,7 @@
 package com.davidmaisuradze.gymapplication.dto.trainee;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,6 +22,6 @@ public class TraineeProfileUpdateRequestDto {
     private String lastName;
     private LocalDate dateOfBirth;
     private String address;
-    @NotBlank(message = "Is active should not be blank")
+    @NotNull(message = "isActive field should not be null")
     private Boolean isActive;
 }

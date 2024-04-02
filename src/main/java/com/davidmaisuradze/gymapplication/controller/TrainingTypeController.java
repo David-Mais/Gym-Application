@@ -15,7 +15,7 @@ import java.util.List;
 public class TrainingTypeController {
     private final TrainingTypeService trainingTypeService;
 
-    @GetMapping("/find/all")
+    @GetMapping("/all")
     public List<TrainingTypeDto> getAll() {
         return trainingTypeService.findAll();
     }

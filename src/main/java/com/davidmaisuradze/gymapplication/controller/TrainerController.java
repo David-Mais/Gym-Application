@@ -1,9 +1,8 @@
 package com.davidmaisuradze.gymapplication.controller;
 
+import com.davidmaisuradze.gymapplication.dto.ActiveStatusDto;
 import com.davidmaisuradze.gymapplication.dto.CredentialsDto;
-import com.davidmaisuradze.gymapplication.dto.PasswordChangeDto;
 import com.davidmaisuradze.gymapplication.dto.trainer.CreateTrainerDto;
-import com.davidmaisuradze.gymapplication.dto.trainer.TrainerDto;
 import com.davidmaisuradze.gymapplication.dto.trainer.TrainerInfoDto;
 import com.davidmaisuradze.gymapplication.dto.trainer.TrainerProfileDto;
 import com.davidmaisuradze.gymapplication.dto.trainer.TrainerProfileUpdateRequestDto;
@@ -11,6 +10,7 @@ import com.davidmaisuradze.gymapplication.dto.trainer.TrainerProfileUpdateRespon
 import com.davidmaisuradze.gymapplication.dto.trainer.TrainerTrainingSearchDto;
 import com.davidmaisuradze.gymapplication.dto.training.TrainingInfoDto;
 import com.davidmaisuradze.gymapplication.service.TrainerService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -29,65 +29,32 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/trainer")
+@RequestMapping("/api/v1/trainers")
 @RequiredArgsConstructor
 public class TrainerController {
     private final TrainerService trainerService;
 
-    @PostMapping("/create")
-    public ResponseEntity<CredentialsDto> createTrainer(@RequestBody CreateTrainerDto createTrainerDto) {
+    @PostMapping()
+    public ResponseEntity<CredentialsDto> createTrainer(
+            @Valid @RequestBody CreateTrainerDto createTrainerDto
+    ) {
         CredentialsDto credentialsDto = trainerService.create(createTrainerDto);
         return new ResponseEntity<>(credentialsDto, HttpStatus.CREATED);
-    }
-
-    @GetMapping("/login")
-    public ResponseEntity<String> login(@RequestBody CredentialsDto credentialsDto) {
-        TrainerDto trainerDto = trainerService.login(credentialsDto);
-
-        if (trainerDto != null) {
-            return ResponseEntity.status(HttpStatus.OK).body("Login Successful");
-        }
-
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credentials not matched");
-    }
-
-    @PutMapping("/login/change/{username}")
-    public ResponseEntity<String> changeLogin(
-            @PathVariable String username,
-            @RequestBody PasswordChangeDto passwordChangeDto
-    ) {
-        boolean changed = trainerService.changePassword(username, passwordChangeDto);
-
-        if (changed) {
-            return ResponseEntity.ok("Password changed");
-        }
-
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Problem encountered during password change");
     }
 
     @GetMapping("/profile/{username}")
     public ResponseEntity<TrainerProfileDto> getProfile(
             @PathVariable String username
     ) {
-        TrainerProfileDto profileDto = trainerService.getProfile(username);
-        if (profileDto != null) {
-            return ResponseEntity.ok(profileDto);
-        }
-        return null;
+        return ResponseEntity.ok(trainerService.getProfile(username));
     }
 
-    @PutMapping("/profile/update/{username}")
+    @PutMapping("/profile/{username}")
     public ResponseEntity<TrainerProfileUpdateResponseDto> updateProfile(
             @PathVariable String username,
-            @RequestBody TrainerProfileUpdateRequestDto trainerProfileUpdateRequestDto
+            @Valid @RequestBody TrainerProfileUpdateRequestDto trainerProfileUpdateRequestDto
     ) {
-        TrainerProfileUpdateResponseDto responseDto = trainerService.updateProfile(username, trainerProfileUpdateRequestDto);
-
-        if (responseDto != null) {
-            return ResponseEntity.ok(responseDto);
-        }
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        return ResponseEntity.ok(trainerService.updateProfile(username, trainerProfileUpdateRequestDto));
     }
 
     @GetMapping("/not-assigned/{username}")
@@ -97,16 +64,13 @@ public class TrainerController {
         return trainerService.getTrainersNotAssigned(username);
     }
 
-    @PatchMapping("/profile/activate/{username}")
-    public ResponseEntity<String> activate(@PathVariable String username) {
-        trainerService.activate(username);
-        return ResponseEntity.ok("Trainer activated");
-    }
-
-    @PatchMapping("/profile/deactivate/{username}")
-    public ResponseEntity<String> deactivate(@PathVariable String username) {
-        trainerService.deactivate(username);
-        return ResponseEntity.ok("Trainer deactivated");
+    @PatchMapping("/{username}/active")
+    public ResponseEntity<Void> activate(
+            @PathVariable String username,
+            @Valid @RequestBody ActiveStatusDto activeStatusDto
+    ) {
+        trainerService.updateActiveStatus(username, activeStatusDto);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/profile/{username}/trainings")
@@ -116,7 +80,7 @@ public class TrainerController {
             @RequestParam(name = "to", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
             @RequestParam(name = "traineeUsername", required = false) String traineeName
     ) {
-        TrainerTrainingSearchDto criteria =  TrainerTrainingSearchDto.builder()
+        TrainerTrainingSearchDto criteria = TrainerTrainingSearchDto.builder()
                 .from(from)
                 .to(to)
                 .name(traineeName)

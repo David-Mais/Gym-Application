@@ -3,10 +3,9 @@ package com.davidmaisuradze.gymapplication.service.impl;
 import com.davidmaisuradze.gymapplication.dao.TraineeDao;
 import com.davidmaisuradze.gymapplication.dao.TrainingTypeDao;
 import com.davidmaisuradze.gymapplication.dao.UserDao;
+import com.davidmaisuradze.gymapplication.dto.ActiveStatusDto;
 import com.davidmaisuradze.gymapplication.dto.CredentialsDto;
-import com.davidmaisuradze.gymapplication.dto.PasswordChangeDto;
 import com.davidmaisuradze.gymapplication.dto.trainee.CreateTraineeDto;
-import com.davidmaisuradze.gymapplication.dto.trainee.TraineeDto;
 import com.davidmaisuradze.gymapplication.dto.trainee.TraineeProfileDto;
 import com.davidmaisuradze.gymapplication.dto.trainee.TraineeProfileUpdateRequestDto;
 import com.davidmaisuradze.gymapplication.dto.trainee.TraineeProfileUpdateResponseDto;
@@ -15,6 +14,7 @@ import com.davidmaisuradze.gymapplication.dto.training.TrainingInfoDto;
 import com.davidmaisuradze.gymapplication.dto.training.TrainingSearchCriteria;
 import com.davidmaisuradze.gymapplication.entity.Trainee;
 import com.davidmaisuradze.gymapplication.entity.Training;
+import com.davidmaisuradze.gymapplication.exception.GymException;
 import com.davidmaisuradze.gymapplication.mapper.TraineeMapper;
 import com.davidmaisuradze.gymapplication.mapper.TrainerMapper;
 import com.davidmaisuradze.gymapplication.mapper.TrainingMapper;
@@ -49,47 +49,40 @@ public class TraineeServiceImpl implements TraineeService {
     @Override
     @Transactional
     public CredentialsDto create(CreateTraineeDto createTraineeDto) {
-        String password = detailsGenerator.generatePassword();
-        String username = detailsGenerator.generateUsername(
-                createTraineeDto.getFirstName(),
-                createTraineeDto.getLastName()
-        );
+        try {
+            String password = detailsGenerator.generatePassword();
+            String username = detailsGenerator.generateUsername(
+                    createTraineeDto.getFirstName(),
+                    createTraineeDto.getLastName()
+            );
 
-        Trainee trainee = traineeMapper.createTraineeDtoToTrainee(createTraineeDto);
+            Trainee trainee = traineeMapper.createTraineeDtoToTrainee(createTraineeDto);
 
-        trainee.setPassword(password);
-        trainee.setUsername(username);
-        trainee.setIsActive(true);
+            trainee.setPassword(password);
+            trainee.setUsername(username);
+            trainee.setIsActive(true);
 
-        traineeDao.create(trainee);
+            traineeDao.create(trainee);
 
-        log.info("Trainee Created");
+            log.info("Trainee Created");
 
-        return userMapper.userToCredentialsDto(trainee);
-    }
-
-    @Override
-    public TraineeDto login(CredentialsDto credentialsDto) {
-        String username = credentialsDto.getUsername();
-        String password = credentialsDto.getPassword();
-
-        if (userDao.checkCredentials(username, password)) {
-            Trainee trainee = traineeDao.findByUsername(username);
-            return traineeMapper.entityToDto(trainee);
+            return userMapper.userToCredentialsDto(trainee);
+        } catch (Exception e) {
+            throw new GymException("First name Last name and date of birth should be provided", "400");
         }
-
-        return null;
     }
 
     @Override
     public TraineeProfileDto getProfile(String username) {
-        Trainee trainee = traineeDao.findByUsername(username);
-        TraineeProfileDto profileDto = traineeMapper.traineeToTrainerProfileDto(trainee);
+        try {
+            Trainee trainee = traineeDao.findByUsername(username);
+            TraineeProfileDto profileDto = traineeMapper.traineeToTrainerProfileDto(trainee);
+            profileDto.setTrainersList(getAllTrainerDto(username));
 
-        profileDto.setTrainersList(getAllTrainerDto(username));
-
-        return profileDto;
-
+            return profileDto;
+        } catch (Exception e) {
+            throw new GymException("Trainee not found with username: " + username, "404");
+        }
     }
 
     @Override
@@ -129,7 +122,6 @@ public class TraineeServiceImpl implements TraineeService {
         responseDto.setTrainersList(getAllTrainerDto(username));
 
         return responseDto;
-
     }
 
     @Override
@@ -161,57 +153,24 @@ public class TraineeServiceImpl implements TraineeService {
     @Override
     @Transactional
     public void deleteByUsername(String username) {
-        Trainee traineeToDelete = traineeDao.findByUsername(username);
-
-        if (traineeToDelete == null) {
-            log.warn("Trainee with username {} does not exist", username);
-            return;
+        try {
+            Trainee traineeToDelete = traineeDao.findByUsername(username);
+            traineeDao.delete(traineeToDelete);
+        } catch (Exception e) {
+            throw new GymException("Trainee does not exist with username: " + username, "404");
         }
-
-        traineeDao.delete(traineeToDelete);
-        log.info("Trainee with username: {} deleted", username);
     }
 
     @Override
     @Transactional
-    public boolean changePassword(String username, PasswordChangeDto passwordChangeDto) {
-        String oldPassword = passwordChangeDto.getOldPassword();
-        boolean checked = userDao.checkCredentials(username, oldPassword);
-
-        log.info("username password matched: {}", checked);
-
-        if (checked) {
-            log.info(CREDENTIAL_MATCH);
-
-            Trainee trainee = traineeDao.findByUsername(username);
-
-            trainee.setPassword(passwordChangeDto.getNewPassword());
-
-            log.info("Trainee password updated");
-            traineeDao.update(trainee);
-
-            return true;
-        }
-        log.warn(CREDENTIAL_MISMATCH);
-        return false;
+    public void updateActiveStatus(String username, ActiveStatusDto activeStatusDto) {
+        Trainee trainee = traineeDao.findByUsername(username);
+        trainee.setIsActive(activeStatusDto.getIsActive());
+        traineeDao.update(trainee);
     }
 
     @Override
     @Transactional
-    public void activate(String username) {
-        setActive(username, true);
-    }
-
-
-    @Override
-    @Transactional
-    public void deactivate(String username) {
-        setActive(username, false);
-    }
-
-    @Override
-    @Transactional
-    //issue
     public List<TrainingInfoDto> getTrainingsList(String username, TrainingSearchCriteria criteria) {
         List<Training> trainings = traineeDao.getTrainingsList(criteria);
 
@@ -229,14 +188,6 @@ public class TraineeServiceImpl implements TraineeService {
         }
 
         return trainingInfoDtos;
-    }
-
-
-    private void setActive(String username, boolean isActive) {
-        Trainee trainee = traineeDao.findByUsername(username);
-        trainee.setIsActive(isActive);
-        traineeDao.update(trainee);
-        log.info("Trainee={} isActive={}", username, isActive);
     }
 
     private List<TrainerInfoDto> getAllTrainerDto(String username) {

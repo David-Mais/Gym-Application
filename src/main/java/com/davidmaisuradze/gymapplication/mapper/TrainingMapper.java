@@ -10,6 +10,5 @@ import org.mapstruct.factory.Mappers;
 public interface TrainingMapper {
     TrainingMapper INSTANCE = Mappers.getMapper(TrainingMapper.class);
     TrainingDto entityToDto(Training training);
-    Training dtoToEntity(TrainingDto trainingDto);
     TrainingInfoDto trainingToTrainingInfoDto(Training training);
 }

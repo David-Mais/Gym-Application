@@ -9,5 +9,4 @@ import org.mapstruct.factory.Mappers;
 public interface TrainingTypeMapper {
     TrainingTypeMapper INSTANCE = Mappers.getMapper(TrainingTypeMapper.class);
     TrainingTypeDto entityToDto(TrainingType trainingType);
-    TrainingType dtoToEntity(TrainingTypeDto trainingTypeDto);
 }

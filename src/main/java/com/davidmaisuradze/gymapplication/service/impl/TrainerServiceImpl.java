@@ -1,13 +1,13 @@
 package com.davidmaisuradze.gymapplication.service.impl;
 
+import com.davidmaisuradze.gymapplication.dao.TraineeDao;
 import com.davidmaisuradze.gymapplication.dao.TrainerDao;
 import com.davidmaisuradze.gymapplication.dao.TrainingTypeDao;
 import com.davidmaisuradze.gymapplication.dao.UserDao;
+import com.davidmaisuradze.gymapplication.dto.ActiveStatusDto;
 import com.davidmaisuradze.gymapplication.dto.CredentialsDto;
-import com.davidmaisuradze.gymapplication.dto.PasswordChangeDto;
 import com.davidmaisuradze.gymapplication.dto.trainee.TraineeInfoDto;
 import com.davidmaisuradze.gymapplication.dto.trainer.CreateTrainerDto;
-import com.davidmaisuradze.gymapplication.dto.trainer.TrainerDto;
 import com.davidmaisuradze.gymapplication.dto.trainer.TrainerInfoDto;
 import com.davidmaisuradze.gymapplication.dto.trainer.TrainerProfileDto;
 import com.davidmaisuradze.gymapplication.dto.trainer.TrainerProfileUpdateRequestDto;
@@ -17,6 +17,7 @@ import com.davidmaisuradze.gymapplication.dto.training.TrainingInfoDto;
 import com.davidmaisuradze.gymapplication.entity.Trainer;
 import com.davidmaisuradze.gymapplication.entity.Training;
 import com.davidmaisuradze.gymapplication.entity.TrainingType;
+import com.davidmaisuradze.gymapplication.exception.GymException;
 import com.davidmaisuradze.gymapplication.mapper.TraineeMapper;
 import com.davidmaisuradze.gymapplication.mapper.TrainerMapper;
 import com.davidmaisuradze.gymapplication.mapper.TrainingMapper;
@@ -36,6 +37,7 @@ import java.util.List;
 @Slf4j
 public class TrainerServiceImpl implements TrainerService {
     private final TrainerDao trainerDao;
+    private final TraineeDao traineeDao;
     private final UserDao userDao;
     private final TrainingTypeDao trainingTypeDao;
     private final DetailsGenerator detailsGenerator;
@@ -49,47 +51,42 @@ public class TrainerServiceImpl implements TrainerService {
     @Override
     @Transactional
     public CredentialsDto create(CreateTrainerDto createTrainerDto) {
-        String password = detailsGenerator.generatePassword();
-        String username = detailsGenerator.generateUsername(
-                createTrainerDto.getFirstName(),
-                createTrainerDto.getLastName()
-        );
+        try {
+            String password = detailsGenerator.generatePassword();
+            String username = detailsGenerator.generateUsername(
+                    createTrainerDto.getFirstName(),
+                    createTrainerDto.getLastName()
+            );
 
-        Trainer trainer = trainerMapper.createTrainerDtoToTrainer(createTrainerDto);
-        TrainingType specialization = trainingTypeDao.findTrainingTypeByName(createTrainerDto.getSpecialization().getTrainingTypeName());
+            Trainer trainer = trainerMapper.createTrainerDtoToTrainer(createTrainerDto);
+            TrainingType specialization = trainingTypeDao.findTrainingTypeByName(createTrainerDto.getSpecialization().getTrainingTypeName());
 
-        trainer.setPassword(password);
-        trainer.setUsername(username);
-        trainer.setIsActive(true);
-        trainer.setSpecialization(specialization);
-        trainerDao.create(trainer);
+            trainer.setPassword(password);
+            trainer.setUsername(username);
+            trainer.setIsActive(true);
+            trainer.setSpecialization(specialization);
+            trainerDao.create(trainer);
 
-        log.info("Trainer Created");
+            log.info("Trainer Created");
 
-        return userMapper.userToCredentialsDto(trainer);
-    }
-
-    @Override
-    public TrainerDto login(CredentialsDto credentialsDto) {
-        String username = credentialsDto.getUsername();
-        String password = credentialsDto.getPassword();
-
-        if (userDao.checkCredentials(username, password)) {
-            Trainer trainer = trainerDao.findByUsername(username);
-            return trainerMapper.entityToDto(trainer);
+            return userMapper.userToCredentialsDto(trainer);
+        } catch (Exception e) {
+            throw new GymException("First name Last name and specialization should be provided", "400");
         }
-
-        return null;
     }
 
     @Override
     public TrainerProfileDto getProfile(String username) {
-        Trainer trainer = trainerDao.findByUsername(username);
-        TrainerProfileDto trainerProfile = trainerMapper.trainerToTrainerProfileDto(trainer);
+        try {
+            Trainer trainer = trainerDao.findByUsername(username);
+            TrainerProfileDto trainerProfile = trainerMapper.trainerToTrainerProfileDto(trainer);
 
-        trainerProfile.setTraineesList(getAllTraineeInfoDto(username));
+            trainerProfile.setTraineesList(getAllTraineeInfoDto(username));
 
-        return trainerProfile;
+            return trainerProfile;
+        } catch (Exception e) {
+            throw new GymException("Trainer not found with username: " + username, "404");
+        }
     }
 
     @Override
@@ -102,7 +99,7 @@ public class TrainerServiceImpl implements TrainerService {
 
         String firstName = requestDto.getFirstName();
         String lastName = requestDto.getLastName();
-        TrainingType specialization = trainingTypeDao.findTrainingTypeByName(requestDto.getSpecialization().getTrainingTypeName());
+        TrainingType specialization = requestDto.getSpecialization();
         Boolean isActive = requestDto.getIsActive();
 
         if (firstName != null) {
@@ -112,7 +109,7 @@ public class TrainerServiceImpl implements TrainerService {
             trainer.setLastName(lastName);
         }
         if (specialization != null) {
-            trainer.setSpecialization(specialization);
+            trainer.setSpecialization(trainingTypeDao.findTrainingTypeByName(specialization.getTrainingTypeName()));
         }
         if (isActive != null) {
             trainer.setIsActive(isActive);
@@ -155,35 +152,21 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     @Transactional
-    public boolean changePassword(String username, PasswordChangeDto passwordChangeDto) {
-        String oldPassword = passwordChangeDto.getOldPassword();
-        String newPassword = passwordChangeDto.getNewPassword();
-        if (userDao.checkCredentials(username, oldPassword)) {
-            log.info(CREDENTIAL_MATCH);
-            Trainer trainer = trainerDao.findByUsername(username);
-            trainer.setPassword(newPassword);
-            log.info("Trainer password updated");
-            trainerDao.update(trainer);
-            return true;
-        }
-        log.warn(CREDENTIAL_MISMATCH);
-        return false;
-    }
-
-    @Override
-    @Transactional
-    public void activate(String username) {
-        setActive(username, true);
-    }
-
-    @Override
-    @Transactional
-    public void deactivate(String username) {
-        setActive(username, false);
+    public void updateActiveStatus(String username, ActiveStatusDto activeStatusDto) {
+        boolean isActive = activeStatusDto.getIsActive();
+        Trainer trainer = trainerDao.findByUsername(username);
+        trainer.setIsActive(isActive);
+        trainerDao.update(trainer);
+        log.info("Trainer={} isActive={}", username, isActive);
     }
 
     @Override
     public List<TrainerInfoDto> getTrainersNotAssigned(String username) {
+        try {
+            traineeDao.findByUsername(username);
+        } catch (Exception e) {
+            throw new GymException("No Trainee with username: " + username, "404");
+        }
         return trainerDao
                 .getTrainersNotAssigned(username)
                 .stream()
@@ -207,13 +190,6 @@ public class TrainerServiceImpl implements TrainerService {
         }
 
         return trainingInfoDtos;
-    }
-
-    private void setActive(String username, boolean isActive) {
-        Trainer trainer = trainerDao.findByUsername(username);
-        trainer.setIsActive(isActive);
-        trainerDao.update(trainer);
-        log.info("Trainer={} isActive={}", username, isActive);
     }
 
     private List<TraineeInfoDto> getAllTraineeInfoDto(String username) {

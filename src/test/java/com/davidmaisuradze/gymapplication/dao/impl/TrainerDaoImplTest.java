@@ -1,6 +1,8 @@
 package com.davidmaisuradze.gymapplication.dao.impl;
 
-import com.davidmaisuradze.gymapplication.config.DaoTestConfig;
+import com.davidmaisuradze.gymapplication.config.ApplicationConfig;
+import com.davidmaisuradze.gymapplication.config.DataSourceConfig;
+import com.davidmaisuradze.gymapplication.config.HibernateConfig;
 import com.davidmaisuradze.gymapplication.dao.TrainerDao;
 import com.davidmaisuradze.gymapplication.dao.TrainingTypeDao;
 import com.davidmaisuradze.gymapplication.entity.Trainer;
@@ -19,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = DaoTestConfig.class)
+@ContextConfiguration(classes = { DataSourceConfig.class, HibernateConfig.class, ApplicationConfig.class })
 @Sql(scripts = "/gym-schema.sql")
 @Transactional
 class TrainerDaoImplTest {

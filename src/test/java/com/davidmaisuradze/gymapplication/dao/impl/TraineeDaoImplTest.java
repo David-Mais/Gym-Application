@@ -1,21 +1,19 @@
 package com.davidmaisuradze.gymapplication.dao.impl;
 
-import com.davidmaisuradze.gymapplication.config.DaoTestConfig;
-import com.davidmaisuradze.gymapplication.config.WebTestConfig;
+import com.davidmaisuradze.gymapplication.config.ApplicationConfig;
+import com.davidmaisuradze.gymapplication.config.DataSourceConfig;
+import com.davidmaisuradze.gymapplication.config.HibernateConfig;
 import com.davidmaisuradze.gymapplication.dao.TraineeDao;
+import com.davidmaisuradze.gymapplication.dto.training.TrainingSearchCriteria;
 import com.davidmaisuradze.gymapplication.entity.Trainee;
 import com.davidmaisuradze.gymapplication.entity.Training;
-import com.davidmaisuradze.gymapplication.dto.training.TrainingSearchCriteria;
 import jakarta.persistence.NoResultException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -26,15 +24,14 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {
-        DaoTestConfig.class,
-        WebTestConfig.class
-})
+@ContextConfiguration(classes = { DataSourceConfig.class, HibernateConfig.class, ApplicationConfig.class })
 @Sql(scripts = "/gym-schema.sql")
 @Transactional
 class TraineeDaoImplTest {
+
     @Autowired
     private TraineeDao traineeDao;
+
     @Test
     void testCreate() {
         Trainee trainee = getTrainee();
@@ -66,7 +63,6 @@ class TraineeDaoImplTest {
         assertEquals(updatedUsername, updatedTrainee.getUsername());
     }
 
-
     @Test
     void testDelete() {
         Trainee trainee = getTrainee();
@@ -82,12 +78,8 @@ class TraineeDaoImplTest {
 
     @Test
     void testTrainingsByCriteria() {
-        TrainingSearchCriteria criteria =
-                TrainingSearchCriteria
-                        .builder()
-                        .from(LocalDate.parse("1990-01-01"))
-                        .to(LocalDate.parse("2012-01-01"))
-                        .build();
+        TrainingSearchCriteria criteria = TrainingSearchCriteria.builder().from(LocalDate.parse("1990-01-01"))
+              .to(LocalDate.parse("2012-01-01")).build();
         List<Training> trainings = traineeDao.getTrainingsList(criteria);
         assertNotNull(trainings);
 
@@ -102,14 +94,7 @@ class TraineeDaoImplTest {
     }
 
     private Trainee getTrainee() {
-        return Trainee
-                .builder()
-                .firstName("First")
-                .lastName("Last")
-                .isActive(true)
-                .username("user")
-                .password("pass")
-                .dateOfBirth(LocalDate.parse("2000-01-01"))
-                .build();
+        return Trainee.builder().firstName("First").lastName("Last").isActive(true).username("user").password("pass")
+              .dateOfBirth(LocalDate.parse("2000-01-01")).build();
     }
 }
