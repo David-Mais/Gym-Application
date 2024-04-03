@@ -1,4 +1,4 @@
-package com.davidmaisuradze.gymapplication.service.util;
+package com.davidmaisuradze.gymapplication.util;
 
 import com.davidmaisuradze.gymapplication.dao.UserDao;
 import lombok.extern.slf4j.Slf4j;

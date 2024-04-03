@@ -1,5 +1,6 @@
 package com.davidmaisuradze.gymapplication.dto.training;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -26,6 +27,7 @@ public class CreateTrainingDto {
     private String trainingName;
     @NotNull(message = "Training date should not be null")
     @Future(message = "Training date should be in future")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate trainingDate;
     @NotNull(message = "Training duration should not be null")
     @Positive(message = "Training duration should be a positive integer")

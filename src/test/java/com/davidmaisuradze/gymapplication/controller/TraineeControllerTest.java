@@ -1,8 +1,5 @@
 package com.davidmaisuradze.gymapplication.controller;
 
-import com.davidmaisuradze.gymapplication.config.ApplicationConfig;
-import com.davidmaisuradze.gymapplication.config.DataSourceConfig;
-import com.davidmaisuradze.gymapplication.config.HibernateConfig;
 import com.davidmaisuradze.gymapplication.dto.ActiveStatusDto;
 import com.davidmaisuradze.gymapplication.dto.trainee.CreateTraineeDto;
 import com.davidmaisuradze.gymapplication.dto.trainee.TraineeProfileDto;
@@ -16,10 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -35,8 +29,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
-@ContextConfiguration(classes = { DataSourceConfig.class, HibernateConfig.class, ApplicationConfig.class })
 @RequiredArgsConstructor
 class TraineeControllerTest {
     private MockMvc mockMvc;
@@ -67,6 +59,25 @@ class TraineeControllerTest {
                                 .writeValueAsString(createTraineeDto)))
                         .andExpect(status().isCreated());
     }
+
+    @Test
+    //could not write. it always returns code 201 even if i dont provide validated fields
+    void testCreateTraineeMissingRequiredFields() throws Exception {
+        CreateTraineeDto createTraineeDtoMissingFields = CreateTraineeDto.builder()
+                .firstName(null)
+                .lastName(null)
+                .dateOfBirth(LocalDate.of(1990, 1, 1))
+                .address("123 Main St")
+                .build();
+
+        mockMvc.perform(post("/api/v1/trainees")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper()
+                                .registerModule(new JavaTimeModule())
+                                .writeValueAsString(createTraineeDtoMissingFields)))
+                .andExpect(status().isBadRequest());
+    }
+
 
     @Test
     void testGetProfile() throws Exception{

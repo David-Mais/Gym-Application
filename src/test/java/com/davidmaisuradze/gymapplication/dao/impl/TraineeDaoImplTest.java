@@ -78,9 +78,12 @@ class TraineeDaoImplTest {
 
     @Test
     void testTrainingsByCriteria() {
-        TrainingSearchCriteria criteria = TrainingSearchCriteria.builder().from(LocalDate.parse("1990-01-01"))
-              .to(LocalDate.parse("2012-01-01")).build();
-        List<Training> trainings = traineeDao.getTrainingsList(criteria);
+        TrainingSearchCriteria criteria = TrainingSearchCriteria
+                .builder()
+                .from(LocalDate.parse("1990-01-01"))
+                .to(LocalDate.parse("2012-01-01"))
+                .build();
+        List<Training> trainings = traineeDao.getTrainingsList(null, criteria);
         assertNotNull(trainings);
 
         assertEquals(2, trainings.size());

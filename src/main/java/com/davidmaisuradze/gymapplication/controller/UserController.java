@@ -7,7 +7,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,13 +23,12 @@ public class UserController {
         return ResponseEntity.ok().body(userService.login(credentialsDto));
     }
 
-    @PutMapping("/password/{username}")
+    @PutMapping("/password")
     public ResponseEntity<Boolean> changePassword(
-            @PathVariable String username,
             @Valid @RequestBody PasswordChangeDto passwordChangeDto
     ) {
         return ResponseEntity
                 .ok()
-                .body(userService.changePassword(username, passwordChangeDto));
+                .body(userService.changePassword(passwordChangeDto));
     }
 }

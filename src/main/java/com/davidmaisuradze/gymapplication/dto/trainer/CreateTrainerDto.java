@@ -1,6 +1,7 @@
 package com.davidmaisuradze.gymapplication.dto.trainer;
 
-import com.davidmaisuradze.gymapplication.entity.TrainingType;
+import com.davidmaisuradze.gymapplication.dto.trainingtype.TrainingTypeDto;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -20,5 +21,6 @@ public class CreateTrainerDto {
     @NotBlank(message = "Last name should not be blank")
     private String lastName;
     @NotNull(message = "Specialization should not be null")
-    private TrainingType specialization;
+    @Valid
+    private TrainingTypeDto specialization;
 }

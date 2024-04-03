@@ -11,7 +11,7 @@ public interface TrainerDao {
     Trainer create(Trainer trainer);
     Trainer findByUsername(String username);
     Trainer update(Trainer trainer);
-    List<Training> getTrainingsList(TrainerTrainingSearchDto criteria);
+    List<Training> getTrainingsList(String username, TrainerTrainingSearchDto criteria);
     List<Trainer> getTrainersNotAssigned(String username);
     List<Trainer> findAll();
     List<Trainee> getAllTrainees(String username);

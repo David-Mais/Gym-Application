@@ -13,7 +13,9 @@ public class ErrorController {
 
     @ExceptionHandler(GymException.class)
     public ResponseEntity<ErrorDto> handleCreationException(GymException e) {
-        ErrorDto dto = new ErrorDto(e.getMessage(), e.getErrorCode());
+        ErrorDto dto = new ErrorDto();
+        dto.setErrorCode(e.getErrorCode());
+        dto.setErrorMessage(e.getMessage());
         HttpStatus status = codeToStatus(dto.getErrorCode());
         if (status == null) {
             status = HttpStatus.INTERNAL_SERVER_ERROR;
@@ -22,10 +24,14 @@ public class ErrorController {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorDto> handleValidationError() {
+    public ResponseEntity<ErrorDto> handleValidationError(MethodArgumentNotValidException e) {
         ErrorDto errorDto = new ErrorDto();
+        e.getBindingResult()
+                .getFieldErrors()
+                .forEach(fieldError -> errorDto.getDetails().put(fieldError.getField(), fieldError.getDefaultMessage()));
+
         errorDto.setErrorMessage("Validation error");
-        errorDto.setErrorCode("400");
+        errorDto.setErrorCode("500");
         return new ResponseEntity<>(errorDto, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

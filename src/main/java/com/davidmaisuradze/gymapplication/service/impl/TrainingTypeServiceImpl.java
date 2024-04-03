@@ -2,7 +2,6 @@ package com.davidmaisuradze.gymapplication.service.impl;
 
 import com.davidmaisuradze.gymapplication.dao.TrainingTypeDao;
 import com.davidmaisuradze.gymapplication.dto.trainingtype.TrainingTypeDto;
-import com.davidmaisuradze.gymapplication.entity.TrainingType;
 import com.davidmaisuradze.gymapplication.mapper.TrainingTypeMapper;
 import com.davidmaisuradze.gymapplication.service.TrainingTypeService;
 import lombok.RequiredArgsConstructor;
@@ -17,12 +16,6 @@ import java.util.List;
 public class TrainingTypeServiceImpl implements TrainingTypeService {
     private final TrainingTypeDao trainingTypeDao;
     private final TrainingTypeMapper trainingTypeMapper;
-
-    @Override
-    public TrainingTypeDto findTrainingTypeByName(String name) {
-        TrainingType trainingType = trainingTypeDao.findTrainingTypeByName(name);
-        return trainingTypeMapper.entityToDto(trainingType);
-    }
 
     @Override
     public List<TrainingTypeDto> findAll() {

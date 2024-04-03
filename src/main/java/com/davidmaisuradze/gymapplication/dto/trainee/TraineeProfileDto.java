@@ -1,6 +1,7 @@
 package com.davidmaisuradze.gymapplication.dto.trainee;
 
 import com.davidmaisuradze.gymapplication.dto.trainer.TrainerInfoDto;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,6 +19,7 @@ import java.util.List;
 public class TraineeProfileDto {
     private String firstName;
     private String lastName;
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dateOfBirth;
     private String address;
     private Boolean isActive;

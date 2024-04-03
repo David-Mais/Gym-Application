@@ -1,7 +1,6 @@
 package com.davidmaisuradze.gymapplication.controller;
 
 import com.davidmaisuradze.gymapplication.dto.training.CreateTrainingDto;
-import com.davidmaisuradze.gymapplication.dto.training.TrainingDto;
 import com.davidmaisuradze.gymapplication.service.TrainingService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,10 +17,10 @@ public class TrainingController {
     private final TrainingService trainingService;
 
     @PostMapping()
-    public ResponseEntity<TrainingDto> create(
+    public ResponseEntity<Void> create(
             @Valid @RequestBody CreateTrainingDto createTrainingDto
     ) {
-        TrainingDto dto = trainingService.create(createTrainingDto);
-        return ResponseEntity.ok(dto);
+        trainingService.create(createTrainingDto);
+        return ResponseEntity.ok().build();
     }
 }

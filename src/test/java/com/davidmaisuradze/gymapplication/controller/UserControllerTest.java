@@ -1,8 +1,5 @@
 package com.davidmaisuradze.gymapplication.controller;
 
-import com.davidmaisuradze.gymapplication.config.ApplicationConfig;
-import com.davidmaisuradze.gymapplication.config.DataSourceConfig;
-import com.davidmaisuradze.gymapplication.config.HibernateConfig;
 import com.davidmaisuradze.gymapplication.dto.CredentialsDto;
 import com.davidmaisuradze.gymapplication.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,10 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -27,10 +21,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
-@ContextConfiguration(classes = { DataSourceConfig.class, HibernateConfig.class, ApplicationConfig.class })
 @RequiredArgsConstructor
-public class UserControllerTest {
+class UserControllerTest {
     private MockMvc mockMvc;
 
     @Mock

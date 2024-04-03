@@ -5,15 +5,14 @@ import com.davidmaisuradze.gymapplication.dto.trainer.TrainerTrainingSearchDto;
 import com.davidmaisuradze.gymapplication.entity.Trainee;
 import com.davidmaisuradze.gymapplication.entity.Trainer;
 import com.davidmaisuradze.gymapplication.entity.Training;
+import com.davidmaisuradze.gymapplication.util.TrainingQueryBuilder;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Repository
 @Slf4j
@@ -46,30 +45,19 @@ public class TrainerDaoImpl implements TrainerDao {
     }
 
     @Override
-    public List<Training> getTrainingsList(TrainerTrainingSearchDto criteria) {
-        StringBuilder jpql = new StringBuilder("SELECT t FROM Training t WHERE 1=1");
+    public List<Training> getTrainingsList(String username, TrainerTrainingSearchDto criteria) {
+        TrainingQueryBuilder queryBuilder = new TrainingQueryBuilder();
+        queryBuilder.withTrainerUsername(username);
+        queryBuilder.withFromDate(criteria.getFrom());
+        queryBuilder.withToDate(criteria.getTo());
+        queryBuilder.withTraineeName(criteria.getName());
 
-        Map<String, Object> parameters = new HashMap<>();
+        TypedQuery<Training> query = entityManager.createQuery(
+                queryBuilder.getJpql().toString(),
+                Training.class
+        );
+        queryBuilder.getParameters().forEach(query::setParameter);
 
-        if (criteria.getFrom() != null) {
-            jpql.append(" AND t.trainingDate > :from");
-            parameters.put("from", criteria.getFrom());
-            log.info("From date criteria added");
-        }
-        if (criteria.getTo() != null) {
-            jpql.append(" AND t.trainingDate < :to");
-            parameters.put("to", criteria.getTo());
-            log.info("To date criteria added");
-        }
-        if (criteria.getName() != null && !criteria.getName().isEmpty()) {
-            jpql.append(" AND t.trainee.username = :traineeName");
-            parameters.put("traineeName", criteria.getName());
-            log.info("Name criteria added");
-        }
-
-        TypedQuery<Training> query = entityManager.createQuery(jpql.toString(), Training.class);
-        parameters.forEach(query::setParameter);
-        log.info("All parameters set");
 
         log.info("Returning list of trainings filtered by {}", criteria);
         return query.getResultList();

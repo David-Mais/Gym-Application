@@ -5,5 +5,5 @@ import com.davidmaisuradze.gymapplication.dto.PasswordChangeDto;
 
 public interface UserService {
     boolean login(CredentialsDto credentialsDto);
-    boolean changePassword(String username, PasswordChangeDto passwordChangeDto);
+    boolean changePassword(PasswordChangeDto passwordChangeDto);
 }

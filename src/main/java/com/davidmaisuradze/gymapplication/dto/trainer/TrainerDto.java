@@ -1,6 +1,6 @@
 package com.davidmaisuradze.gymapplication.dto.trainer;
 
-import com.davidmaisuradze.gymapplication.entity.TrainingType;
+import com.davidmaisuradze.gymapplication.dto.trainingtype.TrainingTypeDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,5 +19,5 @@ public class TrainerDto {
     private String username;
     private String password;
     private Boolean isActive;
-    private TrainingType specialization;
+    private TrainingTypeDto specialization;
 }

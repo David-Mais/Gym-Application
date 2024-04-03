@@ -6,6 +6,7 @@ import com.davidmaisuradze.gymapplication.dto.PasswordChangeDto;
 import com.davidmaisuradze.gymapplication.entity.UserEntity;
 import com.davidmaisuradze.gymapplication.exception.GymException;
 import com.davidmaisuradze.gymapplication.service.UserService;
+import jakarta.persistence.NoResultException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,34 +14,51 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private static final String NO_USER = "No user found with username: ";
+    private static final String INVALID_CREDENTIALS = "Invalid Credentials";
     private final UserDao userDao;
+
     @Override
     public boolean login(CredentialsDto credentialsDto) {
-        String username = credentialsDto.getUsername();
-        try {
-            return userDao.checkCredentials(username, credentialsDto.getPassword());
-        } catch (Exception e) {
-            throw new GymException(NO_USER + username, "404");
-        }
+        return loginHelper(
+                credentialsDto.getUsername(),
+                credentialsDto.getPassword()
+        );
     }
 
     @Override
     @Transactional
-    public boolean changePassword(String username, PasswordChangeDto passwordChangeDto) {
+    public boolean changePassword(PasswordChangeDto passwordChangeDto) {
+        String username = passwordChangeDto.getUsername();
+        String oldPassword = passwordChangeDto.getOldPassword();
+        String newPassword = passwordChangeDto.getNewPassword();
+
+        loginHelper(username, oldPassword);
+
+        UserEntity user = userDao.findByUsername(username);
+        user.setPassword(newPassword);
+        userDao.update(user);
+        return true;
+    }
+
+    private String checkedUsername(String username) {
         try {
-            boolean checked = userDao.checkCredentials(username, passwordChangeDto.getOldPassword());
-
-            if (checked) {
-                UserEntity user = userDao.findByUsername(username);
-                user.setPassword(passwordChangeDto.getNewPassword());
-                userDao.update(user);
-                return true;
-            }
-
-            return false;
-        } catch (Exception e) {
-            throw new GymException(NO_USER + username, "404");
+            userDao.findByUsername(username);
+            return username;
+        } catch (NoResultException e) {
+            throw new GymException(INVALID_CREDENTIALS, "401");
         }
+    }
+
+    private boolean loginHelper(String username, String password) {
+        boolean checked = userDao.checkCredentials(
+                checkedUsername(username),
+                password
+        );
+
+        if (!checked) {
+            throw new GymException(INVALID_CREDENTIALS, "401");
+        }
+
+        return true;
     }
 }

@@ -1,8 +1,9 @@
 package com.davidmaisuradze.gymapplication.dto.training;
 
-import com.davidmaisuradze.gymapplication.entity.Trainee;
-import com.davidmaisuradze.gymapplication.entity.Trainer;
-import com.davidmaisuradze.gymapplication.entity.TrainingType;
+import com.davidmaisuradze.gymapplication.dto.trainee.TraineeDto;
+import com.davidmaisuradze.gymapplication.dto.trainer.TrainerDto;
+import com.davidmaisuradze.gymapplication.dto.trainingtype.TrainingTypeDto;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,10 +19,11 @@ import java.time.LocalDate;
 @Setter
 public class TrainingDto {
     private Long id;
-    private Trainee trainee;
-    private Trainer trainer;
+    private TraineeDto trainee;
+    private TrainerDto trainer;
     private String trainingName;
-    private TrainingType trainingType;
+    private TrainingTypeDto trainingType;
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate trainingDate;
     private Integer duration;
 }

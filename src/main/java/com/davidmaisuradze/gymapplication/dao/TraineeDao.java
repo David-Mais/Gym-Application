@@ -12,7 +12,7 @@ public interface TraineeDao {
     Trainee findByUsername(String username);
     Trainee update(Trainee trainee);
     void delete(Trainee trainee);
-    List<Training> getTrainingsList(TrainingSearchCriteria criteria);
+    List<Training> getTrainingsList(String username, TrainingSearchCriteria criteria);
     List<Trainer> getAllTrainers(String username);
     List<Trainee> findAll();
 }

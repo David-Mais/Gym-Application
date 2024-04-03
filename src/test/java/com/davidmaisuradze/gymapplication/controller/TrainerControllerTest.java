@@ -1,12 +1,9 @@
 package com.davidmaisuradze.gymapplication.controller;
 
-import com.davidmaisuradze.gymapplication.config.ApplicationConfig;
-import com.davidmaisuradze.gymapplication.config.DataSourceConfig;
-import com.davidmaisuradze.gymapplication.config.HibernateConfig;
 import com.davidmaisuradze.gymapplication.dto.ActiveStatusDto;
 import com.davidmaisuradze.gymapplication.dto.trainer.CreateTrainerDto;
 import com.davidmaisuradze.gymapplication.dto.trainer.TrainerProfileDto;
-import com.davidmaisuradze.gymapplication.entity.TrainingType;
+import com.davidmaisuradze.gymapplication.dto.trainingtype.TrainingTypeDto;
 import com.davidmaisuradze.gymapplication.service.TrainerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -17,10 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -32,8 +26,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
-@ContextConfiguration(classes = { DataSourceConfig.class, HibernateConfig.class, ApplicationConfig.class })
 @RequiredArgsConstructor
 class TrainerControllerTest {
     private MockMvc mockMvc;
@@ -54,7 +46,7 @@ class TrainerControllerTest {
         CreateTrainerDto createTrainerDto = CreateTrainerDto.builder()
                 .firstName("John")
                 .lastName("Doe")
-                .specialization(TrainingType.builder().trainingTypeName("box").build())
+                .specialization(TrainingTypeDto.builder().trainingTypeName("box").build())
                 .build();
 
         mockMvc.perform(post("/api/v1/trainers")

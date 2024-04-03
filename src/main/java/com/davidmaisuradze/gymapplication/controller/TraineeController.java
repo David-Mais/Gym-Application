@@ -44,28 +44,28 @@ public class TraineeController {
 
     @GetMapping("/profile/{username}")
     public ResponseEntity<TraineeProfileDto> getProfile(
-            @PathVariable String username
+            @PathVariable("username") String username
     ) {
         return ResponseEntity.ok(traineeService.getProfile(username));
     }
 
     @PutMapping("/profile/{username}")
     public ResponseEntity<TraineeProfileUpdateResponseDto> updateProfile(
-            @PathVariable String username,
+            @PathVariable("username") String username,
             @Valid @RequestBody TraineeProfileUpdateRequestDto traineeProfileUpdateRequestDto
     ) {
         return ResponseEntity.ok(traineeService.updateProfile(username, traineeProfileUpdateRequestDto));
     }
 
     @DeleteMapping("/profile/{username}")
-    public ResponseEntity<Void> delete(@PathVariable String username) {
+    public ResponseEntity<Void> delete(@PathVariable("username") String username) {
         traineeService.deleteByUsername(username);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{username}/active")
     public ResponseEntity<Void> activate(
-            @PathVariable String username,
+            @PathVariable("username") String username,
             @Valid @RequestBody ActiveStatusDto activeStatusDto
     ) {
         traineeService.updateActiveStatus(username, activeStatusDto);
@@ -74,7 +74,7 @@ public class TraineeController {
 
     @GetMapping("/profile/{username}/trainings")
     public List<TrainingInfoDto> getTrainings(
-            @PathVariable String username,
+            @PathVariable("username") String username,
             @RequestParam(name = "from", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam(name = "to", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
             @RequestParam(name = "trainerUsername", required = false) String trainerName,
