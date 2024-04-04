@@ -31,8 +31,8 @@ public class ErrorController {
                 .forEach(fieldError -> errorDto.getDetails().put(fieldError.getField(), fieldError.getDefaultMessage()));
 
         errorDto.setErrorMessage("Validation error");
-        errorDto.setErrorCode("500");
-        return new ResponseEntity<>(errorDto, HttpStatus.INTERNAL_SERVER_ERROR);
+        errorDto.setErrorCode("400");
+        return new ResponseEntity<>(errorDto, HttpStatus.BAD_REQUEST);
     }
 
 

@@ -12,8 +12,8 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ErrorDto {
+    private String errorMessage;
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Map<String, Object> details = new HashMap<>();
-    private String errorMessage;
     private String errorCode;
 }

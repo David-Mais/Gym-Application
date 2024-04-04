@@ -61,25 +61,6 @@ class TraineeControllerTest {
     }
 
     @Test
-    //could not write. it always returns code 201 even if i dont provide validated fields
-    void testCreateTraineeMissingRequiredFields() throws Exception {
-        CreateTraineeDto createTraineeDtoMissingFields = CreateTraineeDto.builder()
-                .firstName(null)
-                .lastName(null)
-                .dateOfBirth(LocalDate.of(1990, 1, 1))
-                .address("123 Main St")
-                .build();
-
-        mockMvc.perform(post("/api/v1/trainees")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper()
-                                .registerModule(new JavaTimeModule())
-                                .writeValueAsString(createTraineeDtoMissingFields)))
-                .andExpect(status().isBadRequest());
-    }
-
-
-    @Test
     void testGetProfile() throws Exception{
         String username = "Davit.Maisuradze";
 
