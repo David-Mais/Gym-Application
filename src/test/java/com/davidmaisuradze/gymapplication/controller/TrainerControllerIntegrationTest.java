@@ -4,6 +4,7 @@ import com.davidmaisuradze.gymapplication.config.ApplicationConfig;
 import com.davidmaisuradze.gymapplication.config.WebMvcConfig;
 import com.davidmaisuradze.gymapplication.dto.ActiveStatusDto;
 import com.davidmaisuradze.gymapplication.dto.trainer.CreateTrainerDto;
+import com.davidmaisuradze.gymapplication.dto.trainingtype.TrainingTypeDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,11 +17,13 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
@@ -40,7 +43,7 @@ class TrainerControllerIntegrationTest {
     }
 
     @Test
-    void testRegisterFail() throws Exception {
+    void testRegister_WhenLastNameIsNull_ThenReturnIsBadRequest() throws Exception {
         CreateTrainerDto trainerDto = CreateTrainerDto
                 .builder()
                 .firstName("Trainer")
@@ -54,13 +57,34 @@ class TrainerControllerIntegrationTest {
     }
 
     @Test
-    void testGetProfileFail() throws Exception {
+    @Transactional
+    void testRegister_WhenDtoIsProvided_ThenReturnIsCreated() throws Exception {
+        CreateTrainerDto trainerDto = CreateTrainerDto.builder()
+                .firstName("Trainer")
+                .lastName("Last")
+                .specialization(TrainingTypeDto.builder().trainingTypeName("box").build())
+                .build();
+
+        mockMvc.perform(post("/api/v1/trainers")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(trainerDto)))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    void testGetProfile_WhenUsernameNotExist_ThenReturnIsNotFound() throws Exception {
         mockMvc.perform(get("/api/v1/trainers/profile/{username}", JOHN_DOE))
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    void testActiveStatusFail() throws Exception {
+    void testGetProfile_WhenUsernameExists_ThenReturnIsOk() throws Exception {
+        mockMvc.perform(get("/api/v1/trainers/profile/{username}", "Merab.Dvalishvili"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void testActiveStatus_WhenUsernameNotExists_ThenReturnIsNotFound() throws Exception {
         ActiveStatusDto statusDto = new ActiveStatusDto(false);
 
         mockMvc.perform(patch("/api/v1/trainers/{username}/active", JOHN_DOE)
@@ -70,8 +94,26 @@ class TrainerControllerIntegrationTest {
     }
 
     @Test
-    void TestGetTrainingsFail() throws Exception {
+    @Transactional
+    void testActiveStatus_WhenUsernameExists_ThenReturnIsOk() throws Exception {
+        ActiveStatusDto statusDto = new ActiveStatusDto(true);
+
+        mockMvc.perform(patch("/api/v1/trainers/{username}/active", "Merab.Dvalishvili")
+                        .contentType("application/json")
+                        .content(new ObjectMapper().writeValueAsString(statusDto)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void TestGetTrainings_WhenUsernameNotExists_ThenReturnIsNotFound() throws Exception {
         mockMvc.perform(get("/api/v1/trainers/profile/{username}/trainings", JOHN_DOE))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void TestGetTrainings_WhenUsernameExists_ThenReturnIsOk() throws Exception {
+        mockMvc.perform(get("/api/v1/trainers/profile/{username}/trainings", "Merab.Dvalishvili"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray());
     }
 }

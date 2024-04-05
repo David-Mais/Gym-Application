@@ -3,6 +3,8 @@ package com.davidmaisuradze.gymapplication.controller;
 import com.davidmaisuradze.gymapplication.dto.ActiveStatusDto;
 import com.davidmaisuradze.gymapplication.dto.trainee.CreateTraineeDto;
 import com.davidmaisuradze.gymapplication.dto.trainee.TraineeProfileDto;
+import com.davidmaisuradze.gymapplication.dto.trainee.TraineeProfileUpdateRequestDto;
+import com.davidmaisuradze.gymapplication.dto.trainee.TraineeProfileUpdateResponseDto;
 import com.davidmaisuradze.gymapplication.service.TraineeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -19,11 +21,14 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDate;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -44,7 +49,7 @@ class TraineeControllerTest {
     }
 
     @Test
-    void testCreateTrainee() throws Exception {
+    void testCreateTrainee_WhenDtoIsProvided_ThenReturnIsCreated() throws Exception {
         CreateTraineeDto createTraineeDto = CreateTraineeDto.builder()
                 .firstName("John")
                 .lastName("Doe")
@@ -61,7 +66,33 @@ class TraineeControllerTest {
     }
 
     @Test
-    void testGetProfile() throws Exception{
+    void testUpdateTrainee_WhenDtoIsProvided_ThenReturnIsOk() throws Exception {
+        String username = "user";
+        TraineeProfileUpdateRequestDto updateRequestDto = TraineeProfileUpdateRequestDto
+                .builder()
+                .firstName("first")
+                .lastName("last")
+                .dateOfBirth(LocalDate.parse("2000-01-01"))
+                .address("here")
+                .isActive(true)
+                .build();
+
+        TraineeProfileUpdateResponseDto responseDto = new TraineeProfileUpdateResponseDto();
+
+        when(traineeService.updateProfile(eq(username), any(TraineeProfileUpdateRequestDto.class)))
+                .thenReturn(responseDto);
+
+        mockMvc.perform(put("/api/v1/trainees/profile/{username}", username)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper()
+                        .registerModule(new JavaTimeModule())
+                        .writeValueAsString(updateRequestDto)
+                ))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void testGetProfile_WhenUsernameExists_ThenReturnIsOk() throws Exception{
         String username = "Davit.Maisuradze";
 
         when(traineeService.getProfile(username)).thenReturn(new TraineeProfileDto());
@@ -108,5 +139,4 @@ class TraineeControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray());
     }
-
 }

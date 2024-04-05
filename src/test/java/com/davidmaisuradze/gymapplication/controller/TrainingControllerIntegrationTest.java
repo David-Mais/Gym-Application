@@ -16,6 +16,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDate;
@@ -37,7 +38,7 @@ class TrainingControllerIntegrationTest {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
     @Test
-    void testCreateTraining() throws Exception {
+    void testCreateTraining_WhenDtoIsNotProvided_ThenReturnIsBadRequest() throws Exception {
         CreateTrainingDto createTrainingDto = CreateTrainingDto
                 .builder()
                 .traineeUsername(null)
@@ -54,5 +55,25 @@ class TrainingControllerIntegrationTest {
                                 .registerModule(new JavaTimeModule())
                                 .writeValueAsString(createTrainingDto)))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @Transactional
+    void testCreateTraining_WhenDtoIsProvided_ThenReturnIsOk() throws Exception {
+        CreateTrainingDto createTrainingDto = CreateTrainingDto
+                .builder()
+                .traineeUsername("Davit.Maisuradze")
+                .trainerUsername("Merab.Dvalishvili")
+                .trainingName("training")
+                .trainingDate(LocalDate.parse("2024-10-11"))
+                .duration(60)
+                .build();
+
+        mockMvc.perform(post("/api/v1/trainings")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper
+                                .registerModule(new JavaTimeModule())
+                                .writeValueAsString(createTrainingDto)))
+                .andExpect(status().isOk());
     }
 }

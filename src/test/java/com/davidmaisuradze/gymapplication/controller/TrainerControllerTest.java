@@ -2,7 +2,10 @@ package com.davidmaisuradze.gymapplication.controller;
 
 import com.davidmaisuradze.gymapplication.dto.ActiveStatusDto;
 import com.davidmaisuradze.gymapplication.dto.trainer.CreateTrainerDto;
+import com.davidmaisuradze.gymapplication.dto.trainer.TrainerInfoDto;
 import com.davidmaisuradze.gymapplication.dto.trainer.TrainerProfileDto;
+import com.davidmaisuradze.gymapplication.dto.trainer.TrainerProfileUpdateRequestDto;
+import com.davidmaisuradze.gymapplication.dto.trainer.TrainerProfileUpdateResponseDto;
 import com.davidmaisuradze.gymapplication.dto.trainingtype.TrainingTypeDto;
 import com.davidmaisuradze.gymapplication.service.TrainerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,10 +21,17 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.Arrays;
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -42,7 +52,7 @@ class TrainerControllerTest {
     }
 
     @Test
-    void testCreateTrainer() throws Exception {
+    void testCreateTrainer_WhenDtoIsProvided_ThenReturnIsCreated() throws Exception {
         CreateTrainerDto createTrainerDto = CreateTrainerDto.builder()
                 .firstName("John")
                 .lastName("Doe")
@@ -58,7 +68,46 @@ class TrainerControllerTest {
     }
 
     @Test
-    void testGetProfile() throws Exception{
+    void testUpdateTrainerProfile_WhenDtoIsProvided_ThenReturnIsOk() throws Exception {
+        String username = "testUser";
+        TrainerProfileUpdateRequestDto requestDto = new TrainerProfileUpdateRequestDto();
+        requestDto.setFirstName("John");
+        requestDto.setLastName("Doe");
+        requestDto.setSpecialization(TrainingTypeDto.builder().trainingTypeName("grapple").build());
+        requestDto.setIsActive(true);
+
+        TrainerProfileUpdateResponseDto expectedResponse = new TrainerProfileUpdateResponseDto();
+
+        when(trainerService.updateProfile(eq(username), any(TrainerProfileUpdateRequestDto.class)))
+                .thenReturn(expectedResponse);
+
+        mockMvc.perform(put("/api/v1/trainers/profile/{username}", username)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(requestDto)))
+                .andExpect(status().isOk());
+
+        verify(trainerService).updateProfile(eq(username), any(TrainerProfileUpdateRequestDto.class));
+    }
+
+    @Test
+    void testGetTrainersNotAssigned_WhenUsernameExists_ThenReturnIsOk() throws Exception {
+        String username = "testUser";
+        List<TrainerInfoDto> expected = Arrays.asList(
+                new TrainerInfoDto(),
+                new TrainerInfoDto()
+        );
+
+        when(trainerService.getTrainersNotAssigned(username)).thenReturn(expected);
+
+        mockMvc.perform(get("/api/v1/trainers/not-assigned/{username}", username)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(trainerService).getTrainersNotAssigned(username);
+    }
+
+    @Test
+    void testGetProfile_WhenUsernameExists_ThenReturnIsOk() throws Exception{
         String username = "Davit.Maisuradze";
 
         when(trainerService.getProfile(username)).thenReturn(new TrainerProfileDto());
@@ -68,7 +117,7 @@ class TrainerControllerTest {
     }
 
     @Test
-    void testActivateProfile() throws Exception {
+    void testActivateProfile_WhenUsernameExists_ThenReturnIsOk() throws Exception {
         String username = "Davit.Maisuradze";
         ActiveStatusDto statusDto = new ActiveStatusDto(true);
 
@@ -79,7 +128,7 @@ class TrainerControllerTest {
     }
 
     @Test
-    void testDeactivateProfile() throws Exception {
+    void testDeactivateProfile_WhenUsernameExists_ThenReturnIsOk() throws Exception {
         String username = "Davit.Maisuradze";
         ActiveStatusDto statusDto = new ActiveStatusDto(false);
 
@@ -90,7 +139,7 @@ class TrainerControllerTest {
     }
 
     @Test
-    void testGetTrainings() throws Exception {
+    void testGetTrainings_WhenUsernameExists_ThenReturnIsOk() throws Exception {
         String username = "Davit.Maisuradze";
 
         mockMvc.perform(get("/api/v1/trainers/profile/{username}/trainings", username))

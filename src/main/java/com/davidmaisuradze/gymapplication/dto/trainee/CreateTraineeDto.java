@@ -1,6 +1,8 @@
 package com.davidmaisuradze.gymapplication.dto.trainee;
 
+import com.davidmaisuradze.gymapplication.util.CustomDateDeserializer;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Past;
 import lombok.AllArgsConstructor;
@@ -23,6 +25,7 @@ public class CreateTraineeDto {
     private String lastName;
     @Past(message = "No future people allowed")
     @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonDeserialize(using = CustomDateDeserializer.class)
     private LocalDate dateOfBirth;
     private String address;
 }

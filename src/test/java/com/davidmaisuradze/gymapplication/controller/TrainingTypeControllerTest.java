@@ -35,7 +35,7 @@ class TrainingTypeControllerTest {
     }
 
     @Test
-    void testGetAll() throws Exception {
+    void testGetAll_ThenReturnIsOk() throws Exception {
         List<TrainingTypeDto> expectedList = Arrays.asList(
                 new TrainingTypeDto(1L, "type1"),
                 new TrainingTypeDto(2L, "type2")

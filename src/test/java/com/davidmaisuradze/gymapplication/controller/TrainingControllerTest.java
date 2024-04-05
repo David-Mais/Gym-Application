@@ -17,8 +17,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDate;
 
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -40,7 +40,7 @@ class TrainingControllerTest {
 
 
     @Test
-    void testCreateTraining() throws Exception {
+    void testCreateTraining_WhenDtoIsProvided_thenReturnIsOk() throws Exception {
         CreateTrainingDto createTrainingDto = CreateTrainingDto
                 .builder()
                 .traineeUsername("user")

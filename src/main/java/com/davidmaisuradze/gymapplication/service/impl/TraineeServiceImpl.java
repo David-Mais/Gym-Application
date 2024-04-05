@@ -86,7 +86,7 @@ public class TraineeServiceImpl implements TraineeService {
     ) {
         Trainee trainee = findTraineeProfileByUsername(username);
 
-        updateProfileHelper(trainee, updateRequestDto);
+        updateTraineeProfile(trainee, updateRequestDto);
 
         TraineeProfileUpdateResponseDto responseDto = traineeMapper.traineeToUpdateResponseDto(trainee);
 
@@ -146,7 +146,7 @@ public class TraineeServiceImpl implements TraineeService {
                 .toList();
     }
 
-    private void updateProfileHelper(Trainee trainee, TraineeProfileUpdateRequestDto updateRequestDto) {
+    private void updateTraineeProfile(Trainee trainee, TraineeProfileUpdateRequestDto updateRequestDto) {
         String firstName = updateRequestDto.getFirstName();
         String lastName = updateRequestDto.getLastName();
         LocalDate dob = updateRequestDto.getDateOfBirth();

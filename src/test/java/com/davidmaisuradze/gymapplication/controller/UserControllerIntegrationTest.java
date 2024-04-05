@@ -3,6 +3,7 @@ package com.davidmaisuradze.gymapplication.controller;
 import com.davidmaisuradze.gymapplication.config.ApplicationConfig;
 import com.davidmaisuradze.gymapplication.config.WebMvcConfig;
 import com.davidmaisuradze.gymapplication.dto.CredentialsDto;
+import com.davidmaisuradze.gymapplication.dto.PasswordChangeDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,10 +16,14 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+
 @ExtendWith(SpringExtension.class)
 @WebAppConfiguration
 @ContextConfiguration(classes = {WebMvcConfig.class, ApplicationConfig.class})
@@ -33,7 +38,7 @@ class UserControllerIntegrationTest {
     }
 
     @Test
-    void testLogin() throws Exception {
+    void testLogin_WhenCredentialsNotMatch_ThenReturnIsUnauthorized() throws Exception {
         CredentialsDto credentialsDto = CredentialsDto.builder()
                 .username("Davit.Maisuradze15")
                 .password("actuallyNewPass")
@@ -43,5 +48,49 @@ class UserControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(credentialsDto)))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void testLogin_WhenCredentialsMatch_ThenReturnIsOk() throws Exception {
+        CredentialsDto credentialsDto = CredentialsDto.builder()
+                .username("Davit.Maisuradze")
+                .password("newPass")
+                .build();
+
+        mockMvc.perform(get("/api/v1/users/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(credentialsDto)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void testChangePassword_WhenCredentialsNotMatch_ThenReturnIsUnauthorized() throws Exception {
+        PasswordChangeDto passwordChangeDto = PasswordChangeDto
+                .builder()
+                .username("Davit.Maisuradze")
+                .oldPassword("somePass")
+                .newPassword("newPass")
+                .build();
+
+        mockMvc.perform(put("/api/v1/users/password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(passwordChangeDto)))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @Transactional
+    void testChangePassword_WhenCredentialsMatch_ThenReturnIsOk() throws Exception {
+        PasswordChangeDto passwordChangeDto = PasswordChangeDto
+                .builder()
+                .username("Davit.Maisuradze")
+                .oldPassword("newPass")
+                .newPassword("somePass")
+                .build();
+
+        mockMvc.perform(put("/api/v1/users/password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(passwordChangeDto)))
+                .andExpect(status().isOk());
     }
 }
