@@ -1,25 +1,22 @@
 package com.davidmaisuradze.gymapplication.util;
 
-import com.davidmaisuradze.gymapplication.dao.UserDao;
+import com.davidmaisuradze.gymapplication.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.UUID;
 
 @Component
+@RequiredArgsConstructor
 @Slf4j
 public class DetailsGenerator {
-    private final UserDao userDao;
+    private final UserRepository userRepository;
 
-    @Autowired
-    public DetailsGenerator(UserDao userDao) {
-        this.userDao = userDao;
-    }
 
     public String generateUsername(String firstName, String lastName) {
-        List<String> usernames = userDao.getAllUsernames();
+        List<String> usernames = userRepository.findAllUsernames();
 
         String baseUsername = firstName + "." + lastName;
         String finalUsername = baseUsername;
@@ -30,7 +27,7 @@ public class DetailsGenerator {
             finalUsername = baseUsername + counter;
         }
 
-        log.info("Username generated: " + finalUsername);
+        log.info("Username generated: {}", finalUsername);
         return finalUsername;
     }
 

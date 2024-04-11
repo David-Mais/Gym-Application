@@ -1,8 +1,8 @@
 package com.davidmaisuradze.gymapplication.service.impl;
 
-import com.davidmaisuradze.gymapplication.dao.TrainingTypeDao;
 import com.davidmaisuradze.gymapplication.dto.trainingtype.TrainingTypeDto;
 import com.davidmaisuradze.gymapplication.mapper.TrainingTypeMapper;
+import com.davidmaisuradze.gymapplication.repository.TrainingTypeRepository;
 import com.davidmaisuradze.gymapplication.service.TrainingTypeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,12 +14,12 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class TrainingTypeServiceImpl implements TrainingTypeService {
-    private final TrainingTypeDao trainingTypeDao;
+    private final TrainingTypeRepository trainingTypeRepository;
     private final TrainingTypeMapper trainingTypeMapper;
 
     @Override
     public List<TrainingTypeDto> findAll() {
-        List<TrainingTypeDto> trainingTypes = trainingTypeDao.findAll()
+        List<TrainingTypeDto> trainingTypes = trainingTypeRepository.findAll()
                 .stream()
                 .map(trainingTypeMapper::entityToDto)
                 .toList();

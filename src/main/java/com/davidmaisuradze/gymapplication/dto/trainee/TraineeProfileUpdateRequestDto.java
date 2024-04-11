@@ -1,6 +1,8 @@
 package com.davidmaisuradze.gymapplication.dto.trainee;
 
+import com.davidmaisuradze.gymapplication.util.CustomDateDeserializer;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
@@ -24,6 +26,7 @@ public class TraineeProfileUpdateRequestDto {
     private String lastName;
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Past(message = "No future people allowed")
+    @JsonDeserialize(using = CustomDateDeserializer.class)
     private LocalDate dateOfBirth;
     private String address;
     @NotNull(message = "isActive field should not be null")

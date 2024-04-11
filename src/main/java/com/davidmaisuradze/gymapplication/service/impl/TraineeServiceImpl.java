@@ -1,8 +1,5 @@
 package com.davidmaisuradze.gymapplication.service.impl;
 
-import com.davidmaisuradze.gymapplication.dao.TraineeDao;
-import com.davidmaisuradze.gymapplication.dao.TrainerDao;
-import com.davidmaisuradze.gymapplication.dao.TrainingTypeDao;
 import com.davidmaisuradze.gymapplication.dto.ActiveStatusDto;
 import com.davidmaisuradze.gymapplication.dto.CredentialsDto;
 import com.davidmaisuradze.gymapplication.dto.trainee.CreateTraineeDto;
@@ -20,6 +17,9 @@ import com.davidmaisuradze.gymapplication.mapper.TrainerMapper;
 import com.davidmaisuradze.gymapplication.mapper.TrainingMapper;
 import com.davidmaisuradze.gymapplication.mapper.TrainingTypeMapper;
 import com.davidmaisuradze.gymapplication.mapper.UserMapper;
+import com.davidmaisuradze.gymapplication.repository.TraineeRepository;
+import com.davidmaisuradze.gymapplication.repository.TrainerRepository;
+import com.davidmaisuradze.gymapplication.repository.TrainingTypeRepository;
 import com.davidmaisuradze.gymapplication.service.TraineeService;
 import com.davidmaisuradze.gymapplication.util.DetailsGenerator;
 import jakarta.persistence.NoResultException;
@@ -36,9 +36,9 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class TraineeServiceImpl implements TraineeService {
-    private final TraineeDao traineeDao;
-    private final TrainerDao trainerDao;
-    private final TrainingTypeDao trainingTypeDao;
+    private final TraineeRepository traineeRepository;
+    private final TrainerRepository trainerRepository;
+    private final TrainingTypeRepository trainingTypeRepository;
     private final DetailsGenerator detailsGenerator;
     private final TraineeMapper traineeMapper;
     private final TrainerMapper trainerMapper;
@@ -62,7 +62,7 @@ public class TraineeServiceImpl implements TraineeService {
         trainee.setUsername(username);
         trainee.setIsActive(true);
 
-        traineeDao.create(trainee);
+        traineeRepository.save(trainee);
 
         log.info("Trainee Created");
 
@@ -99,7 +99,7 @@ public class TraineeServiceImpl implements TraineeService {
     @Transactional
     public void deleteByUsername(String username) {
         Trainee traineeToDelete = findTraineeProfileByUsername(username);
-        traineeDao.delete(traineeToDelete);
+        traineeRepository.delete(traineeToDelete);
     }
 
     @Override
@@ -107,7 +107,7 @@ public class TraineeServiceImpl implements TraineeService {
     public void updateActiveStatus(String username, ActiveStatusDto activeStatusDto) {
         Trainee trainee = findTraineeProfileByUsername(username);
         trainee.setIsActive(activeStatusDto.getIsActive());
-        traineeDao.update(trainee);
+        traineeRepository.save(trainee);
     }
 
     @Override
@@ -115,7 +115,12 @@ public class TraineeServiceImpl implements TraineeService {
     public List<TrainingInfoDto> getTrainingsList(String username, TrainingSearchCriteria criteria) {
         trainingSearchValidator(username, criteria);
 
-        List<Training> trainings = traineeDao.getTrainingsList(username, criteria);
+        List<Training> trainings = traineeRepository.getTrainingsList(
+                username,
+                criteria.getFrom(),
+                criteria.getTo(),
+                criteria.getName(),
+                criteria.getTrainingTypeName());
         List<TrainingInfoDto> trainingInfoDtos = new ArrayList<>();
 
         for (Training t : trainings) {
@@ -126,7 +131,7 @@ public class TraineeServiceImpl implements TraineeService {
             if (criteria.getTrainingTypeName() != null) {
                 trainingInfo.setTrainingType(
                         trainingTypeMapper
-                                .entityToDto(trainingTypeDao.findTrainingTypeByName(criteria.getTrainingTypeName()))
+                                .entityToDto(trainingTypeRepository.findByTrainingTypeName(criteria.getTrainingTypeName()))
                 );
             }
             trainingInfoDtos.add(trainingInfo);
@@ -139,7 +144,7 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     private List<TrainerInfoDto> getAllTrainerDto(String username) {
-        return traineeDao
+        return traineeRepository
                 .getAllTrainers(username)
                 .stream()
                 .map(trainerMapper::trainerToTrainerInfoDto)
@@ -169,20 +174,28 @@ public class TraineeServiceImpl implements TraineeService {
             trainee.setIsActive(isActive);
         }
 
-        traineeDao.update(trainee);
+        traineeRepository.save(trainee);
     }
 
     private Trainee findTraineeProfileByUsername(String username) {
+        return getTrainee(username, traineeRepository);
+    }
+
+    static Trainee getTrainee(String username, TraineeRepository traineeRepository) {
         try {
-            return traineeDao.findByUsername(username);
-        } catch (NoResultException e) {
+            Trainee trainee = traineeRepository.findByUsername(username);
+            if (trainee == null) {
+                throw new GymException("Trainee not found with username: " + username, "404");
+            }
+            return trainee;
+        } catch (Exception e) {
             throw new GymException("Trainee not found with username: " + username, "404");
         }
     }
 
     private boolean trainerExists(String username) {
         try {
-            return trainerDao.findByUsername(username) != null;
+            return trainerRepository.findByUsername(username) != null;
         } catch (NoResultException e) {
             return false;
         }
@@ -190,7 +203,7 @@ public class TraineeServiceImpl implements TraineeService {
 
     private boolean trainingTypeExists(String typeName) {
         try {
-            return trainingTypeDao.findTrainingTypeByName(typeName) != null;
+            return trainingTypeRepository.findByTrainingTypeName(typeName) != null;
         } catch (NoResultException e) {
             return false;
         }

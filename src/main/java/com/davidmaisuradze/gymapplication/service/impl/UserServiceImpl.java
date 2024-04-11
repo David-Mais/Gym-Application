@@ -1,10 +1,10 @@
 package com.davidmaisuradze.gymapplication.service.impl;
 
-import com.davidmaisuradze.gymapplication.dao.UserDao;
 import com.davidmaisuradze.gymapplication.dto.CredentialsDto;
 import com.davidmaisuradze.gymapplication.dto.PasswordChangeDto;
 import com.davidmaisuradze.gymapplication.entity.UserEntity;
 import com.davidmaisuradze.gymapplication.exception.GymException;
+import com.davidmaisuradze.gymapplication.repository.UserRepository;
 import com.davidmaisuradze.gymapplication.service.UserService;
 import jakarta.persistence.NoResultException;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private static final String INVALID_CREDENTIALS = "Invalid Credentials";
-    private final UserDao userDao;
+    private final UserRepository userRepository;
 
     @Override
     public boolean login(CredentialsDto credentialsDto) {
@@ -34,15 +34,15 @@ public class UserServiceImpl implements UserService {
 
         loginHelper(username, oldPassword);
 
-        UserEntity user = userDao.findByUsername(username);
+        UserEntity user = userRepository.findByUsername(checkedUsername(username));
         user.setPassword(newPassword);
-        userDao.update(user);
+        userRepository.save(user);
         return true;
     }
 
     private String checkedUsername(String username) {
         try {
-            userDao.findByUsername(username);
+            userRepository.findByUsername(username);
             return username;
         } catch (NoResultException e) {
             throw new GymException(INVALID_CREDENTIALS, "401");
@@ -50,10 +50,9 @@ public class UserServiceImpl implements UserService {
     }
 
     private boolean loginHelper(String username, String password) {
-        boolean checked = userDao.checkCredentials(
-                checkedUsername(username),
-                password
-        );
+        boolean checked = userRepository.findPasswordByUsername(username)
+                .map(password::equals)
+                .orElse(false);
 
         if (!checked) {
             throw new GymException(INVALID_CREDENTIALS, "401");
