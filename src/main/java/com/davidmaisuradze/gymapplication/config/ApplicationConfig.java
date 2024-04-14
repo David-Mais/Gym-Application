@@ -1,5 +1,6 @@
 package com.davidmaisuradze.gymapplication.config;
 
+import com.davidmaisuradze.gymapplication.config.logging.TransactionIdInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

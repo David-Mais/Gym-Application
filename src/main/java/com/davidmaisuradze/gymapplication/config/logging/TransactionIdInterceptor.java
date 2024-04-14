@@ -1,4 +1,4 @@
-package com.davidmaisuradze.gymapplication.config;
+package com.davidmaisuradze.gymapplication.config.logging;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

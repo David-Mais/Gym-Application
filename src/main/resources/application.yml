@@ -1,3 +1,32 @@
 spring:
   profiles:
     active: dev
+  jpa:
+    show-sql: true
+    open-in-view: true
+
+logging:
+  level:
+    root: info
+    org:
+      springframework:
+        boot:
+          web: info
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,custom
+  endpoint:
+    health:
+      show-details: always
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
