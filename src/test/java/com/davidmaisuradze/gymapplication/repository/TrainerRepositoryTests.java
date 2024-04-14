@@ -10,6 +10,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -23,16 +24,16 @@ class TrainerRepositoryTests {
     @Test
     void testFindByUsername_WhenTrainerExists_ThenReturnTrainer() {
         String username = "Merab.Dvalishvili";
-        Trainer trainer = trainerRepository.findByUsername(username);
-        assertThat(trainer).isNotNull();
-        assertThat(trainer.getUsername()).isEqualTo(username);
+        Optional<Trainer> trainer = trainerRepository.findByUsername(username);
+        assertThat(trainer).isPresent();
+        assertThat(trainer.get().getUsername()).isEqualTo(username);
     }
 
     @Test
     void testFindByUsername_WhenTrainerDoesNotExist_ThenReturnNull() {
         String username = "Not.Existing";
-        Trainer trainer = trainerRepository.findByUsername(username);
-        assertThat(trainer).isNull();
+        Optional<Trainer> trainer = trainerRepository.findByUsername(username);
+        assertThat(trainer).isEmpty();
     }
 
     @Test

@@ -10,10 +10,11 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface TraineeRepository extends JpaRepository<Trainee, Long> {
-    Trainee findByUsername(String username);
+    Optional<Trainee> findByUsername(String username);
 
     @Query("select t.trainer from Training t where t.trainee.username = :username")
     List<Trainer> getAllTrainers(@Param("username") String username);

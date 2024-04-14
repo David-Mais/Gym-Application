@@ -8,6 +8,7 @@ import com.davidmaisuradze.gymapplication.dto.trainee.TraineeProfileUpdateReques
 import com.davidmaisuradze.gymapplication.dto.trainee.TraineeProfileUpdateResponseDto;
 import com.davidmaisuradze.gymapplication.dto.training.TrainingInfoDto;
 import com.davidmaisuradze.gymapplication.dto.training.TrainingSearchCriteria;
+import com.davidmaisuradze.gymapplication.entity.Trainee;
 
 import java.util.List;
 
@@ -18,4 +19,5 @@ public interface TraineeService {
     void deleteByUsername(String username);
     void updateActiveStatus(String username, ActiveStatusDto activeStatusDto);
     List<TrainingInfoDto> getTrainingsList(String username, TrainingSearchCriteria criteria);
+    Trainee getTrainee(String username);
 }

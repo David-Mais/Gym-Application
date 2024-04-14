@@ -6,10 +6,10 @@ import com.davidmaisuradze.gymapplication.entity.UserEntity;
 import com.davidmaisuradze.gymapplication.exception.GymException;
 import com.davidmaisuradze.gymapplication.repository.UserRepository;
 import com.davidmaisuradze.gymapplication.service.UserService;
-import jakarta.persistence.NoResultException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 
 @Service
 @RequiredArgsConstructor
@@ -34,19 +34,16 @@ public class UserServiceImpl implements UserService {
 
         loginHelper(username, oldPassword);
 
-        UserEntity user = userRepository.findByUsername(checkedUsername(username));
+        UserEntity user = findUserByUsername(username);
         user.setPassword(newPassword);
         userRepository.save(user);
         return true;
     }
 
-    private String checkedUsername(String username) {
-        try {
-            userRepository.findByUsername(username);
-            return username;
-        } catch (NoResultException e) {
-            throw new GymException(INVALID_CREDENTIALS, "401");
-        }
+    private UserEntity findUserByUsername(String username) {
+        return userRepository
+                .findByUsername(username)
+                .orElseThrow(() -> new GymException("User not found with username: " + username, "404"));
     }
 
     private boolean loginHelper(String username, String password) {

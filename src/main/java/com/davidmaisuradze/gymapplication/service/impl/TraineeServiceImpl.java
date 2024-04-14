@@ -22,14 +22,12 @@ import com.davidmaisuradze.gymapplication.repository.TrainerRepository;
 import com.davidmaisuradze.gymapplication.repository.TrainingTypeRepository;
 import com.davidmaisuradze.gymapplication.service.TraineeService;
 import com.davidmaisuradze.gymapplication.util.DetailsGenerator;
-import jakarta.persistence.NoResultException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -71,7 +69,7 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     public TraineeProfileDto getProfile(String username) {
-        Trainee trainee = findTraineeProfileByUsername(username);
+        Trainee trainee = getTrainee(username);
         TraineeProfileDto profileDto = traineeMapper.traineeToTrainerProfileDto(trainee);
         profileDto.setTrainersList(getAllTrainerDto(username));
 
@@ -84,7 +82,7 @@ public class TraineeServiceImpl implements TraineeService {
             String username,
             TraineeProfileUpdateRequestDto updateRequestDto
     ) {
-        Trainee trainee = findTraineeProfileByUsername(username);
+        Trainee trainee = getTrainee(username);
 
         updateTraineeProfile(trainee, updateRequestDto);
 
@@ -98,14 +96,14 @@ public class TraineeServiceImpl implements TraineeService {
     @Override
     @Transactional
     public void deleteByUsername(String username) {
-        Trainee traineeToDelete = findTraineeProfileByUsername(username);
+        Trainee traineeToDelete = getTrainee(username);
         traineeRepository.delete(traineeToDelete);
     }
 
     @Override
     @Transactional
     public void updateActiveStatus(String username, ActiveStatusDto activeStatusDto) {
-        Trainee trainee = findTraineeProfileByUsername(username);
+        Trainee trainee = getTrainee(username);
         trainee.setIsActive(activeStatusDto.getIsActive());
         traineeRepository.save(trainee);
     }
@@ -120,22 +118,24 @@ public class TraineeServiceImpl implements TraineeService {
                 criteria.getFrom(),
                 criteria.getTo(),
                 criteria.getName(),
-                criteria.getTrainingTypeName());
-        List<TrainingInfoDto> trainingInfoDtos = new ArrayList<>();
+                criteria.getTrainingTypeName()
+        );
 
-        for (Training t : trainings) {
-            TrainingInfoDto trainingInfo = trainingMapper.trainingToTrainingInfoDto(t);
 
-            trainingInfo.setUsername(t.getTrainer().getUsername());
+        List<TrainingInfoDto> trainingInfoDtos = trainings.stream()
+                .map(t -> {
+                    TrainingInfoDto trainingInfo = trainingMapper.trainingToTrainingInfoDto(t);
+                    trainingInfo.setUsername(t.getTrainer().getUsername());
 
-            if (criteria.getTrainingTypeName() != null) {
-                trainingInfo.setTrainingType(
-                        trainingTypeMapper
-                                .entityToDto(trainingTypeRepository.findByTrainingTypeName(criteria.getTrainingTypeName()))
-                );
-            }
-            trainingInfoDtos.add(trainingInfo);
-        }
+                    if (criteria.getTrainingTypeName() != null) {
+                        trainingTypeRepository.findByTrainingTypeName(criteria.getTrainingTypeName())
+                                .ifPresent(trainingType -> trainingInfo.setTrainingType(
+                                        trainingTypeMapper.entityToDto(trainingType)
+                                ));
+                    }
+                    return trainingInfo;
+                })
+                .toList();
 
         if (trainingInfoDtos.isEmpty()) {
             throw new GymException("No Trainings found", "404");
@@ -143,7 +143,14 @@ public class TraineeServiceImpl implements TraineeService {
         return trainingInfoDtos;
     }
 
-    private List<TrainerInfoDto> getAllTrainerDto(String username) {
+    @Override
+    public Trainee getTrainee(String username) {
+        return traineeRepository
+                .findByUsername(username)
+                .orElseThrow(() -> new GymException("Trainee not found with username: " + username, "404"));
+    }
+
+    public List<TrainerInfoDto> getAllTrainerDto(String username) {
         return traineeRepository
                 .getAllTrainers(username)
                 .stream()
@@ -177,40 +184,20 @@ public class TraineeServiceImpl implements TraineeService {
         traineeRepository.save(trainee);
     }
 
-    private Trainee findTraineeProfileByUsername(String username) {
-        return getTrainee(username, traineeRepository);
-    }
-
-    static Trainee getTrainee(String username, TraineeRepository traineeRepository) {
-        try {
-            Trainee trainee = traineeRepository.findByUsername(username);
-            if (trainee == null) {
-                throw new GymException("Trainee not found with username: " + username, "404");
-            }
-            return trainee;
-        } catch (Exception e) {
-            throw new GymException("Trainee not found with username: " + username, "404");
-        }
-    }
-
     private boolean trainerExists(String username) {
-        try {
-            return trainerRepository.findByUsername(username) != null;
-        } catch (NoResultException e) {
-            return false;
-        }
+        return trainerRepository
+                .findByUsername(username)
+                .isPresent();
     }
 
     private boolean trainingTypeExists(String typeName) {
-        try {
-            return trainingTypeRepository.findByTrainingTypeName(typeName) != null;
-        } catch (NoResultException e) {
-            return false;
-        }
+        return trainingTypeRepository
+                .findByTrainingTypeName(typeName)
+                .isPresent();
     }
 
     private void trainingSearchValidator(String username, TrainingSearchCriteria criteria) {
-        findTraineeProfileByUsername(username);
+        getTrainee(username);
 
         if (criteria.getName() != null && (!trainerExists(criteria.getName()))) {
             throw new GymException("Trainer not found with username: " + criteria.getName(), "404");

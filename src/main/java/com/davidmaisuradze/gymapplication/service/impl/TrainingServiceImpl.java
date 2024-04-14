@@ -5,9 +5,9 @@ import com.davidmaisuradze.gymapplication.entity.Trainee;
 import com.davidmaisuradze.gymapplication.entity.Trainer;
 import com.davidmaisuradze.gymapplication.entity.Training;
 import com.davidmaisuradze.gymapplication.entity.TrainingType;
-import com.davidmaisuradze.gymapplication.repository.TraineeRepository;
-import com.davidmaisuradze.gymapplication.repository.TrainerRepository;
 import com.davidmaisuradze.gymapplication.repository.TrainingRepository;
+import com.davidmaisuradze.gymapplication.service.TraineeService;
+import com.davidmaisuradze.gymapplication.service.TrainerService;
 import com.davidmaisuradze.gymapplication.service.TrainingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,16 +16,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
-import static com.davidmaisuradze.gymapplication.service.impl.TraineeServiceImpl.getTrainee;
-import static com.davidmaisuradze.gymapplication.service.impl.TrainerServiceImpl.getTrainer;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class TrainingServiceImpl implements TrainingService {
+    private final TraineeService traineeService;
+    private final TrainerService trainerService;
     private final TrainingRepository trainingRepository;
-    private final TrainerRepository trainerRepository;
-    private final TraineeRepository traineeRepository;
 
     @Override
     @Transactional
@@ -51,10 +49,10 @@ public class TrainingServiceImpl implements TrainingService {
     }
 
     private Trainee findTraineeProfileByUsername(String username) {
-        return getTrainee(username, traineeRepository);
+        return traineeService.getTrainee(username);
     }
 
     private Trainer findTrainerProfileByUsername(String username) {
-        return getTrainer(username, trainerRepository);
+        return trainerService.getTrainer(username);
     }
 }

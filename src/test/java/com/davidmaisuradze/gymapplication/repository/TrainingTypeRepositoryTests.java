@@ -7,6 +7,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 
@@ -20,15 +22,15 @@ class TrainingTypeRepositoryTests {
     @Test
     void findTrainingTypeByName_WhenTrainingTypeExists_ReturnsTrainingType() {
         String name = "mma";
-        TrainingType trainingType = trainingTypeRepository.findByTrainingTypeName(name);
-        assertThat(trainingType).isNotNull();
-        assertThat(trainingType.getTrainingTypeName()).isEqualTo(name);
+        Optional<TrainingType> trainingType = trainingTypeRepository.findByTrainingTypeName(name);
+        assertThat(trainingType).isPresent();
+        assertThat(trainingType.get().getTrainingTypeName()).isEqualTo(name);
     }
 
     @Test
     void findTrainingTypeByName_WhenTrainingTypeDoesNotExist_ReturnsNull() {
         String name = "yoga";
-        TrainingType trainingType = trainingTypeRepository.findByTrainingTypeName(name);
-        assertThat(trainingType).isNull();
+        Optional<TrainingType> trainingType = trainingTypeRepository.findByTrainingTypeName(name);
+        assertThat(trainingType).isEmpty();
     }
 }

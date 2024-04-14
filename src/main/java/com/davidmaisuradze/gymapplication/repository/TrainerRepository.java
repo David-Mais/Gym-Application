@@ -10,10 +10,11 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface TrainerRepository extends JpaRepository<Trainer, Long> {
-    Trainer findByUsername(String username);
+    Optional<Trainer> findByUsername(String username);
 
     @Query("select t from Trainer t where t not in (select tr.trainer from Training tr where tr.trainee.username = :username) and t.isActive = true")
     List<Trainer> getTrainersNotAssigned(@Param("username") String username);

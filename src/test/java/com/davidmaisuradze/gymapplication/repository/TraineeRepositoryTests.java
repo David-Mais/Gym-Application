@@ -11,6 +11,7 @@ import org.springframework.test.context.jdbc.Sql;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -34,16 +35,16 @@ class TraineeRepositoryTests {
                 .build();
         traineeRepository.save(newTrainee);
 
-        Trainee found = traineeRepository.findByUsername("Some.User");
+        Optional<Trainee> found = traineeRepository.findByUsername("Some.User");
 
-        assertThat(found.getUsername()).isEqualTo(newTrainee.getUsername());
+        assertThat(found.get().getUsername()).isEqualTo(newTrainee.getUsername());
     }
 
     @Test
     void testFindByUsername_WhenUsernameDoesNotExist_ThenReturnNull() {
         String username = "Non.Existing";
-        Trainee trainee = traineeRepository.findByUsername(username);
-        assertThat(trainee).isNull();
+        Optional<Trainee> trainee = traineeRepository.findByUsername(username);
+        assertThat(trainee).isEmpty();
     }
 
     @Test

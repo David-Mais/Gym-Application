@@ -4,6 +4,7 @@ import com.davidmaisuradze.gymapplication.util.CustomDateDeserializer;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,6 +27,7 @@ public class CreateTraineeDto {
     @Past(message = "No future people allowed")
     @JsonFormat(pattern = "yyyy-MM-dd")
     @JsonDeserialize(using = CustomDateDeserializer.class)
+    @NotNull(message = "Date of Birth should not be null")
     private LocalDate dateOfBirth;
     private String address;
 }

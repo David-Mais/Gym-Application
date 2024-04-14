@@ -22,16 +22,16 @@ class UserRepositoryTests {
     @Test
     void testFindByUsername_WhenUserExists_ThenReturnUser() {
         String username = "Davit.Maisuradze";
-        UserEntity user = userRepository.findByUsername(username);
-        assertThat(user).isNotNull();
-        assertThat(user.getUsername()).isEqualTo(username);
+        Optional<UserEntity> user = userRepository.findByUsername(username);
+        assertThat(user).isPresent();
+        assertThat(user.get().getUsername()).isEqualTo(username);
     }
 
     @Test
     void testFindByUsername_WhenUserDoesNotExist_ThenReturnNull() {
         String username = "Non.Existing";
-        UserEntity user = userRepository.findByUsername(username);
-        assertThat(user).isNull();
+        Optional<UserEntity> user = userRepository.findByUsername(username);
+        assertThat(user).isEmpty();
     }
 
     @Test

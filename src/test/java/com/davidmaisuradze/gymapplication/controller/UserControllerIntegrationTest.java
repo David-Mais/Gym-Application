@@ -13,7 +13,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -33,7 +33,7 @@ class UserControllerIntegrationTest {
                 .password("actuallyNewPass")
                 .build();
 
-        mockMvc.perform(get("/api/v1/users/login")
+        mockMvc.perform(post("/api/v1/users/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(credentialsDto)))
                 .andExpect(status().isUnauthorized());
@@ -46,7 +46,7 @@ class UserControllerIntegrationTest {
                 .password("newPass")
                 .build();
 
-        mockMvc.perform(get("/api/v1/users/login")
+        mockMvc.perform(post("/api/v1/users/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(credentialsDto)))
                 .andExpect(status().isOk());
