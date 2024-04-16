@@ -70,7 +70,7 @@ public class TraineeServiceImpl implements TraineeService {
     @Override
     public TraineeProfileDto getProfile(String username) {
         Trainee trainee = getTrainee(username);
-        TraineeProfileDto profileDto = traineeMapper.traineeToTrainerProfileDto(trainee);
+        TraineeProfileDto profileDto = traineeMapper.traineeToTraineeProfileDto(trainee);
         profileDto.setTrainersList(getAllTrainerDto(username));
 
         return profileDto;
@@ -113,46 +113,51 @@ public class TraineeServiceImpl implements TraineeService {
     public List<TrainingInfoDto> getTrainingsList(String username, TrainingSearchCriteria criteria) {
         trainingSearchValidator(username, criteria);
 
+        String trainerUsername = criteria.getName();
+        String trainingTypeName = criteria.getTrainingTypeName();
+        if (trainerUsername != null) {
+            trainerUsername = trainerUsername.toLowerCase();
+        }
+        if (trainingTypeName != null) {
+            trainingTypeName = trainingTypeName.toLowerCase();
+        }
+
         List<Training> trainings = traineeRepository.getTrainingsList(
-                username,
+                username.toLowerCase(),
                 criteria.getFrom(),
                 criteria.getTo(),
-                criteria.getName(),
-                criteria.getTrainingTypeName()
+                trainerUsername,
+                trainingTypeName
         );
 
 
-        List<TrainingInfoDto> trainingInfoDtos = trainings.stream()
+        return trainings.stream()
                 .map(t -> {
                     TrainingInfoDto trainingInfo = trainingMapper.trainingToTrainingInfoDto(t);
                     trainingInfo.setUsername(t.getTrainer().getUsername());
 
                     if (criteria.getTrainingTypeName() != null) {
-                        trainingTypeRepository.findByTrainingTypeName(criteria.getTrainingTypeName())
+                        trainingTypeRepository.findByTrainingTypeNameIgnoreCase(criteria.getTrainingTypeName())
                                 .ifPresent(trainingType -> trainingInfo.setTrainingType(
                                         trainingTypeMapper.entityToDto(trainingType)
-                                ));
+                                )
+                                );
                     }
                     return trainingInfo;
                 })
                 .toList();
-
-        if (trainingInfoDtos.isEmpty()) {
-            throw new GymException("No Trainings found", "404");
-        }
-        return trainingInfoDtos;
     }
 
     @Override
     public Trainee getTrainee(String username) {
         return traineeRepository
-                .findByUsername(username)
+                .findByUsernameIgnoreCase(username)
                 .orElseThrow(() -> new GymException("Trainee not found with username: " + username, "404"));
     }
 
     public List<TrainerInfoDto> getAllTrainerDto(String username) {
         return traineeRepository
-                .getAllTrainers(username)
+                .getAllTrainers(username.toLowerCase())
                 .stream()
                 .map(trainerMapper::trainerToTrainerInfoDto)
                 .toList();
@@ -186,13 +191,13 @@ public class TraineeServiceImpl implements TraineeService {
 
     private boolean trainerExists(String username) {
         return trainerRepository
-                .findByUsername(username)
+                .findByUsernameIgnoreCase(username.toLowerCase())
                 .isPresent();
     }
 
     private boolean trainingTypeExists(String typeName) {
         return trainingTypeRepository
-                .findByTrainingTypeName(typeName)
+                .findByTrainingTypeNameIgnoreCase(typeName)
                 .isPresent();
     }
 

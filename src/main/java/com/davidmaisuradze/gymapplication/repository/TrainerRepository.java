@@ -14,18 +14,18 @@ import java.util.Optional;
 
 @Repository
 public interface TrainerRepository extends JpaRepository<Trainer, Long> {
-    Optional<Trainer> findByUsername(String username);
+    Optional<Trainer> findByUsernameIgnoreCase(String username);
 
-    @Query("select t from Trainer t where t not in (select tr.trainer from Training tr where tr.trainee.username = :username) and t.isActive = true")
+    @Query("select t from Trainer t where t not in (select tr.trainer from Training tr where lower(tr.trainee.username) = :username) and t.isActive = true")
     List<Trainer> getTrainersNotAssigned(@Param("username") String username);
 
-    @Query("select t.trainee from Training t where t.trainer.username = :username")
+    @Query("select t.trainee from Training t where lower(t.trainer.username) = :username")
     List<Trainee> getAllTrainees(@Param("username") String username);
 
-    @Query("select t from Training t where t.trainer.username = :username " +
+    @Query("select t from Training t where lower(t.trainer.username) = :username " +
             "and (:fromDate is null or t.trainingDate >= :fromDate) " +
             "and (:toDate is null or t.trainingDate <= :toDate) " +
-            "and (:traineeName is null or t.trainee.username = :traineeName)")
+            "and (:traineeName is null or lower(t.trainee.username) = :traineeName)")
     List<Training> getTrainingsList(
             @Param("username") String username,
             @Param("fromDate") LocalDate fromDate,

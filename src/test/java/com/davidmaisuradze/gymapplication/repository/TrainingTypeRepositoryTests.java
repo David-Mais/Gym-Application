@@ -22,7 +22,7 @@ class TrainingTypeRepositoryTests {
     @Test
     void findTrainingTypeByName_WhenTrainingTypeExists_ReturnsTrainingType() {
         String name = "mma";
-        Optional<TrainingType> trainingType = trainingTypeRepository.findByTrainingTypeName(name);
+        Optional<TrainingType> trainingType = trainingTypeRepository.findByTrainingTypeNameIgnoreCase(name);
         assertThat(trainingType).isPresent();
         assertThat(trainingType.get().getTrainingTypeName()).isEqualTo(name);
     }
@@ -30,7 +30,7 @@ class TrainingTypeRepositoryTests {
     @Test
     void findTrainingTypeByName_WhenTrainingTypeDoesNotExist_ReturnsNull() {
         String name = "yoga";
-        Optional<TrainingType> trainingType = trainingTypeRepository.findByTrainingTypeName(name);
+        Optional<TrainingType> trainingType = trainingTypeRepository.findByTrainingTypeNameIgnoreCase(name);
         assertThat(trainingType).isEmpty();
     }
 }

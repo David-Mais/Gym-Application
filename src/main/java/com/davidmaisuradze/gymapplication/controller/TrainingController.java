@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/trainings")
 @RequiredArgsConstructor
-@Tag(name = "TrainingController", description = "Endpoint for managing Trainings")
+@Tag(name = "Trainings", description = "Endpoint for managing Trainings")
 public class TrainingController {
     private final TrainingService trainingService;
 

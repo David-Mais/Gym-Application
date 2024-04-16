@@ -13,7 +13,6 @@ logging:
         boot:
           web: info
 
-
 management:
   endpoints:
     web:

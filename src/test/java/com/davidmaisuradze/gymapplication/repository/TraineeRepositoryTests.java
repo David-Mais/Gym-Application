@@ -35,7 +35,7 @@ class TraineeRepositoryTests {
                 .build();
         traineeRepository.save(newTrainee);
 
-        Optional<Trainee> found = traineeRepository.findByUsername("Some.User");
+        Optional<Trainee> found = traineeRepository.findByUsernameIgnoreCase("Some.User");
 
         assertThat(found.get().getUsername()).isEqualTo(newTrainee.getUsername());
     }
@@ -43,14 +43,14 @@ class TraineeRepositoryTests {
     @Test
     void testFindByUsername_WhenUsernameDoesNotExist_ThenReturnNull() {
         String username = "Non.Existing";
-        Optional<Trainee> trainee = traineeRepository.findByUsername(username);
+        Optional<Trainee> trainee = traineeRepository.findByUsernameIgnoreCase(username);
         assertThat(trainee).isEmpty();
     }
 
     @Test
     void testGetAllTrainers_WhenUsernameExists_ThenReturnAllTrainers() {
         String username = "Davit.Maisuradze";
-        List<Trainer> trainers = traineeRepository.getAllTrainers(username);
+        List<Trainer> trainers = traineeRepository.getAllTrainers(username.toLowerCase());
         assertThat(trainers).isNotNull().hasSize(1);
     }
 
@@ -66,10 +66,10 @@ class TraineeRepositoryTests {
         String username = "Davit.Maisuradze";
         String trainer = "Merab.Dvalishvili";
         List<Training> trainings = traineeRepository.getTrainingsList(
-                username,
+                username.toLowerCase(),
                 null,
                   null,
-                trainer,
+                trainer.toLowerCase(),
                 null
         );
 

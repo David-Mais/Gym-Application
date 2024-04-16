@@ -14,7 +14,6 @@ import java.util.UUID;
 public class DetailsGenerator {
     private final UserRepository userRepository;
 
-
     public String generateUsername(String firstName, String lastName) {
         List<String> usernames = userRepository.findAllUsernames();
 

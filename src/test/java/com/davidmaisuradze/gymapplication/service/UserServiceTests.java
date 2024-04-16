@@ -4,6 +4,7 @@ import com.davidmaisuradze.gymapplication.dto.CredentialsDto;
 import com.davidmaisuradze.gymapplication.dto.PasswordChangeDto;
 import com.davidmaisuradze.gymapplication.entity.Trainee;
 import com.davidmaisuradze.gymapplication.entity.UserEntity;
+import com.davidmaisuradze.gymapplication.exception.GymException;
 import com.davidmaisuradze.gymapplication.repository.UserRepository;
 import com.davidmaisuradze.gymapplication.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
@@ -41,6 +43,25 @@ class UserServiceTests {
         assertTrue(result);
     }
 
+    @Test
+    void testLogin_WhenCredentialsNotMatch_thenThrowGymException() {
+        CredentialsDto credentials = new CredentialsDto();
+        credentials.setUsername("username");
+        credentials.setPassword("password");
+
+        when(userRepository.findPasswordByUsername(anyString())).thenReturn(Optional.empty());
+
+        GymException exception = assertThrows(
+                GymException.class,
+                () -> userService.login(credentials)
+        );
+
+        assertEquals("Invalid Credentials", exception.getMessage());
+        assertEquals("401", exception.getErrorCode());
+
+        verify(userRepository, times(1)).findPasswordByUsername(anyString());
+    }
+
 
     @Test
     void testChangePassword() {
@@ -62,5 +83,25 @@ class UserServiceTests {
         assertEquals("newPass", user.getPassword());
 
         verify(userRepository, times(1)).save(user);
+    }
+
+    @Test
+    void testChangePassword_WhenPasswordNotMatch_thenThrowGymException() {
+        PasswordChangeDto passwordChangeDto = new PasswordChangeDto();
+        passwordChangeDto.setUsername("user");
+        passwordChangeDto.setOldPassword("pass");
+        passwordChangeDto.setNewPassword("newPass");
+
+        when(userRepository.findPasswordByUsername(anyString())).thenReturn(Optional.empty());
+
+        GymException exception = assertThrows(
+                GymException.class,
+                () -> userService.changePassword(passwordChangeDto)
+        );
+
+        assertEquals("Invalid Credentials", exception.getMessage());
+        assertEquals("401", exception.getErrorCode());
+
+        verify(userRepository, times(1)).findPasswordByUsername(anyString());
     }
 }

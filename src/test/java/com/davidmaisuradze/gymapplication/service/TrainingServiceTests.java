@@ -5,6 +5,7 @@ import com.davidmaisuradze.gymapplication.entity.Trainee;
 import com.davidmaisuradze.gymapplication.entity.Trainer;
 import com.davidmaisuradze.gymapplication.entity.Training;
 import com.davidmaisuradze.gymapplication.entity.TrainingType;
+import com.davidmaisuradze.gymapplication.exception.GymException;
 import com.davidmaisuradze.gymapplication.repository.TrainingRepository;
 import com.davidmaisuradze.gymapplication.service.impl.TrainingServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,8 @@ import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -70,5 +73,33 @@ class TrainingServiceTests {
         assertEquals(duration, capturedTraining.getDuration());
         assertSame(trainee, capturedTraining.getTrainee());
         assertSame(trainer, capturedTraining.getTrainer());
+    }
+
+    @Test
+    void createTraining_WhenTrainerDoesNotExist_ThenThrowException() {
+        String traineeName = "traineeName";
+        String trainerName = "nonExistentTrainer";
+        String trainingName = "trainingName";
+        LocalDate trainingDate = LocalDate.of(2000, 1, 1);
+        Integer duration = 30;
+
+        CreateTrainingDto trainingDto = CreateTrainingDto.builder()
+                .traineeUsername(traineeName)
+                .trainerUsername(trainerName)
+                .trainingName(trainingName)
+                .trainingDate(trainingDate)
+                .duration(duration)
+                .build();
+
+        when(trainerService.getTrainer(anyString()))
+                .thenThrow(new GymException("Trainer not found with username: " + trainerName, "404"));
+
+        GymException exception = assertThrows(
+                GymException.class,
+                () -> trainingService.create(trainingDto)
+        );
+
+        assertTrue(exception.getMessage().contains("Trainer not found with username: "));
+        assertEquals("404", exception.getErrorCode());
     }
 }

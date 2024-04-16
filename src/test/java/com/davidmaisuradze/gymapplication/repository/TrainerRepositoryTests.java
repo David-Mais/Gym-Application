@@ -24,7 +24,7 @@ class TrainerRepositoryTests {
     @Test
     void testFindByUsername_WhenTrainerExists_ThenReturnTrainer() {
         String username = "Merab.Dvalishvili";
-        Optional<Trainer> trainer = trainerRepository.findByUsername(username);
+        Optional<Trainer> trainer = trainerRepository.findByUsernameIgnoreCase(username);
         assertThat(trainer).isPresent();
         assertThat(trainer.get().getUsername()).isEqualTo(username);
     }
@@ -32,7 +32,7 @@ class TrainerRepositoryTests {
     @Test
     void testFindByUsername_WhenTrainerDoesNotExist_ThenReturnNull() {
         String username = "Not.Existing";
-        Optional<Trainer> trainer = trainerRepository.findByUsername(username);
+        Optional<Trainer> trainer = trainerRepository.findByUsernameIgnoreCase(username);
         assertThat(trainer).isEmpty();
     }
 
@@ -46,7 +46,7 @@ class TrainerRepositoryTests {
     @Test
     void testGetAllTrainees_WhenTrainerExists_ThenReturnTraineeList() {
         String username = "Merab.Dvalishvili";
-        List<Trainee> trainees = trainerRepository.getAllTrainees(username);
+        List<Trainee> trainees = trainerRepository.getAllTrainees(username.toLowerCase());
         assertThat(trainees).isNotNull().isNotEmpty().hasSize(2);
     }
 
@@ -61,7 +61,7 @@ class TrainerRepositoryTests {
     void testGetTrainings_WhenTrainerExists_ThenReturnTrainingList() {
         String username = "Merab.Dvalishvili";
         List<Training> trainings = trainerRepository.getTrainingsList(
-                username,
+                username.toLowerCase(),
                 null,
                 null,
                 null

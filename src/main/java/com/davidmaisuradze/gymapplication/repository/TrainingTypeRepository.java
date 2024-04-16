@@ -8,5 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface TrainingTypeRepository extends JpaRepository<TrainingType, Long> {
-    Optional<TrainingType> findByTrainingTypeName(String trainingTypeName);
+    Optional<TrainingType> findByTrainingTypeNameIgnoreCase(String trainingTypeName);
 }

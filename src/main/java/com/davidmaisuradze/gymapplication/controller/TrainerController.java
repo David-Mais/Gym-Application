@@ -40,7 +40,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/trainers")
 @RequiredArgsConstructor
-@Tag(name = "TrainerController", description = "Endpoint for managing Trainers")
+@Tag(name = "Trainers", description = "Endpoint for managing Trainers")
 public class TrainerController {
     private final TrainerService trainerService;
 
@@ -839,19 +839,6 @@ public class TrainerController {
                                                     value = """
                                                             {
                                                               "errorMessage": "Trainer not found with username: Tom.Cruise",
-                                                              "errorCode": "404"
-                                                            }
-                                                            """
-                                            ),
-                                            @ExampleObject(
-                                                    name = "No such training",
-                                                    description = "If all the filters were applied correctly and no " +
-                                                            "validation errors were noticed but there was no training " +
-                                                            "that fit specified criteria API returns 404 status code " +
-                                                            "since no trainings were found.",
-                                                    value = """
-                                                            {
-                                                              "errorMessage": "No Trainings found",
                                                               "errorCode": "404"
                                                             }
                                                             """

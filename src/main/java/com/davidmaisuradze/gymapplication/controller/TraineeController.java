@@ -40,7 +40,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/trainees")
 @RequiredArgsConstructor
-@Tag(name = "TraineeController", description = "Endpoint for managing Trainees")
+@Tag(name = "Trainees", description = "Endpoint for managing Trainees")
 public class TraineeController {
     private final TraineeService traineeService;
 
@@ -658,7 +658,7 @@ public class TraineeController {
                                     schema = @Schema(implementation = TrainingInfoDto.class),
                                     examples = {
                                             @ExampleObject(
-                                                    name = "**Multiple trainings found**",
+                                                    name = "Multiple trainings found",
                                                     description = "When more than one training matched the specified " +
                                                             "filters, then list of training info DTOs are returned.",
                                                     value = """
@@ -687,7 +687,7 @@ public class TraineeController {
                                                             """
                                             ),
                                             @ExampleObject(
-                                                    name = "**Single training found**",
+                                                    name = "Single training found",
                                                     description = "If only one training was found a list of " +
                                                             "single training info DTO is returned.",
                                                     value = """

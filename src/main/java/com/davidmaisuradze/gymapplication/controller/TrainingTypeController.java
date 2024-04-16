@@ -19,7 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/trainingtypes")
 @RequiredArgsConstructor
-@Tag(name = "TrainingTypeController", description = "Endpoint for managing Training Types")
+@Tag(name = "Training Types", description = "Endpoint for managing Training Types")
 public class TrainingTypeController {
     private final TrainingTypeService trainingTypeService;
 

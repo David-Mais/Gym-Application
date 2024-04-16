@@ -14,7 +14,7 @@ public interface TraineeMapper {
     TraineeMapper INSTANCE = Mappers.getMapper(TraineeMapper.class);
     TraineeDto traineeEntityToTraineeDto(Trainee trainee);
     Trainee createTraineeDtoToTrainee(CreateTraineeDto createTraineeDto);
-    TraineeProfileDto traineeToTrainerProfileDto(Trainee trainee);
+    TraineeProfileDto traineeToTraineeProfileDto(Trainee trainee);
     TraineeProfileUpdateResponseDto traineeToUpdateResponseDto(Trainee trainee);
     TraineeInfoDto traineeToTraineeInfoDto(Trainee trainee);
 }

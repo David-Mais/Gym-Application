@@ -13,8 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class LoggingAspect {
-
-    @Pointcut("within(@org.springframework.web.bind.annotation.RestController *)")
+    @Pointcut("within(@org.springframework.web.bind.annotation.RestController *) && !execution(* org.springdoc.webmvc.api.OpenApiWebMvcResource.openapiJson(..))")
     public void restController() {
     }
 

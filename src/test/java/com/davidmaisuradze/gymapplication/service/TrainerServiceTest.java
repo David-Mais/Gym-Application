@@ -15,6 +15,7 @@ import com.davidmaisuradze.gymapplication.entity.Trainer;
 import com.davidmaisuradze.gymapplication.entity.Training;
 import com.davidmaisuradze.gymapplication.entity.TrainingType;
 import com.davidmaisuradze.gymapplication.entity.UserEntity;
+import com.davidmaisuradze.gymapplication.exception.GymException;
 import com.davidmaisuradze.gymapplication.mapper.TraineeMapper;
 import com.davidmaisuradze.gymapplication.mapper.TrainerMapper;
 import com.davidmaisuradze.gymapplication.mapper.TrainingMapper;
@@ -38,6 +39,8 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -71,18 +74,18 @@ class TrainerServiceTest {
 
 
     @Test
-    void testCreateTrainer() {
-        CreateTrainerDto createTraineeDto = new CreateTrainerDto();
+    void testCreateTrainer_WhenCreateDtoProvided_ThenReturnCredentialsDto() {
+        CreateTrainerDto createTrainerDto = new CreateTrainerDto();
         String firstName = "firstName";
         String lastName = "lastName";
-        createTraineeDto.setFirstName(firstName);
-        createTraineeDto.setLastName(lastName);
+        createTrainerDto.setFirstName(firstName);
+        createTrainerDto.setLastName(lastName);
         String username = "user";
         String password = "password";
         TrainingTypeDto specialization = new TrainingTypeDto();
         specialization.setTrainingTypeName("specialization");
 
-        createTraineeDto.setSpecialization(specialization);
+        createTrainerDto.setSpecialization(specialization);
 
         CredentialsDto credentialsDto = new CredentialsDto();
         credentialsDto.setUsername(username);
@@ -92,16 +95,36 @@ class TrainerServiceTest {
         when(detailsGenerator.generatePassword()).thenReturn(password);
         when(trainerMapper.createTrainerDtoToTrainer(any(CreateTrainerDto.class))).thenReturn(new Trainer());
         when(userMapper.userToCredentialsDto(any(UserEntity.class))).thenReturn(credentialsDto);
-        when(trainingTypeRepository.findByTrainingTypeName(anyString())).thenReturn(Optional.of(new TrainingType()));
+        when(trainingTypeRepository.findByTrainingTypeNameIgnoreCase(anyString())).thenReturn(Optional.of(new TrainingType()));
 
-        CredentialsDto actual = trainerService.create(createTraineeDto);
+        CredentialsDto actual = trainerService.create(createTrainerDto);
 
         assertEquals(credentialsDto, actual);
         verify(trainerRepository, times(1)).save(any(Trainer.class));
     }
 
     @Test
-    void testGetTraineeProfile() {
+    void testCreateTrainer_WhenInvalidCreateDtoProvided_ThenThrowGymException() {
+        CreateTrainerDto createTrainerDto = new CreateTrainerDto();
+
+        createTrainerDto.setFirstName(null);
+        createTrainerDto.setLastName("lastName");
+
+        TrainingTypeDto specialization = new TrainingTypeDto();
+        specialization.setTrainingTypeName("specialization");
+        createTrainerDto.setSpecialization(specialization);
+
+        when(detailsGenerator.generatePassword()).thenReturn(null);
+        when(detailsGenerator.generateUsername(null, "lastName")).thenReturn(null);
+        when(trainerMapper.createTrainerDtoToTrainer(any(CreateTrainerDto.class))).thenReturn(new Trainer());
+        when(trainingTypeRepository.findByTrainingTypeNameIgnoreCase(anyString())).thenReturn(Optional.empty());
+
+
+        assertThrows(GymException.class, () -> trainerService.create(createTrainerDto));
+    }
+
+    @Test
+    void testGetTrainerProfile_WhenTrainerExists_ThenReturnProfile() {
         String username = "user";
         Trainer trainer = new Trainer();
         trainer.setFirstName("firstName");
@@ -111,18 +134,31 @@ class TrainerServiceTest {
         trainerProfileDto.setFirstName("firstName");
 
 
-        when(trainerRepository.findByUsername(any())).thenReturn(Optional.of(trainer));
+        when(trainerRepository.findByUsernameIgnoreCase(any())).thenReturn(Optional.of(trainer));
         when(trainerMapper.trainerToTrainerProfileDto(any(Trainer.class))).thenReturn(trainerProfileDto);
         when(trainerRepository.getAllTrainees(anyString())).thenReturn(new ArrayList<>());
 
         TrainerProfileDto actual = trainerService.getProfile(username);
 
         assertEquals("firstName", actual.getFirstName());
-        verify(trainerRepository, times(1)).findByUsername(anyString());
+        verify(trainerRepository, times(1)).findByUsernameIgnoreCase(anyString());
     }
 
     @Test
-    void testUpdateProfile() {
+    void testGetTrainerProfile_WhenUsernameDoesNotExist_ThenThrowGymException() {
+        when(trainerRepository.findByUsernameIgnoreCase(anyString())).thenReturn(Optional.empty());
+
+        GymException exception = assertThrows(
+                GymException.class,
+                () -> trainerService.getProfile(anyString())
+        );
+
+        assertTrue(exception.getMessage().contains("Trainer not found with username: "));
+        assertEquals("404", exception.getErrorCode());
+    }
+
+    @Test
+    void testUpdateTrainerProfile_WhenTrainerExists_ThenUpdateProfile() {
         String username = "user";
         TrainerProfileUpdateRequestDto updateRequestDto = new TrainerProfileUpdateRequestDto();
 
@@ -131,7 +167,7 @@ class TrainerServiceTest {
         TrainerProfileUpdateResponseDto expectedResponse = new TrainerProfileUpdateResponseDto();
 
 
-        when(trainerRepository.findByUsername(anyString())).thenReturn(Optional.of(trainer));
+        when(trainerRepository.findByUsernameIgnoreCase(anyString())).thenReturn(Optional.of(trainer));
         when(trainerMapper.trainerToUpdateResponseDto(any(Trainer.class))).thenReturn(expectedResponse);
         when(trainerRepository.getAllTrainees(anyString())).thenReturn(List.of(new Trainee()));
 
@@ -146,27 +182,64 @@ class TrainerServiceTest {
     }
 
     @Test
-    void testUpdateActiveStatus() {
+    void testUpdateTrainerProfile_WhenTrainerDoesNotExist_ThenThrowGymException() {
+        String username = "trainer";
+
+        when(trainerRepository.findByUsernameIgnoreCase(anyString())).thenReturn(Optional.empty());
+
+        TrainerProfileUpdateRequestDto updateRequestDto = new TrainerProfileUpdateRequestDto();
+
+        GymException exception = assertThrows(
+                GymException.class,
+                () -> trainerService.updateProfile(username, updateRequestDto));
+
+        assertTrue(exception.getMessage().contains("Trainer not found with username: "));
+        assertEquals("404", exception.getErrorCode());
+
+        verify(trainerRepository, times(1)).findByUsernameIgnoreCase(anyString());
+    }
+
+    @Test
+    void testUpdateActiveStatus_WhenTrainerExists_ThenUpdateActiveStatus() {
         ActiveStatusDto activeStatusDto = new ActiveStatusDto();
         activeStatusDto.setIsActive(true);
 
         Trainer trainer = new Trainer();
         trainer.setIsActive(false);
 
-        when(trainerRepository.findByUsername(anyString())).thenReturn(Optional.of(trainer));
+        when(trainerRepository.findByUsernameIgnoreCase(anyString())).thenReturn(Optional.of(trainer));
 
         trainerService.updateActiveStatus(anyString(), activeStatusDto);
 
         assertEquals(true, trainer.getIsActive());
-        verify(trainerRepository, times(1)).findByUsername(anyString());
+        verify(trainerRepository, times(1)).findByUsernameIgnoreCase(anyString());
         verify(trainerRepository, times(1)).save(trainer);
     }
 
     @Test
-    void testTrainersNotAssigned() {
+    void testUpdateActiveStatus_WhenTrainerDoesNotExist_ThenThrowGymException() {
+        String username = "Non.Existing";
+        ActiveStatusDto statusDto = new ActiveStatusDto();
+        statusDto.setIsActive(true);
+
+        when(trainerRepository.findByUsernameIgnoreCase(anyString())).thenReturn(Optional.empty());
+
+        GymException exception = assertThrows(
+                GymException.class,
+                () -> trainerService.updateActiveStatus(username, statusDto)
+        );
+
+        assertTrue(exception.getMessage().contains("Trainer not found with username: "));
+        assertEquals("404", exception.getErrorCode());
+
+        verify(trainerRepository, times(1)).findByUsernameIgnoreCase(anyString());
+    }
+
+    @Test
+    void testTrainersNotAssigned_WhenTraineeExists_ThenReturnListOfTrainerInfoDto() {
         Trainee trainee = new Trainee();
 
-        when(traineeRepository.findByUsername(anyString())).thenReturn(Optional.of(trainee));
+        when(traineeRepository.findByUsernameIgnoreCase(anyString())).thenReturn(Optional.of(trainee));
         when(trainerRepository.getTrainersNotAssigned(anyString())).thenReturn(List.of(new Trainer()));
         when(trainerMapper.trainerToTrainerInfoDto(any(Trainer.class))).thenReturn(new TrainerInfoDto());
 
@@ -176,7 +249,23 @@ class TrainerServiceTest {
     }
 
     @Test
-    void testGetTrainingsList() {
+    void testTrainersNotAssigned_WhenTraineeDoesNotExist_ThenThrowGymException() {
+        when(traineeRepository.findByUsernameIgnoreCase(anyString())).thenReturn(Optional.empty());
+
+
+        GymException exception = assertThrows(
+                GymException.class,
+                () -> trainerService.getTrainersNotAssigned(anyString())
+        );
+
+        assertTrue(exception.getMessage().contains("Trainer not found with username: "));
+        assertEquals("404", exception.getErrorCode());
+
+        verify(traineeRepository, times(1)).findByUsernameIgnoreCase(anyString());
+    }
+
+    @Test
+    void testGetTrainingsList_WhenTrainerExists_ThenReturnListOfTrainerInfoDto() {
         String username = "user";
         TrainerTrainingSearchDto criteria = new TrainerTrainingSearchDto();
         Trainee trainee = new Trainee();
@@ -189,7 +278,7 @@ class TrainerServiceTest {
 
         List<Training> trainings = List.of(training);
 
-        when(trainerRepository.findByUsername(anyString())).thenReturn(Optional.of(trainer));
+        when(trainerRepository.findByUsernameIgnoreCase(anyString())).thenReturn(Optional.of(trainer));
         when(trainerRepository.getTrainingsList(eq(username), isNull(), isNull(), isNull())).thenReturn(trainings);
         when(trainingMapper.trainingToTrainingInfoDto(any(Training.class))).thenReturn(new TrainingInfoDto());
         when(trainingTypeMapper.entityToDto(any(TrainingType.class))).thenReturn(new TrainingTypeDto());
@@ -199,23 +288,59 @@ class TrainerServiceTest {
         assertNotNull(trainingDtos);
         assertFalse(trainingDtos.isEmpty());
 
-        verify(trainerRepository, times(1)).findByUsername(username);
+        verify(trainerRepository, times(1)).findByUsernameIgnoreCase(username);
         verify(trainerRepository, times(1)).getTrainingsList(eq(username), isNull(), isNull(), isNull());
     }
 
     @Test
-    void testGetTrainer() {
+    void testGetTrainingsList_WhenTrainerDoesNotExist_ThenThrowGymException() {
+        String username = "user";
+        TrainerTrainingSearchDto criteria = new TrainerTrainingSearchDto();
+        criteria.setName("nonexisting");
+
+        when(trainerRepository.findByUsernameIgnoreCase(anyString())).thenReturn(Optional.empty());
+
+        GymException exception = assertThrows(
+                GymException.class,
+                () -> trainerService.getTrainingsList(username, criteria)
+        );
+
+        assertTrue(exception.getMessage().contains("Trainer not found with username: "));
+        assertEquals("404", exception.getErrorCode());
+
+        verify(trainerRepository, times(1)).findByUsernameIgnoreCase(anyString());
+    }
+
+    @Test
+    void testGetTrainer_WhenTrainerExists_ThenReturnTrainer() {
         String username = "user";
         Trainer expected = new Trainer();
         expected.setUsername(username);
 
-        when(trainerRepository.findByUsername(anyString())).thenReturn(Optional.of(expected));
+        when(trainerRepository.findByUsernameIgnoreCase(anyString())).thenReturn(Optional.of(expected));
 
         Trainer actual = trainerService.getTrainer(username);
 
         assertNotNull(actual);
         assertEquals(username, actual.getUsername());
 
-        verify(trainerRepository, times(1)).findByUsername(anyString());
+        verify(trainerRepository, times(1)).findByUsernameIgnoreCase(anyString());
+    }
+
+    @Test
+    void testGetTrainer_WhenTrainerDoesNotExist_ThenThrowGymException() {
+        String username = "Non.Existing";
+
+        when(trainerRepository.findByUsernameIgnoreCase(anyString())).thenReturn(Optional.empty());
+
+        GymException exception = assertThrows(
+                GymException.class,
+                () -> trainerService.getTrainer(username)
+        );
+
+        assertTrue(exception.getMessage().contains("Trainer not found with username: "));
+        assertEquals("404", exception.getErrorCode());
+
+        verify(trainerRepository, times(1)).findByUsernameIgnoreCase(anyString());
     }
 }

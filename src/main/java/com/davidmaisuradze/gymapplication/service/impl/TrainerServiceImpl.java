@@ -110,7 +110,7 @@ public class TrainerServiceImpl implements TrainerService {
     @Override
     public List<TrainerInfoDto> getTrainersNotAssigned(String username) {
         if (traineeNotExists(username)) {
-            throw new GymException("Trainee not found with username: " + username, "404");
+            throw new GymException("Trainer not found with username: " + username, "404");
         }
         return trainerRepository
                 .getTrainersNotAssigned(username)
@@ -123,12 +123,18 @@ public class TrainerServiceImpl implements TrainerService {
     public List<TrainingInfoDto> getTrainingsList(String username, TrainerTrainingSearchDto criteria) {
         trainingSearchValidator(username, criteria);
 
+        String traineeUsername = criteria.getName();
+        if (traineeUsername != null) {
+            traineeUsername = traineeUsername.toLowerCase();
+        }
+
         List<Training> trainings = trainerRepository.getTrainingsList(
-                username,
+                username.toLowerCase(),
                 criteria.getFrom(),
                 criteria.getTo(),
-                criteria.getName()
+                traineeUsername
         );
+
         List<TrainingInfoDto> trainingInfoDtos = new ArrayList<>();
 
         for (Training t : trainings) {
@@ -138,29 +144,25 @@ public class TrainerServiceImpl implements TrainerService {
             trainingInfoDtos.add(trainingInfo);
         }
 
-        if (trainingInfoDtos.isEmpty()) {
-            throw new GymException("No Trainings found", "404");
-        }
-
         return trainingInfoDtos;
     }
 
     @Override
     public Trainer getTrainer(String username) {
         return trainerRepository
-                .findByUsername(username)
+                .findByUsernameIgnoreCase(username)
                 .orElseThrow(() -> new GymException("Trainer not found with username: " + username, "404"));
     }
 
     private List<TraineeInfoDto> getAllTraineeInfoDto(String username) {
-        return trainerRepository.getAllTrainees(username)
+        return trainerRepository.getAllTrainees(username.toLowerCase())
                 .stream()
                 .map(traineeMapper::traineeToTraineeInfoDto)
                 .toList();
     }
 
     private TrainingType findTrainingTypeByName(String typeName) {
-        Optional<TrainingType> type = trainingTypeRepository.findByTrainingTypeName(typeName);
+        Optional<TrainingType> type = trainingTypeRepository.findByTrainingTypeNameIgnoreCase(typeName);
         if (type.isEmpty()) {
             throw new GymException("Training type not found", "404");
         }
@@ -186,7 +188,7 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     private boolean traineeNotExists(String username) {
-        return traineeRepository.findByUsername(username).isEmpty();
+        return traineeRepository.findByUsernameIgnoreCase(username).isEmpty();
     }
 
     private void trainingSearchValidator(String username, TrainerTrainingSearchDto criteria) {
