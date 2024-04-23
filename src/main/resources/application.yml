@@ -12,6 +12,7 @@ logging:
       springframework:
         boot:
           web: info
+        security: debug
 
 management:
   endpoints:

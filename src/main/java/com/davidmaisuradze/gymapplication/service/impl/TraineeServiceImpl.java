@@ -16,7 +16,6 @@ import com.davidmaisuradze.gymapplication.mapper.TraineeMapper;
 import com.davidmaisuradze.gymapplication.mapper.TrainerMapper;
 import com.davidmaisuradze.gymapplication.mapper.TrainingMapper;
 import com.davidmaisuradze.gymapplication.mapper.TrainingTypeMapper;
-import com.davidmaisuradze.gymapplication.mapper.UserMapper;
 import com.davidmaisuradze.gymapplication.repository.TraineeRepository;
 import com.davidmaisuradze.gymapplication.repository.TrainerRepository;
 import com.davidmaisuradze.gymapplication.repository.TrainingTypeRepository;
@@ -24,6 +23,7 @@ import com.davidmaisuradze.gymapplication.service.TraineeService;
 import com.davidmaisuradze.gymapplication.util.DetailsGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,10 +40,9 @@ public class TraineeServiceImpl implements TraineeService {
     private final DetailsGenerator detailsGenerator;
     private final TraineeMapper traineeMapper;
     private final TrainerMapper trainerMapper;
-    private final UserMapper userMapper;
     private final TrainingMapper trainingMapper;
     private final TrainingTypeMapper trainingTypeMapper;
-
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -56,7 +55,7 @@ public class TraineeServiceImpl implements TraineeService {
 
         Trainee trainee = traineeMapper.createTraineeDtoToTrainee(createTraineeDto);
 
-        trainee.setPassword(password);
+        trainee.setPassword(passwordEncoder.encode(password));
         trainee.setUsername(username);
         trainee.setIsActive(true);
 
@@ -64,7 +63,11 @@ public class TraineeServiceImpl implements TraineeService {
 
         log.info("Trainee Created");
 
-        return userMapper.userToCredentialsDto(trainee);
+        CredentialsDto credentialsDto = new CredentialsDto();
+        credentialsDto.setUsername(username);
+        credentialsDto.setPassword(password);
+
+        return credentialsDto;
     }
 
     @Override

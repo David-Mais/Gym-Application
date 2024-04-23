@@ -26,6 +26,7 @@ import com.davidmaisuradze.gymapplication.service.TrainerService;
 import com.davidmaisuradze.gymapplication.util.DetailsGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,6 +47,7 @@ public class TrainerServiceImpl implements TrainerService {
     private final UserMapper userMapper;
     private final TrainingMapper trainingMapper;
     private final TrainingTypeMapper trainingTypeMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -59,7 +61,7 @@ public class TrainerServiceImpl implements TrainerService {
         Trainer trainer = trainerMapper.createTrainerDtoToTrainer(createTrainerDto);
         TrainingType specialization = findTrainingTypeByName(createTrainerDto.getSpecialization().getTrainingTypeName());
 
-        trainer.setPassword(password);
+        trainer.setPassword(passwordEncoder.encode(password));
         trainer.setUsername(username);
         trainer.setIsActive(true);
         trainer.setSpecialization(specialization);
