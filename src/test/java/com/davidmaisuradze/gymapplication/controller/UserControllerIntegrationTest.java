@@ -19,7 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 @Sql(scripts = "/database/test-schema.sql")
 @ActiveProfiles("test")
 class UserControllerIntegrationTest {

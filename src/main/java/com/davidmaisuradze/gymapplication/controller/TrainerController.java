@@ -10,6 +10,7 @@ import com.davidmaisuradze.gymapplication.dto.trainer.TrainerProfileUpdateReques
 import com.davidmaisuradze.gymapplication.dto.trainer.TrainerProfileUpdateResponseDto;
 import com.davidmaisuradze.gymapplication.dto.trainer.TrainerTrainingSearchDto;
 import com.davidmaisuradze.gymapplication.dto.training.TrainingInfoDto;
+import com.davidmaisuradze.gymapplication.security.RegistrationTokenDto;
 import com.davidmaisuradze.gymapplication.service.TrainerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -185,11 +186,11 @@ public class TrainerController {
                     )
             }
     )
-    public ResponseEntity<CredentialsDto> createTrainer(
+    public ResponseEntity<RegistrationTokenDto> createTrainer(
             @Valid @RequestBody CreateTrainerDto createTrainerDto
     ) {
-        CredentialsDto credentialsDto = trainerService.create(createTrainerDto);
-        return new ResponseEntity<>(credentialsDto, HttpStatus.CREATED);
+        RegistrationTokenDto registrationTokenDto = trainerService.create(createTrainerDto);
+        return new ResponseEntity<>(registrationTokenDto, HttpStatus.CREATED);
     }
 
     @GetMapping("/profile/{username}")

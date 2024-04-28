@@ -1,7 +1,6 @@
 package com.davidmaisuradze.gymapplication.service.impl;
 
 import com.davidmaisuradze.gymapplication.dto.ActiveStatusDto;
-import com.davidmaisuradze.gymapplication.dto.CredentialsDto;
 import com.davidmaisuradze.gymapplication.dto.trainee.TraineeInfoDto;
 import com.davidmaisuradze.gymapplication.dto.trainer.CreateTrainerDto;
 import com.davidmaisuradze.gymapplication.dto.trainer.TrainerInfoDto;
@@ -18,10 +17,11 @@ import com.davidmaisuradze.gymapplication.mapper.TraineeMapper;
 import com.davidmaisuradze.gymapplication.mapper.TrainerMapper;
 import com.davidmaisuradze.gymapplication.mapper.TrainingMapper;
 import com.davidmaisuradze.gymapplication.mapper.TrainingTypeMapper;
-import com.davidmaisuradze.gymapplication.mapper.UserMapper;
 import com.davidmaisuradze.gymapplication.repository.TraineeRepository;
 import com.davidmaisuradze.gymapplication.repository.TrainerRepository;
 import com.davidmaisuradze.gymapplication.repository.TrainingTypeRepository;
+import com.davidmaisuradze.gymapplication.security.GymUserDetails;
+import com.davidmaisuradze.gymapplication.security.RegistrationTokenDto;
 import com.davidmaisuradze.gymapplication.service.TrainerService;
 import com.davidmaisuradze.gymapplication.util.DetailsGenerator;
 import lombok.RequiredArgsConstructor;
@@ -44,14 +44,14 @@ public class TrainerServiceImpl implements TrainerService {
     private final DetailsGenerator detailsGenerator;
     private final TrainerMapper trainerMapper;
     private final TraineeMapper traineeMapper;
-    private final UserMapper userMapper;
     private final TrainingMapper trainingMapper;
     private final TrainingTypeMapper trainingTypeMapper;
     private final PasswordEncoder passwordEncoder;
+    private final TokenService tokenService;
 
     @Override
     @Transactional
-    public CredentialsDto create(CreateTrainerDto createTrainerDto) {
+    public RegistrationTokenDto create(CreateTrainerDto createTrainerDto) {
         String password = detailsGenerator.generatePassword();
         String username = detailsGenerator.generateUsername(
                 createTrainerDto.getFirstName(),
@@ -65,11 +65,12 @@ public class TrainerServiceImpl implements TrainerService {
         trainer.setUsername(username);
         trainer.setIsActive(true);
         trainer.setSpecialization(specialization);
-        trainerRepository.save(trainer);
+        trainer = trainerRepository.save(trainer);
 
         log.info("Trainer Created");
 
-        return userMapper.userToCredentialsDto(trainer);
+        GymUserDetails user = new GymUserDetails(trainer);
+        return tokenService.register(user, username, password);
     }
 
     @Override

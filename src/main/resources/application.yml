@@ -30,3 +30,11 @@ management:
     metrics:
       export:
         enabled: true
+
+security:
+  jwt:
+    secret: '92898efcc0d1de074c41bec111add6ae654e20c5cb53f0418d68c0ba055fdd17'
+    expiration: 1440000 # 1000 * 60 * 24 = 24 HOURS
+  login:
+    max-attempts: 3
+    timeout: 5 #minutes

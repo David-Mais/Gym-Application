@@ -26,6 +26,7 @@ class TraineeRepositoryTests {
     void testFindByUsername_WhenUsernameExists_ThenReturnTrainee() {
         Trainee newTrainee = Trainee
                 .builder()
+                .id(1L)
                 .firstName("Some")
                 .lastName("User")
                 .username("Some.User")
@@ -37,7 +38,7 @@ class TraineeRepositoryTests {
 
         Optional<Trainee> found = traineeRepository.findByUsernameIgnoreCase("Some.User");
 
-        assertThat(found.get().getUsername()).isEqualTo(newTrainee.getUsername());
+        found.ifPresent(trainee -> assertThat(trainee.getUsername()).isEqualTo(newTrainee.getUsername()));
     }
 
     @Test

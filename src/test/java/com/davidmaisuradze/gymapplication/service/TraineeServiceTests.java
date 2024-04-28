@@ -1,25 +1,26 @@
 package com.davidmaisuradze.gymapplication.service;
 
 import com.davidmaisuradze.gymapplication.dto.ActiveStatusDto;
-import com.davidmaisuradze.gymapplication.dto.CredentialsDto;
 import com.davidmaisuradze.gymapplication.dto.trainee.CreateTraineeDto;
 import com.davidmaisuradze.gymapplication.dto.trainee.TraineeProfileDto;
 import com.davidmaisuradze.gymapplication.dto.trainee.TraineeProfileUpdateRequestDto;
 import com.davidmaisuradze.gymapplication.dto.trainee.TraineeProfileUpdateResponseDto;
 import com.davidmaisuradze.gymapplication.dto.training.TrainingInfoDto;
 import com.davidmaisuradze.gymapplication.dto.training.TrainingSearchCriteria;
+import com.davidmaisuradze.gymapplication.entity.Token;
 import com.davidmaisuradze.gymapplication.entity.Trainee;
 import com.davidmaisuradze.gymapplication.entity.Trainer;
 import com.davidmaisuradze.gymapplication.entity.Training;
-import com.davidmaisuradze.gymapplication.entity.UserEntity;
 import com.davidmaisuradze.gymapplication.exception.GymException;
 import com.davidmaisuradze.gymapplication.mapper.TraineeMapper;
 import com.davidmaisuradze.gymapplication.mapper.TrainerMapper;
 import com.davidmaisuradze.gymapplication.mapper.TrainingMapper;
-import com.davidmaisuradze.gymapplication.mapper.UserMapper;
 import com.davidmaisuradze.gymapplication.repository.TraineeRepository;
 import com.davidmaisuradze.gymapplication.repository.TrainerRepository;
 import com.davidmaisuradze.gymapplication.repository.TrainingTypeRepository;
+import com.davidmaisuradze.gymapplication.security.GymUserDetails;
+import com.davidmaisuradze.gymapplication.security.RegistrationTokenDto;
+import com.davidmaisuradze.gymapplication.service.impl.TokenService;
 import com.davidmaisuradze.gymapplication.service.impl.TraineeServiceImpl;
 import com.davidmaisuradze.gymapplication.util.DetailsGenerator;
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
@@ -61,48 +63,48 @@ class TraineeServiceTests {
     @Mock
     private TrainerMapper trainerMapper;
     @Mock
-    private UserMapper userMapper;
+    private PasswordEncoder passwordEncoder;
+    @Mock
+    private TokenService tokenService;
     @InjectMocks
     private TraineeServiceImpl traineeService;
 
     @Test
-    void testCreateTrainee_WhenValidCreateDtoProvided_ThenReturnCredentialsDto() {
+    void testCreateTrainee_WhenValidCreateDtoProvided_ThenReturnRegistrationTokenDto() {
         CreateTraineeDto createTraineeDto = new CreateTraineeDto();
-        String firstName = "firstName";
-        String lastName = "lastName";
-        createTraineeDto.setFirstName(firstName);
-        createTraineeDto.setLastName(lastName);
-        String username = "user";
-        String password = "password";
+        createTraineeDto.setFirstName("John");
+        createTraineeDto.setLastName("Doe");
 
-        CredentialsDto credentialsDto = new CredentialsDto();
-        credentialsDto.setUsername(username);
-        credentialsDto.setPassword(password);
+        String expectedUsername = "johndoe";
+        String expectedPassword = "securepassword";
+        String expectedToken = "token123";
 
-        when(detailsGenerator.generatePassword()).thenReturn(password);
-        when(detailsGenerator.generateUsername(anyString(), anyString())).thenReturn(username);
-        when(traineeMapper.createTraineeDtoToTrainee(any(CreateTraineeDto.class))).thenReturn(new Trainee());
-        when(userMapper.userToCredentialsDto(any(UserEntity.class))).thenReturn(credentialsDto);
+        Trainee mockTrainee = new Trainee();
+        mockTrainee.setUsername(expectedUsername);
+        mockTrainee.setPassword(expectedPassword);
 
-        CredentialsDto actual = traineeService.create(createTraineeDto);
+        Token token = new Token();
+        token.setJwtToken("token123");
+        RegistrationTokenDto expected = new RegistrationTokenDto();
+        expected.setToken(token);
+        expected.setUsername(expectedUsername);
+        expected.setPassword(expectedPassword);
 
-        assertEquals(actual, credentialsDto);
+        when(detailsGenerator.generatePassword()).thenReturn(expectedPassword);
+        when(detailsGenerator.generateUsername("John", "Doe")).thenReturn(expectedUsername);
+        when(traineeMapper.createTraineeDtoToTrainee(createTraineeDto)).thenReturn(mockTrainee);
+        when(passwordEncoder.encode(expectedPassword)).thenReturn("encodedPassword");
+        when(traineeRepository.save(any(Trainee.class))).thenReturn(mockTrainee);
+
+        when(tokenService.register(any(GymUserDetails.class), anyString(), anyString())).thenReturn(expected);
+
+        RegistrationTokenDto actual = traineeService.create(createTraineeDto);
+
+        assertEquals(expectedUsername, actual.getUsername());
+        assertEquals(expectedPassword, actual.getPassword());
+        assertEquals(expectedToken, actual.getToken().getJwtToken());
+
         verify(traineeRepository, times(1)).save(any(Trainee.class));
-    }
-
-    @Test
-    void testCreateTrainee_WhenInvalidCreateDtoProvided_ThenThrowGymException() {
-        CreateTraineeDto createTraineeDto = new CreateTraineeDto();
-        createTraineeDto.setFirstName(null);
-        createTraineeDto.setLastName("lastName");
-
-        when(detailsGenerator.generatePassword()).thenReturn(null);
-        when(detailsGenerator.generateUsername(null, "lastName")).thenReturn(null);
-
-        when(traineeMapper.createTraineeDtoToTrainee(any(CreateTraineeDto.class))).thenReturn(new Trainee());
-        when(userMapper.userToCredentialsDto(any(UserEntity.class))).thenThrow(new RuntimeException("No user should be created"));
-
-        assertThrows(RuntimeException.class, () -> traineeService.create(createTraineeDto));
     }
 
     @Test

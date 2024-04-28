@@ -43,3 +43,12 @@ CREATE TABLE IF NOT EXISTS trainings
     FOREIGN KEY (trainer_id) REFERENCES trainers (id),
     FOREIGN KEY (training_type_id) REFERENCES training_types (id)
 );
+
+CREATE TABLE IF NOT EXISTS tokens
+(
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    token VARCHAR(300),
+    is_active BOOLEAN,
+    user_id BIGINT,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);

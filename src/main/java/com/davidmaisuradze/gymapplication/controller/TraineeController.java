@@ -1,7 +1,6 @@
 package com.davidmaisuradze.gymapplication.controller;
 
 import com.davidmaisuradze.gymapplication.dto.ActiveStatusDto;
-import com.davidmaisuradze.gymapplication.dto.CredentialsDto;
 import com.davidmaisuradze.gymapplication.dto.ErrorDto;
 import com.davidmaisuradze.gymapplication.dto.trainee.CreateTraineeDto;
 import com.davidmaisuradze.gymapplication.dto.trainee.TraineeProfileDto;
@@ -9,6 +8,7 @@ import com.davidmaisuradze.gymapplication.dto.trainee.TraineeProfileUpdateReques
 import com.davidmaisuradze.gymapplication.dto.trainee.TraineeProfileUpdateResponseDto;
 import com.davidmaisuradze.gymapplication.dto.training.TrainingInfoDto;
 import com.davidmaisuradze.gymapplication.dto.training.TrainingSearchCriteria;
+import com.davidmaisuradze.gymapplication.security.RegistrationTokenDto;
 import com.davidmaisuradze.gymapplication.service.TraineeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -178,11 +178,11 @@ public class TraineeController {
                     )
             }
     )
-    public ResponseEntity<CredentialsDto> createTrainee(
+    public ResponseEntity<RegistrationTokenDto> createTrainee(
             @Valid @RequestBody CreateTraineeDto createTraineeDto
     ) {
-        CredentialsDto credentialsDto = traineeService.create(createTraineeDto);
-        return new ResponseEntity<>(credentialsDto, HttpStatus.CREATED);
+        RegistrationTokenDto registrationTokenDto = traineeService.create(createTraineeDto);
+        return new ResponseEntity<>(registrationTokenDto, HttpStatus.CREATED);
     }
 
     @GetMapping("/profile/{username}")

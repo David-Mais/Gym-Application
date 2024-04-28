@@ -1,7 +1,6 @@
 package com.davidmaisuradze.gymapplication.service.impl;
 
 import com.davidmaisuradze.gymapplication.dto.ActiveStatusDto;
-import com.davidmaisuradze.gymapplication.dto.CredentialsDto;
 import com.davidmaisuradze.gymapplication.dto.trainee.CreateTraineeDto;
 import com.davidmaisuradze.gymapplication.dto.trainee.TraineeProfileDto;
 import com.davidmaisuradze.gymapplication.dto.trainee.TraineeProfileUpdateRequestDto;
@@ -19,6 +18,8 @@ import com.davidmaisuradze.gymapplication.mapper.TrainingTypeMapper;
 import com.davidmaisuradze.gymapplication.repository.TraineeRepository;
 import com.davidmaisuradze.gymapplication.repository.TrainerRepository;
 import com.davidmaisuradze.gymapplication.repository.TrainingTypeRepository;
+import com.davidmaisuradze.gymapplication.security.GymUserDetails;
+import com.davidmaisuradze.gymapplication.security.RegistrationTokenDto;
 import com.davidmaisuradze.gymapplication.service.TraineeService;
 import com.davidmaisuradze.gymapplication.util.DetailsGenerator;
 import lombok.RequiredArgsConstructor;
@@ -43,10 +44,11 @@ public class TraineeServiceImpl implements TraineeService {
     private final TrainingMapper trainingMapper;
     private final TrainingTypeMapper trainingTypeMapper;
     private final PasswordEncoder passwordEncoder;
+    private final TokenService tokenService;
 
     @Override
     @Transactional
-    public CredentialsDto create(CreateTraineeDto createTraineeDto) {
+    public RegistrationTokenDto create(CreateTraineeDto createTraineeDto) {
         String password = detailsGenerator.generatePassword();
         String username = detailsGenerator.generateUsername(
                 createTraineeDto.getFirstName(),
@@ -59,15 +61,12 @@ public class TraineeServiceImpl implements TraineeService {
         trainee.setUsername(username);
         trainee.setIsActive(true);
 
-        traineeRepository.save(trainee);
+        trainee = traineeRepository.save(trainee);
 
         log.info("Trainee Created");
 
-        CredentialsDto credentialsDto = new CredentialsDto();
-        credentialsDto.setUsername(username);
-        credentialsDto.setPassword(password);
-
-        return credentialsDto;
+        GymUserDetails user = new GymUserDetails(trainee);
+        return tokenService.register(user, username, password);
     }
 
     @Override

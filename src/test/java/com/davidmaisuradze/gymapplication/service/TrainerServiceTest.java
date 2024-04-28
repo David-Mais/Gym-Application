@@ -1,7 +1,6 @@
 package com.davidmaisuradze.gymapplication.service;
 
 import com.davidmaisuradze.gymapplication.dto.ActiveStatusDto;
-import com.davidmaisuradze.gymapplication.dto.CredentialsDto;
 import com.davidmaisuradze.gymapplication.dto.trainer.CreateTrainerDto;
 import com.davidmaisuradze.gymapplication.dto.trainer.TrainerInfoDto;
 import com.davidmaisuradze.gymapplication.dto.trainer.TrainerProfileDto;
@@ -10,20 +9,22 @@ import com.davidmaisuradze.gymapplication.dto.trainer.TrainerProfileUpdateRespon
 import com.davidmaisuradze.gymapplication.dto.trainer.TrainerTrainingSearchDto;
 import com.davidmaisuradze.gymapplication.dto.training.TrainingInfoDto;
 import com.davidmaisuradze.gymapplication.dto.trainingtype.TrainingTypeDto;
+import com.davidmaisuradze.gymapplication.entity.Token;
 import com.davidmaisuradze.gymapplication.entity.Trainee;
 import com.davidmaisuradze.gymapplication.entity.Trainer;
 import com.davidmaisuradze.gymapplication.entity.Training;
 import com.davidmaisuradze.gymapplication.entity.TrainingType;
-import com.davidmaisuradze.gymapplication.entity.UserEntity;
 import com.davidmaisuradze.gymapplication.exception.GymException;
 import com.davidmaisuradze.gymapplication.mapper.TraineeMapper;
 import com.davidmaisuradze.gymapplication.mapper.TrainerMapper;
 import com.davidmaisuradze.gymapplication.mapper.TrainingMapper;
 import com.davidmaisuradze.gymapplication.mapper.TrainingTypeMapper;
-import com.davidmaisuradze.gymapplication.mapper.UserMapper;
 import com.davidmaisuradze.gymapplication.repository.TraineeRepository;
 import com.davidmaisuradze.gymapplication.repository.TrainerRepository;
 import com.davidmaisuradze.gymapplication.repository.TrainingTypeRepository;
+import com.davidmaisuradze.gymapplication.security.GymUserDetails;
+import com.davidmaisuradze.gymapplication.security.RegistrationTokenDto;
+import com.davidmaisuradze.gymapplication.service.impl.TokenService;
 import com.davidmaisuradze.gymapplication.service.impl.TrainerServiceImpl;
 import com.davidmaisuradze.gymapplication.util.DetailsGenerator;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,44 +66,61 @@ class TrainerServiceTest {
     @Mock
     private TraineeMapper traineeMapper;
     @Mock
-    private UserMapper userMapper;
-    @Mock
     private TrainingMapper trainingMapper;
     @Mock
     private TrainingTypeMapper trainingTypeMapper;
+    @Mock
+    private PasswordEncoder passwordEncoder;
+    @Mock
+    private TokenService tokenService;
     @InjectMocks
     private TrainerServiceImpl trainerService;
 
 
     @Test
-    void testCreateTrainer_WhenCreateDtoProvided_ThenReturnCredentialsDto() {
+    void testCreateTrainer_WhenCreateDtoProvided_ThenReturnRegistrationTokenDto() {
         CreateTrainerDto createTrainerDto = new CreateTrainerDto();
-        String firstName = "firstName";
-        String lastName = "lastName";
-        createTrainerDto.setFirstName(firstName);
-        createTrainerDto.setLastName(lastName);
-        String username = "user";
-        String password = "password";
+        createTrainerDto.setFirstName("John");
+        createTrainerDto.setLastName("Doe");
         TrainingTypeDto specialization = new TrainingTypeDto();
-        specialization.setTrainingTypeName("specialization");
-
+        String trainingType = "Yoga";
+        specialization.setTrainingTypeName(trainingType);
         createTrainerDto.setSpecialization(specialization);
 
-        CredentialsDto credentialsDto = new CredentialsDto();
-        credentialsDto.setUsername(username);
-        credentialsDto.setPassword(password);
+        String expectedUsername = "johndoe";
+        String expectedPassword = "securepassword";
+        String expectedToken = "token123";
 
-        when(detailsGenerator.generateUsername(anyString(), anyString())).thenReturn(username);
-        when(detailsGenerator.generatePassword()).thenReturn(password);
-        when(trainerMapper.createTrainerDtoToTrainer(any(CreateTrainerDto.class))).thenReturn(new Trainer());
-        when(userMapper.userToCredentialsDto(any(UserEntity.class))).thenReturn(credentialsDto);
+        Trainer mockTrainer = new Trainer();
+        mockTrainer.setUsername(expectedUsername);
+        mockTrainer.setPassword(expectedPassword);
+
+        Token token = new Token();
+        token.setJwtToken("token123");
+        RegistrationTokenDto expected = new RegistrationTokenDto();
+        expected.setToken(token);
+        expected.setUsername(expectedUsername);
+        expected.setPassword(expectedPassword);
+
+        when(detailsGenerator.generateUsername(anyString(), anyString())).thenReturn(expectedUsername);
+        when(detailsGenerator.generatePassword()).thenReturn(expectedPassword);
+        when(trainerMapper.createTrainerDtoToTrainer(any(CreateTrainerDto.class))).thenReturn(mockTrainer);
+        when(passwordEncoder.encode(expectedPassword)).thenReturn("encodedPassword");
+        when(trainerRepository.save(any(Trainer.class))).thenReturn(mockTrainer);
         when(trainingTypeRepository.findByTrainingTypeNameIgnoreCase(anyString())).thenReturn(Optional.of(new TrainingType()));
 
-        CredentialsDto actual = trainerService.create(createTrainerDto);
+        when(tokenService.register(any(GymUserDetails.class), anyString(), anyString())).thenReturn(expected);
 
-        assertEquals(credentialsDto, actual);
+        RegistrationTokenDto actual = trainerService.create(createTrainerDto);
+
+        assertNotNull(actual);
+        assertEquals(expectedUsername, actual.getUsername());
+        assertEquals(expectedPassword, actual.getPassword());
+        assertEquals(expectedToken, actual.getToken().getJwtToken());
+
         verify(trainerRepository, times(1)).save(any(Trainer.class));
     }
+
 
     @Test
     void testCreateTrainer_WhenInvalidCreateDtoProvided_ThenThrowGymException() {
@@ -150,7 +169,7 @@ class TrainerServiceTest {
 
         GymException exception = assertThrows(
                 GymException.class,
-                () -> trainerService.getProfile(anyString())
+                () -> trainerService.getProfile("Non.Existing")
         );
 
         assertTrue(exception.getMessage().contains("Trainer not found with username: "));
@@ -255,7 +274,7 @@ class TrainerServiceTest {
 
         GymException exception = assertThrows(
                 GymException.class,
-                () -> trainerService.getTrainersNotAssigned(anyString())
+                () -> trainerService.getTrainersNotAssigned("Non.Existing")
         );
 
         assertTrue(exception.getMessage().contains("Trainer not found with username: "));

@@ -1,12 +1,12 @@
 INSERT INTO users (first_name, is_active, last_name, password, username)
 VALUES
-    ('Davit', 1, 'Maisuradze', 'newPass', 'Davit.Maisuradze'),
-    ('Mariam', 1, 'Katamashvili', 'marimagaria', 'Mariam.Katamashvili'),
-    ('Merab', 1, 'Dvlaishvili', 'merabmerab', 'Merab.Dvalishvili'),
-    ('David', 1, 'Kheladze', 'davdav', 'David.Kheladze'),
-    ('Salome', 1, 'Chachua', 'salosalo', 'Salome.Chachua'),
-    ('John', 0, 'Doe', 'johnny', 'John.Doe'),
-    ('Ilia', 1, 'Topuria', 'ufcchamp', 'Ilia.Topuria');
+    ('Davit', 1, 'Maisuradze', '$2a$12$9leKhVdZ6r5i/79AcrlNF.ppbHk3m0Ef.PgHddUGa1a/AuuPE1V9i', 'Davit.Maisuradze'),
+    ('Mariam', 1, 'Katamashvili', '$2a$12$9leKhVdZ6r5i/79AcrlNF.ppbHk3m0Ef.PgHddUGa1a/AuuPE1V9i', 'Mariam.Katamashvili'),
+    ('Merab', 1, 'Dvlaishvili', '$2a$12$9leKhVdZ6r5i/79AcrlNF.ppbHk3m0Ef.PgHddUGa1a/AuuPE1V9i', 'Merab.Dvalishvili'),
+    ('David', 1, 'Kheladze', '$2a$12$9leKhVdZ6r5i/79AcrlNF.ppbHk3m0Ef.PgHddUGa1a/AuuPE1V9i', 'David.Kheladze'),
+    ('Salome', 1, 'Chachua', '$2a$12$9leKhVdZ6r5i/79AcrlNF.ppbHk3m0Ef.PgHddUGa1a/AuuPE1V9i', 'Salome.Chachua'),
+    ('John', 0, 'Doe', '$2a$12$9leKhVdZ6r5i/79AcrlNF.ppbHk3m0Ef.PgHddUGa1a/AuuPE1V9i', 'John.Doe'),
+    ('Ilia', 1, 'Topuria', '$2a$12$9leKhVdZ6r5i/79AcrlNF.ppbHk3m0Ef.PgHddUGa1a/AuuPE1V9i', 'Ilia.Topuria');
 
 INSERT INTO training_types (training_type_name)
 VALUES ('box'), ('dance'), ('mma');

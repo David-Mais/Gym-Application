@@ -1,16 +1,11 @@
-drop table if exists trainings;
-drop table if exists trainers;
-drop table if exists trainees;
-drop table if exists users;
-drop table if exists training_types;
-
-create table if not exists training_types
+CREATE TABLE IF NOT EXISTS training_types
 (
     id   BIGINT AUTO_INCREMENT PRIMARY KEY,
     training_type_name VARCHAR(255) NOT NULL UNIQUE
 );
+ALTER TABLE training_types ALTER COLUMN id RESTART WITH 1;
 
-CREATE TABLE users
+CREATE TABLE IF NOT EXISTS users
 (
     id         BIGINT AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(255) NOT NULL,
@@ -19,20 +14,23 @@ CREATE TABLE users
     password   VARCHAR(255) NOT NULL,
     is_active  BOOLEAN      NOT NULL
 );
+ALTER TABLE users ALTER COLUMN id RESTART WITH 1;
 
-CREATE TABLE trainees
+CREATE TABLE IF NOT EXISTS trainees
 (
-    id            BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id            BIGINT NOT NULL,
     date_of_birth DATE NOT NULL,
     address       VARCHAR(255),
+    PRIMARY KEY (id),
     FOREIGN KEY (id) REFERENCES users (id)
 );
 
-CREATE TABLE trainers
+CREATE TABLE IF NOT EXISTS trainers
 (
-    id            BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id            BIGINT,
     specialization       BIGINT,
     FOREIGN KEY (specialization) REFERENCES training_types (id),
+    PRIMARY KEY (id),
     FOREIGN KEY (id) REFERENCES users (id)
 );
 
@@ -48,21 +46,35 @@ CREATE TABLE IF NOT EXISTS trainings
     FOREIGN KEY (trainee_id) REFERENCES trainees (id),
     FOREIGN KEY (trainer_id) REFERENCES trainers (id),
     FOREIGN KEY (training_type_id) REFERENCES training_types (id)
-    );
+);
 
+CREATE TABLE IF NOT EXISTS tokens
+(
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    token VARCHAR(300),
+    is_active BOOLEAN,
+    user_id BIGINT,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
 
-INSERT INTO users (first_name, is_active, last_name, password, username)
-VALUES
-    ('Davit', 1, 'Maisuradze', 'newPass', 'Davit.Maisuradze'),
-    ('Mariam', 1, 'Katamashvili', 'marimagaria', 'Mariam.Katamashvili'),
-    ('Merab', 1, 'Dvlaishvili', 'merabmerab', 'Merab.Dvalishvili'),
-    ('David', 1, 'Kheladze', 'davdav', 'David.Kheladze'),
-    ('Salome', 1, 'Chachua', 'salosalo', 'Salome.Chachua'),
-    ('John', 0, 'Doe', 'johnny', 'John.Doe'),
-    ('Ilia', 1, 'Topuria', 'ufcchamp', 'Ilia.Topuria');
+DELETE FROM trainings;
+DELETE FROM trainers;
+DELETE FROM training_types;
+DELETE FROM trainees;
+DELETE FROM users;
 
 INSERT INTO training_types (training_type_name)
 VALUES ('box'), ('dance'), ('mma');
+
+INSERT INTO users (id, first_name, is_active, last_name, password, username)
+VALUES
+    (1, 'Davit', true, 'Maisuradze', 'newPass', 'Davit.Maisuradze'),
+    (2, 'Mariam', true, 'Katamashvili', '$2a$12$9leKhVdZ6r5i/79AcrlNF.ppbHk3m0Ef.PgHddUGa1a/AuuPE1V9i', 'Mariam.Katamashvili'),
+    (3, 'Merab', true, 'Dvlaishvili', '$2a$12$9leKhVdZ6r5i/79AcrlNF.ppbHk3m0Ef.PgHddUGa1a/AuuPE1V9i', 'Merab.Dvalishvili'),
+    (4, 'David', true, 'Kheladze', '$2a$12$9leKhVdZ6r5i/79AcrlNF.ppbHk3m0Ef.PgHddUGa1a/AuuPE1V9i', 'David.Kheladze'),
+    (5, 'Salome', true, 'Chachua', '$2a$12$9leKhVdZ6r5i/79AcrlNF.ppbHk3m0Ef.PgHddUGa1a/AuuPE1V9i', 'Salome.Chachua'),
+    (6, 'John', false, 'Doe', '$2a$12$9leKhVdZ6r5i/79AcrlNF.ppbHk3m0Ef.PgHddUGa1a/AuuPE1V9i', 'John.Doe'),
+    (7, 'Ilia', true, 'Topuria', '$2a$12$9leKhVdZ6r5i/79AcrlNF.ppbHk3m0Ef.PgHddUGa1a/AuuPE1V9i', 'Ilia.Topuria');
 
 INSERT INTO trainees (address, date_of_birth, id)
 VALUES
