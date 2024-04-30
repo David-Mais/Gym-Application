@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class MyLogoutHandler implements LogoutHandler {
+public class TokenLogoutHandler implements LogoutHandler {
     private final TokenRepository tokenRepository;
     @Override
     public void logout(
