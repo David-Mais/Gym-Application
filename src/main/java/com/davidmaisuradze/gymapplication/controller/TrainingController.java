@@ -137,7 +137,28 @@ public class TrainingController {
                                             ),
                                     }
                             )
-                    )
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized user",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ErrorDto.class),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "Missing or invalid token",
+                                                    description = "When bearer token is either missing or invalid there will be an authentication " +
+                                                            "error so client will receive response code 401 alongside the following response body.",
+                                                    value = """
+                                                            {
+                                                              "errorMessage": "Token is missing or invalid.",
+                                                              "errorCode": "401"
+                                                            }
+                                                            """
+                                            )
+                                    }
+                            )
+                    ),
             }
     )
     public ResponseEntity<Void> create(

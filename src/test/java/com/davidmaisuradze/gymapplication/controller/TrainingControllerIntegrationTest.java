@@ -28,6 +28,7 @@ class TrainingControllerIntegrationTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
+    @Transactional
     void testCreateTraining_WhenDtoIsNotProvided_ThenReturnIsBadRequest() throws Exception {
         CreateTrainingDto createTrainingDto = CreateTrainingDto
                 .builder()

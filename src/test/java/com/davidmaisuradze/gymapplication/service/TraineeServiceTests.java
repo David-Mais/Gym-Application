@@ -1,13 +1,15 @@
 package com.davidmaisuradze.gymapplication.service;
 
 import com.davidmaisuradze.gymapplication.dto.ActiveStatusDto;
+import com.davidmaisuradze.gymapplication.dto.CredentialsDto;
+import com.davidmaisuradze.gymapplication.dto.security.RegistrationResponse;
+import com.davidmaisuradze.gymapplication.dto.security.TokenDto;
 import com.davidmaisuradze.gymapplication.dto.trainee.CreateTraineeDto;
 import com.davidmaisuradze.gymapplication.dto.trainee.TraineeProfileDto;
 import com.davidmaisuradze.gymapplication.dto.trainee.TraineeProfileUpdateRequestDto;
 import com.davidmaisuradze.gymapplication.dto.trainee.TraineeProfileUpdateResponseDto;
 import com.davidmaisuradze.gymapplication.dto.training.TrainingInfoDto;
 import com.davidmaisuradze.gymapplication.dto.training.TrainingSearchCriteria;
-import com.davidmaisuradze.gymapplication.entity.Token;
 import com.davidmaisuradze.gymapplication.entity.Trainee;
 import com.davidmaisuradze.gymapplication.entity.Trainer;
 import com.davidmaisuradze.gymapplication.entity.Training;
@@ -19,8 +21,6 @@ import com.davidmaisuradze.gymapplication.repository.TraineeRepository;
 import com.davidmaisuradze.gymapplication.repository.TrainerRepository;
 import com.davidmaisuradze.gymapplication.repository.TrainingTypeRepository;
 import com.davidmaisuradze.gymapplication.security.GymUserDetails;
-import com.davidmaisuradze.gymapplication.security.RegistrationTokenDto;
-import com.davidmaisuradze.gymapplication.service.impl.TokenService;
 import com.davidmaisuradze.gymapplication.service.impl.TraineeServiceImpl;
 import com.davidmaisuradze.gymapplication.util.DetailsGenerator;
 import org.junit.jupiter.api.Test;
@@ -29,6 +29,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -70,6 +71,7 @@ class TraineeServiceTests {
     private TraineeServiceImpl traineeService;
 
     @Test
+    @Transactional
     void testCreateTrainee_WhenValidCreateDtoProvided_ThenReturnRegistrationTokenDto() {
         CreateTraineeDto createTraineeDto = new CreateTraineeDto();
         createTraineeDto.setFirstName("John");
@@ -83,12 +85,12 @@ class TraineeServiceTests {
         mockTrainee.setUsername(expectedUsername);
         mockTrainee.setPassword(expectedPassword);
 
-        Token token = new Token();
-        token.setJwtToken("token123");
-        RegistrationTokenDto expected = new RegistrationTokenDto();
+        TokenDto token = new TokenDto();
+        token.setToken("token123");
+        RegistrationResponse expected = new RegistrationResponse();
         expected.setToken(token);
-        expected.setUsername(expectedUsername);
-        expected.setPassword(expectedPassword);
+        CredentialsDto credentialsDto = new CredentialsDto(expectedUsername, expectedPassword);
+        expected.setCredentials(credentialsDto);
 
         when(detailsGenerator.generatePassword()).thenReturn(expectedPassword);
         when(detailsGenerator.generateUsername("John", "Doe")).thenReturn(expectedUsername);
@@ -98,11 +100,11 @@ class TraineeServiceTests {
 
         when(tokenService.register(any(GymUserDetails.class), anyString(), anyString())).thenReturn(expected);
 
-        RegistrationTokenDto actual = traineeService.create(createTraineeDto);
+        RegistrationResponse actual = traineeService.create(createTraineeDto);
 
-        assertEquals(expectedUsername, actual.getUsername());
-        assertEquals(expectedPassword, actual.getPassword());
-        assertEquals(expectedToken, actual.getToken().getJwtToken());
+        assertEquals(expectedUsername, actual.getCredentials().getUsername());
+        assertEquals(expectedPassword, actual.getCredentials().getPassword());
+        assertEquals(expectedToken, actual.getToken().getToken());
 
         verify(traineeRepository, times(1)).save(any(Trainee.class));
     }
@@ -143,6 +145,7 @@ class TraineeServiceTests {
     }
 
     @Test
+    @Transactional
     void testUpdateProfile_WhenUserExists_ThenReturnTraineeUpdateResponseDto() {
         String username = "user";
         TraineeProfileUpdateRequestDto updateRequestDto = new TraineeProfileUpdateRequestDto();
@@ -167,6 +170,7 @@ class TraineeServiceTests {
     }
 
     @Test
+    @Transactional
     void testUpdateProfile_WhenUserDoesNotExist_ThenThrowGymException() {
         String username = "user";
 
@@ -185,6 +189,7 @@ class TraineeServiceTests {
     }
 
     @Test
+    @Transactional
     void testDeleteTrainee_WhenTraineeExists() {
         String username = "user";
         Trainee traineeToDelete = new Trainee();
@@ -199,6 +204,7 @@ class TraineeServiceTests {
     }
 
     @Test
+    @Transactional
     void testDeleteTrainee_WhenTraineeDoesNotExist_ThenThrowGymException() {
         String username = "Non.Existing";
 
@@ -216,6 +222,7 @@ class TraineeServiceTests {
     }
 
     @Test
+    @Transactional
     void testUpdateActiveStatus() {
         ActiveStatusDto activeStatusDto = new ActiveStatusDto();
         activeStatusDto.setIsActive(true);
@@ -233,6 +240,7 @@ class TraineeServiceTests {
     }
 
     @Test
+    @Transactional
     void testUpdateActiveStatus_WhenTraineeDoesNotExist_ThenThrowGymException() {
         String username = "Non.Existing";
         ActiveStatusDto statusDto = new ActiveStatusDto();

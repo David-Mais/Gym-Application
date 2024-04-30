@@ -31,9 +31,6 @@ public class Token {
     @Column(name = "token")
     private String jwtToken;
 
-    @Column(name = "is_active")
-    private Boolean isActive;
-
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserEntity user;

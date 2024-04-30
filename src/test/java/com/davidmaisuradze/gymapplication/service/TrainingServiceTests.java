@@ -14,6 +14,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
@@ -37,6 +38,7 @@ class TrainingServiceTests {
     private TrainingServiceImpl trainingService;
 
     @Test
+    @Transactional
     void createTraining() {
         Trainee trainee = new Trainee();
         Trainer trainer = new Trainer();
@@ -76,6 +78,7 @@ class TrainingServiceTests {
     }
 
     @Test
+    @Transactional
     void createTraining_WhenTrainerDoesNotExist_ThenThrowException() {
         String traineeName = "traineeName";
         String trainerName = "nonExistentTrainer";

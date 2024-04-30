@@ -1,19 +1,22 @@
 package com.davidmaisuradze.gymapplication.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Data
+@RequiredArgsConstructor
 @NoArgsConstructor
-@AllArgsConstructor
 public class ErrorDto {
+    @NonNull
     private String errorMessage;
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Map<String, Object> details = new HashMap<>();
+    @NonNull
     private String errorCode;
 }

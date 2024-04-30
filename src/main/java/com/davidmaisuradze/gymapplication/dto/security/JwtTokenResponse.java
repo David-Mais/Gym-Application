@@ -1,4 +1,4 @@
-package com.davidmaisuradze.gymapplication.security;
+package com.davidmaisuradze.gymapplication.dto.security;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

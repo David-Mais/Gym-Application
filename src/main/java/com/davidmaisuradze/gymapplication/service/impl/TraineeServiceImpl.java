@@ -1,6 +1,7 @@
 package com.davidmaisuradze.gymapplication.service.impl;
 
 import com.davidmaisuradze.gymapplication.dto.ActiveStatusDto;
+import com.davidmaisuradze.gymapplication.dto.security.RegistrationResponse;
 import com.davidmaisuradze.gymapplication.dto.trainee.CreateTraineeDto;
 import com.davidmaisuradze.gymapplication.dto.trainee.TraineeProfileDto;
 import com.davidmaisuradze.gymapplication.dto.trainee.TraineeProfileUpdateRequestDto;
@@ -19,11 +20,12 @@ import com.davidmaisuradze.gymapplication.repository.TraineeRepository;
 import com.davidmaisuradze.gymapplication.repository.TrainerRepository;
 import com.davidmaisuradze.gymapplication.repository.TrainingTypeRepository;
 import com.davidmaisuradze.gymapplication.security.GymUserDetails;
-import com.davidmaisuradze.gymapplication.security.RegistrationTokenDto;
+import com.davidmaisuradze.gymapplication.service.TokenService;
 import com.davidmaisuradze.gymapplication.service.TraineeService;
 import com.davidmaisuradze.gymapplication.util.DetailsGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,7 +50,7 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     @Transactional
-    public RegistrationTokenDto create(CreateTraineeDto createTraineeDto) {
+    public RegistrationResponse create(CreateTraineeDto createTraineeDto) {
         String password = detailsGenerator.generatePassword();
         String username = detailsGenerator.generateUsername(
                 createTraineeDto.getFirstName(),
@@ -70,6 +72,7 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Override
+    @PreAuthorize("#username == authentication.principal.username")
     public TraineeProfileDto getProfile(String username) {
         Trainee trainee = getTrainee(username);
         TraineeProfileDto profileDto = traineeMapper.traineeToTraineeProfileDto(trainee);
@@ -80,6 +83,7 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     @Transactional
+    @PreAuthorize("#username == authentication.principal.username")
     public TraineeProfileUpdateResponseDto updateProfile(
             String username,
             TraineeProfileUpdateRequestDto updateRequestDto
@@ -97,6 +101,7 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     @Transactional
+    @PreAuthorize("#username == authentication.principal.username")
     public void deleteByUsername(String username) {
         Trainee traineeToDelete = getTrainee(username);
         traineeRepository.delete(traineeToDelete);
@@ -104,6 +109,7 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     @Transactional
+    @PreAuthorize("#username == authentication.principal.username")
     public void updateActiveStatus(String username, ActiveStatusDto activeStatusDto) {
         Trainee trainee = getTrainee(username);
         trainee.setIsActive(activeStatusDto.getIsActive());
@@ -112,6 +118,7 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     @Transactional
+    @PreAuthorize("#username == authentication.principal.username")
     public List<TrainingInfoDto> getTrainingsList(String username, TrainingSearchCriteria criteria) {
         trainingSearchValidator(username, criteria);
 

@@ -52,16 +52,16 @@ CREATE TABLE IF NOT EXISTS tokens
 (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     token VARCHAR(300),
-    is_active BOOLEAN,
     user_id BIGINT,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
-DELETE FROM trainings;
-DELETE FROM trainers;
-DELETE FROM training_types;
-DELETE FROM trainees;
-DELETE FROM users;
+DELETE FROM tokens WHERE TRUE;
+DELETE FROM trainings WHERE TRUE;
+DELETE FROM trainers WHERE TRUE;
+DELETE FROM training_types WHERE TRUE;
+DELETE FROM trainees WHERE TRUE;
+DELETE FROM users WHERE TRUE;
 
 INSERT INTO training_types (training_type_name)
 VALUES ('box'), ('dance'), ('mma');

@@ -1,6 +1,7 @@
 package com.davidmaisuradze.gymapplication.service;
 
 import com.davidmaisuradze.gymapplication.dto.ActiveStatusDto;
+import com.davidmaisuradze.gymapplication.dto.security.RegistrationResponse;
 import com.davidmaisuradze.gymapplication.dto.trainee.CreateTraineeDto;
 import com.davidmaisuradze.gymapplication.dto.trainee.TraineeProfileDto;
 import com.davidmaisuradze.gymapplication.dto.trainee.TraineeProfileUpdateRequestDto;
@@ -8,12 +9,11 @@ import com.davidmaisuradze.gymapplication.dto.trainee.TraineeProfileUpdateRespon
 import com.davidmaisuradze.gymapplication.dto.training.TrainingInfoDto;
 import com.davidmaisuradze.gymapplication.dto.training.TrainingSearchCriteria;
 import com.davidmaisuradze.gymapplication.entity.Trainee;
-import com.davidmaisuradze.gymapplication.security.RegistrationTokenDto;
 
 import java.util.List;
 
 public interface TraineeService {
-    RegistrationTokenDto create(CreateTraineeDto traineeDto);
+    RegistrationResponse create(CreateTraineeDto traineeDto);
     TraineeProfileDto getProfile(String username);
     TraineeProfileUpdateResponseDto updateProfile(String username, TraineeProfileUpdateRequestDto updateRequestDto);
     void deleteByUsername(String username);

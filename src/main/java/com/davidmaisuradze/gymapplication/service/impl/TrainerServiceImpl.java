@@ -1,6 +1,7 @@
 package com.davidmaisuradze.gymapplication.service.impl;
 
 import com.davidmaisuradze.gymapplication.dto.ActiveStatusDto;
+import com.davidmaisuradze.gymapplication.dto.security.RegistrationResponse;
 import com.davidmaisuradze.gymapplication.dto.trainee.TraineeInfoDto;
 import com.davidmaisuradze.gymapplication.dto.trainer.CreateTrainerDto;
 import com.davidmaisuradze.gymapplication.dto.trainer.TrainerInfoDto;
@@ -21,11 +22,12 @@ import com.davidmaisuradze.gymapplication.repository.TraineeRepository;
 import com.davidmaisuradze.gymapplication.repository.TrainerRepository;
 import com.davidmaisuradze.gymapplication.repository.TrainingTypeRepository;
 import com.davidmaisuradze.gymapplication.security.GymUserDetails;
-import com.davidmaisuradze.gymapplication.security.RegistrationTokenDto;
+import com.davidmaisuradze.gymapplication.service.TokenService;
 import com.davidmaisuradze.gymapplication.service.TrainerService;
 import com.davidmaisuradze.gymapplication.util.DetailsGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,7 +53,7 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     @Transactional
-    public RegistrationTokenDto create(CreateTrainerDto createTrainerDto) {
+    public RegistrationResponse create(CreateTrainerDto createTrainerDto) {
         String password = detailsGenerator.generatePassword();
         String username = detailsGenerator.generateUsername(
                 createTrainerDto.getFirstName(),
@@ -74,6 +76,7 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
+    @PreAuthorize("#username == authentication.principal.username")
     public TrainerProfileDto getProfile(String username) {
         Trainer trainer = getTrainer(username);
         TrainerProfileDto trainerProfile = trainerMapper.trainerToTrainerProfileDto(trainer);
@@ -85,6 +88,7 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     @Transactional
+    @PreAuthorize("#username == authentication.principal.username")
     public TrainerProfileUpdateResponseDto updateProfile(
             String username,
             TrainerProfileUpdateRequestDto requestDto
@@ -102,6 +106,7 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     @Transactional
+    @PreAuthorize("#username == authentication.principal.username")
     public void updateActiveStatus(String username, ActiveStatusDto activeStatusDto) {
         boolean isActive = activeStatusDto.getIsActive();
         Trainer trainer = getTrainer(username);
@@ -111,6 +116,7 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
+    @PreAuthorize("#username == authentication.principal.username")
     public List<TrainerInfoDto> getTrainersNotAssigned(String username) {
         if (traineeNotExists(username)) {
             throw new GymException("Trainer not found with username: " + username, "404");
@@ -123,6 +129,7 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
+    @PreAuthorize("#username == authentication.principal.username")
     public List<TrainingInfoDto> getTrainingsList(String username, TrainerTrainingSearchDto criteria) {
         trainingSearchValidator(username, criteria);
 

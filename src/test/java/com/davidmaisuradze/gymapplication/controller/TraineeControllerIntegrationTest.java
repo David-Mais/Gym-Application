@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -62,23 +64,29 @@ class TraineeControllerIntegrationTest {
                 .andExpect(status().isCreated());
     }
 
+    @WithMockUser("Davit.Maisuradze3")
     @Test
     void testGetProfile_WhenUsernameNotExist_ThenReturnIsNotFound() throws Exception {
         String username = "Davit.Maisuradze3";
 
-        mockMvc.perform(get("/api/v1/trainees/profile/{username}", username))
+        mockMvc.perform(get("/api/v1/trainees/profile/{username}", username)
+                        .with(user(username)))  // Simulating an authenticated user with the same username
                 .andExpect(status().isNotFound());
     }
 
+    @WithMockUser("Davit.Maisuradze")
     @Test
     void testGetProfile_WhenUsernameExists_ThenReturnIsOk() throws Exception {
         String username = "Davit.Maisuradze";
 
-        mockMvc.perform(get("/api/v1/trainees/profile/{username}", username))
+        mockMvc.perform(get("/api/v1/trainees/profile/{username}", username)
+                        .with(user(username)))  // Simulating an authenticated user with the same username
                 .andExpect(status().isOk());
     }
 
+    @WithMockUser(username = "Davit.Maisuradze2")
     @Test
+    @Transactional
     void testDeleteProfile_WhenUsernameNotExists_ThenReturnIsNotFound() throws Exception {
         String username = "Davit.Maisuradze2";
 
@@ -86,6 +94,7 @@ class TraineeControllerIntegrationTest {
                 .andExpect(status().isNotFound());
     }
 
+    @WithMockUser(username = "Davit.Maisuradze")
     @Test
     @Transactional
     void testDeleteProfile_WhenUsernameExists_ThenReturnIsNoContent() throws Exception {
@@ -95,7 +104,9 @@ class TraineeControllerIntegrationTest {
                 .andExpect(status().isNoContent());
     }
 
+    @WithMockUser(username = "Davit.Maisuradze10")
     @Test
+    @Transactional
     void testActiveStatus_WhenUsernameNotExists_ThenReturnIsNotFound() throws Exception {
         String username = "Davit.Maisuradze10";
         ActiveStatusDto statusDto = new ActiveStatusDto(false);
@@ -106,6 +117,7 @@ class TraineeControllerIntegrationTest {
                 .andExpect(status().isNotFound());
     }
 
+    @WithMockUser(username = "Davit.Maisuradze")
     @Test
     @Transactional
     void testActiveStatus_WhenUsernameExists_ThenReturnIsOk() throws Exception {
@@ -118,6 +130,7 @@ class TraineeControllerIntegrationTest {
                 .andExpect(status().isOk());
     }
 
+    @WithMockUser(username = "Davit.Maisuradze8")
     @Test
     void TestGetTrainings_WhenUsernameNotExists_ThenReturnIsNotFound() throws Exception {
         String username = "Davit.Maisuradze8";
@@ -126,6 +139,7 @@ class TraineeControllerIntegrationTest {
                 .andExpect(status().isNotFound());
     }
 
+    @WithMockUser(username = "Davit.Maisuradze")
     @Test
     void TestGetTrainings_WhenUsernameExists_ThenReturnIsOk() throws Exception {
         String username = "Davit.Maisuradze";

@@ -2,13 +2,13 @@ package com.davidmaisuradze.gymapplication.controller;
 
 import com.davidmaisuradze.gymapplication.dto.ActiveStatusDto;
 import com.davidmaisuradze.gymapplication.dto.ErrorDto;
+import com.davidmaisuradze.gymapplication.dto.security.RegistrationResponse;
 import com.davidmaisuradze.gymapplication.dto.trainee.CreateTraineeDto;
 import com.davidmaisuradze.gymapplication.dto.trainee.TraineeProfileDto;
 import com.davidmaisuradze.gymapplication.dto.trainee.TraineeProfileUpdateRequestDto;
 import com.davidmaisuradze.gymapplication.dto.trainee.TraineeProfileUpdateResponseDto;
 import com.davidmaisuradze.gymapplication.dto.training.TrainingInfoDto;
 import com.davidmaisuradze.gymapplication.dto.training.TrainingSearchCriteria;
-import com.davidmaisuradze.gymapplication.security.RegistrationTokenDto;
 import com.davidmaisuradze.gymapplication.service.TraineeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -111,24 +111,42 @@ public class TraineeController {
                                                     name = "Trainee registered successfully",
                                                     description = "When trainee is registered successfully " +
                                                             "their newly generated Username and Password are " +
-                                                            "provided using CredentialsDto",
+                                                            "provided using CredentialsDto and their Jwt token by " +
+                                                            "token DTO.",
                                                     value = """
-                                                    {
-                                                      "username": "Davit.Maisuradze",
-                                                      "password": "myPass12"
-                                                    }
+                                                            {
+                                                              "credentials": {
+                                                                "username": "Davit.Maisuradze1",
+                                                                "password": "eb1f9db3"
+                                                              },
+                                                              "token": {
+                                                                "id": 1,
+                                                                "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJEYXZpdC5NYWlzdXJhZHplMSIsImlhdCI6MTcxNDQ2OTcxNSwiZXhwIjoxNzE0NDg5NzE1fQ.1p5IBJVJgSJAT2j47vng3Rr9dLnwg-Tni-m0sL2MCME",
+                                                                "username": "Davit.Maisuradze1",
+                                                                "expiredAt": "2024-04-30T15:08:35.000+00:00"
+                                                              }
+                                                            }
                                                     """
                                             ),
                                             @ExampleObject(
                                                     name = "Trainee registered successfully II",
                                                     description = "When trainee is registered successfully " +
                                                             "their newly generated Username and Password are " +
-                                                            "provided using CredentialsDto",
+                                                            "provided using CredentialsDto and their Jwt token by " +
+                                                            "token DTO.",
                                                     value = """
-                                                    {
-                                                      "username": "John.Doe",
-                                                      "password": "lancfhiu"
-                                                    }
+                                                            {
+                                                              "credentials": {
+                                                                "username": "Jane.Deo",
+                                                                "password": "4303a9ef"
+                                                              },
+                                                              "token": {
+                                                                "id": 1,
+                                                                "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKYW5lLkRlbyIsImlhdCI6MTcxNDQ2OTg3MSwiZXhwIjoxNzE0NDg5ODcxfQ.SmlDNya0-BJl65Fvph3XwJXaVCDtBFG-A3ekNHegH2U",
+                                                                "username": "Jane.Deo",
+                                                                "expiredAt": "2024-04-30T15:11:11.000+00:00"
+                                                              }
+                                                            }
                                                     """
                                             )
                                     }
@@ -178,11 +196,11 @@ public class TraineeController {
                     )
             }
     )
-    public ResponseEntity<RegistrationTokenDto> createTrainee(
+    public ResponseEntity<RegistrationResponse> createTrainee(
             @Valid @RequestBody CreateTraineeDto createTraineeDto
     ) {
-        RegistrationTokenDto registrationTokenDto = traineeService.create(createTraineeDto);
-        return new ResponseEntity<>(registrationTokenDto, HttpStatus.CREATED);
+        RegistrationResponse registrationResponse = traineeService.create(createTraineeDto);
+        return new ResponseEntity<>(registrationResponse, HttpStatus.CREATED);
     }
 
     @GetMapping("/profile/{username}")
@@ -255,6 +273,49 @@ public class TraineeController {
                                                                   }
                                                                 }
                                                               ]
+                                                            }
+                                                            """
+                                            )
+                                    }
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized user",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ErrorDto.class),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "Missing or invalid token",
+                                                    description = "When bearer token is either missing or invalid there will be an authentication " +
+                                                            "error so client will receive response code 401 alongside the following response body.",
+                                                    value = """
+                                                            {
+                                                              "errorMessage": "Token is missing or invalid.",
+                                                              "errorCode": "401"
+                                                            }
+                                                            """
+                                            )
+                                    }
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "Access Denied",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ErrorDto.class),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "No permission to access resource",
+                                                    description = "When client has a token that is valid but it is for " +
+                                                            "user A and tries to access information about user B with the " +
+                                                            "same token there will be response code 403 and an error DTO.",
+                                                    value = """
+                                                            {
+                                                              "errorMessage": "Access denied",
+                                                              "errorCode": "403"
                                                             }
                                                             """
                                             )
@@ -459,6 +520,49 @@ public class TraineeController {
                                             )
                                     }
                             )
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized user",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ErrorDto.class),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "Missing or invalid token",
+                                                    description = "When bearer token is either missing or invalid there will be an authentication " +
+                                                            "error so client will receive response code 401 alongside the following response body.",
+                                                    value = """
+                                                            {
+                                                              "errorMessage": "Token is missing or invalid.",
+                                                              "errorCode": "401"
+                                                            }
+                                                            """
+                                            )
+                                    }
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "Access Denied",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ErrorDto.class),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "No permission to access resource",
+                                                    description = "When client has a token that is valid but it is for " +
+                                                            "user A and tries to access information about user B with the " +
+                                                            "same token there will be response code 403 and an error DTO.",
+                                                    value = """
+                                                            {
+                                                              "errorMessage": "Access denied",
+                                                              "errorCode": "403"
+                                                            }
+                                                            """
+                                            )
+                                    }
+                            )
                     )
             }
     )
@@ -485,6 +589,49 @@ public class TraineeController {
                     @ApiResponse(
                             responseCode = "204",
                             description = "Trainee deleted successfully"
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized user",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ErrorDto.class),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "Missing or invalid token",
+                                                    description = "When bearer token is either missing or invalid there will be an authentication " +
+                                                            "error so client will receive response code 401 alongside the following response body.",
+                                                    value = """
+                                                            {
+                                                              "errorMessage": "Token is missing or invalid.",
+                                                              "errorCode": "401"
+                                                            }
+                                                            """
+                                            )
+                                    }
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "Access Denied",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ErrorDto.class),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "No permission to access resource",
+                                                    description = "When client has a token that is valid but it is for " +
+                                                            "user A and tries to access information about user B with the " +
+                                                            "same token there will be response code 403 and an error DTO.",
+                                                    value = """
+                                                            {
+                                                              "errorMessage": "Access denied",
+                                                              "errorCode": "403"
+                                                            }
+                                                            """
+                                            )
+                                    }
+                            )
                     ),
                     @ApiResponse(
                             responseCode = "404",
@@ -577,6 +724,49 @@ public class TraineeController {
                                                                 "isActive": "Is Active field should not be null"
                                                               },
                                                               "errorCode": "400"
+                                                            }
+                                                            """
+                                            )
+                                    }
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized user",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ErrorDto.class),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "Missing or invalid token",
+                                                    description = "When bearer token is either missing or invalid there will be an authentication " +
+                                                            "error so client will receive response code 401 alongside the following response body.",
+                                                    value = """
+                                                            {
+                                                              "errorMessage": "Token is missing or invalid.",
+                                                              "errorCode": "401"
+                                                            }
+                                                            """
+                                            )
+                                    }
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "Access Denied",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ErrorDto.class),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "No permission to access resource",
+                                                    description = "When client has a token that is valid but it is for " +
+                                                            "user A and tries to access information about user B with the " +
+                                                            "same token there will be response code 403 and an error DTO.",
+                                                    value = """
+                                                            {
+                                                              "errorMessage": "Access denied",
+                                                              "errorCode": "403"
                                                             }
                                                             """
                                             )
@@ -727,6 +917,49 @@ public class TraineeController {
                                                                 "actualValue": "01-01-2004"
                                                               },
                                                               "errorCode": "400"
+                                                            }
+                                                            """
+                                            )
+                                    }
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized user",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ErrorDto.class),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "Missing or invalid token",
+                                                    description = "When bearer token is either missing or invalid there will be an authentication " +
+                                                            "error so client will receive response code 401 alongside the following response body.",
+                                                    value = """
+                                                            {
+                                                              "errorMessage": "Token is missing or invalid.",
+                                                              "errorCode": "401"
+                                                            }
+                                                            """
+                                            )
+                                    }
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "Access Denied",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ErrorDto.class),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "No permission to access resource",
+                                                    description = "When client has a token that is valid but it is for " +
+                                                            "user A and tries to access information about user B with the " +
+                                                            "same token there will be response code 403 and an error DTO.",
+                                                    value = """
+                                                            {
+                                                              "errorMessage": "Access denied",
+                                                              "errorCode": "403"
                                                             }
                                                             """
                                             )

@@ -13,8 +13,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PasswordChangeDto {
-    @NotBlank(message = "Username should not be blank")
-    private String username;
     @NotBlank(message = "Old password should not be blank")
     private String oldPassword;
 

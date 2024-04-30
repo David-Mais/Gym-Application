@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
@@ -60,19 +61,23 @@ class TrainerControllerIntegrationTest {
                 .andExpect(status().isCreated());
     }
 
+    @WithMockUser(JOHN_DOE)
     @Test
     void testGetProfile_WhenUsernameNotExist_ThenReturnIsNotFound() throws Exception {
         mockMvc.perform(get("/api/v1/trainers/profile/{username}", JOHN_DOE))
                 .andExpect(status().isNotFound());
     }
 
+    @WithMockUser("Merab.Dvalishvili")
     @Test
     void testGetProfile_WhenUsernameExists_ThenReturnIsOk() throws Exception {
         mockMvc.perform(get("/api/v1/trainers/profile/{username}", "Merab.Dvalishvili"))
                 .andExpect(status().isOk());
     }
 
+    @WithMockUser(JOHN_DOE)
     @Test
+    @Transactional
     void testActiveStatus_WhenUsernameNotExists_ThenReturnIsNotFound() throws Exception {
         ActiveStatusDto statusDto = new ActiveStatusDto(false);
 
@@ -82,6 +87,7 @@ class TrainerControllerIntegrationTest {
                 .andExpect(status().isNotFound());
     }
 
+    @WithMockUser("Merab.Dvalishvili")
     @Test
     @Transactional
     void testActiveStatus_WhenUsernameExists_ThenReturnIsOk() throws Exception {
@@ -93,12 +99,14 @@ class TrainerControllerIntegrationTest {
                 .andExpect(status().isOk());
     }
 
+    @WithMockUser(JOHN_DOE)
     @Test
     void TestGetTrainings_WhenUsernameNotExists_ThenReturnIsNotFound() throws Exception {
         mockMvc.perform(get("/api/v1/trainers/profile/{username}/trainings", JOHN_DOE))
                 .andExpect(status().isNotFound());
     }
 
+    @WithMockUser("Merab.Dvalishvili")
     @Test
     void TestGetTrainings_WhenUsernameExists_ThenReturnIsOk() throws Exception {
         mockMvc.perform(get("/api/v1/trainers/profile/{username}/trainings", "Merab.Dvalishvili"))

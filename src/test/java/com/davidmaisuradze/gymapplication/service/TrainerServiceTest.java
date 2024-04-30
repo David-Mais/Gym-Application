@@ -1,6 +1,9 @@
 package com.davidmaisuradze.gymapplication.service;
 
 import com.davidmaisuradze.gymapplication.dto.ActiveStatusDto;
+import com.davidmaisuradze.gymapplication.dto.CredentialsDto;
+import com.davidmaisuradze.gymapplication.dto.security.RegistrationResponse;
+import com.davidmaisuradze.gymapplication.dto.security.TokenDto;
 import com.davidmaisuradze.gymapplication.dto.trainer.CreateTrainerDto;
 import com.davidmaisuradze.gymapplication.dto.trainer.TrainerInfoDto;
 import com.davidmaisuradze.gymapplication.dto.trainer.TrainerProfileDto;
@@ -9,7 +12,6 @@ import com.davidmaisuradze.gymapplication.dto.trainer.TrainerProfileUpdateRespon
 import com.davidmaisuradze.gymapplication.dto.trainer.TrainerTrainingSearchDto;
 import com.davidmaisuradze.gymapplication.dto.training.TrainingInfoDto;
 import com.davidmaisuradze.gymapplication.dto.trainingtype.TrainingTypeDto;
-import com.davidmaisuradze.gymapplication.entity.Token;
 import com.davidmaisuradze.gymapplication.entity.Trainee;
 import com.davidmaisuradze.gymapplication.entity.Trainer;
 import com.davidmaisuradze.gymapplication.entity.Training;
@@ -23,8 +25,6 @@ import com.davidmaisuradze.gymapplication.repository.TraineeRepository;
 import com.davidmaisuradze.gymapplication.repository.TrainerRepository;
 import com.davidmaisuradze.gymapplication.repository.TrainingTypeRepository;
 import com.davidmaisuradze.gymapplication.security.GymUserDetails;
-import com.davidmaisuradze.gymapplication.security.RegistrationTokenDto;
-import com.davidmaisuradze.gymapplication.service.impl.TokenService;
 import com.davidmaisuradze.gymapplication.service.impl.TrainerServiceImpl;
 import com.davidmaisuradze.gymapplication.util.DetailsGenerator;
 import org.junit.jupiter.api.Test;
@@ -33,6 +33,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,6 +79,7 @@ class TrainerServiceTest {
 
 
     @Test
+    @Transactional
     void testCreateTrainer_WhenCreateDtoProvided_ThenReturnRegistrationTokenDto() {
         CreateTrainerDto createTrainerDto = new CreateTrainerDto();
         createTrainerDto.setFirstName("John");
@@ -95,12 +97,12 @@ class TrainerServiceTest {
         mockTrainer.setUsername(expectedUsername);
         mockTrainer.setPassword(expectedPassword);
 
-        Token token = new Token();
-        token.setJwtToken("token123");
-        RegistrationTokenDto expected = new RegistrationTokenDto();
+        TokenDto token = new TokenDto();
+        token.setToken("token123");
+        RegistrationResponse expected = new RegistrationResponse();
         expected.setToken(token);
-        expected.setUsername(expectedUsername);
-        expected.setPassword(expectedPassword);
+        CredentialsDto credentialsDto = new CredentialsDto(expectedUsername, expectedPassword);
+        expected.setCredentials(credentialsDto);
 
         when(detailsGenerator.generateUsername(anyString(), anyString())).thenReturn(expectedUsername);
         when(detailsGenerator.generatePassword()).thenReturn(expectedPassword);
@@ -111,18 +113,19 @@ class TrainerServiceTest {
 
         when(tokenService.register(any(GymUserDetails.class), anyString(), anyString())).thenReturn(expected);
 
-        RegistrationTokenDto actual = trainerService.create(createTrainerDto);
+        RegistrationResponse actual = trainerService.create(createTrainerDto);
 
         assertNotNull(actual);
-        assertEquals(expectedUsername, actual.getUsername());
-        assertEquals(expectedPassword, actual.getPassword());
-        assertEquals(expectedToken, actual.getToken().getJwtToken());
+        assertEquals(expectedUsername, actual.getCredentials().getUsername());
+        assertEquals(expectedPassword, actual.getCredentials().getPassword());
+        assertEquals(expectedToken, actual.getToken().getToken());
 
         verify(trainerRepository, times(1)).save(any(Trainer.class));
     }
 
 
     @Test
+    @Transactional
     void testCreateTrainer_WhenInvalidCreateDtoProvided_ThenThrowGymException() {
         CreateTrainerDto createTrainerDto = new CreateTrainerDto();
 
@@ -177,6 +180,7 @@ class TrainerServiceTest {
     }
 
     @Test
+    @Transactional
     void testUpdateTrainerProfile_WhenTrainerExists_ThenUpdateProfile() {
         String username = "user";
         TrainerProfileUpdateRequestDto updateRequestDto = new TrainerProfileUpdateRequestDto();
@@ -201,6 +205,7 @@ class TrainerServiceTest {
     }
 
     @Test
+    @Transactional
     void testUpdateTrainerProfile_WhenTrainerDoesNotExist_ThenThrowGymException() {
         String username = "trainer";
 
@@ -219,6 +224,7 @@ class TrainerServiceTest {
     }
 
     @Test
+    @Transactional
     void testUpdateActiveStatus_WhenTrainerExists_ThenUpdateActiveStatus() {
         ActiveStatusDto activeStatusDto = new ActiveStatusDto();
         activeStatusDto.setIsActive(true);
@@ -236,6 +242,7 @@ class TrainerServiceTest {
     }
 
     @Test
+    @Transactional
     void testUpdateActiveStatus_WhenTrainerDoesNotExist_ThenThrowGymException() {
         String username = "Non.Existing";
         ActiveStatusDto statusDto = new ActiveStatusDto();

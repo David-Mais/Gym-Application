@@ -48,7 +48,6 @@ CREATE TABLE IF NOT EXISTS tokens
 (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     token VARCHAR(300),
-    is_active BOOLEAN,
     user_id BIGINT,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );

@@ -1,6 +1,5 @@
 package com.davidmaisuradze.gymapplication.security;
 
-import com.davidmaisuradze.gymapplication.entity.Token;
 import com.davidmaisuradze.gymapplication.repository.TokenRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -19,7 +18,7 @@ import java.util.function.Function;
 
 @Component
 @RequiredArgsConstructor
-public class JwtService {
+public class JwtTokenProvider {
     @Value("${security.jwt.secret}")
     private String secret;
     @Value("${security.jwt.expiration}")
@@ -29,6 +28,10 @@ public class JwtService {
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
+    }
+
+    public Date getExpiration(String token) {
+        return extractClaim(token, Claims::getExpiration);
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
@@ -58,7 +61,7 @@ public class JwtService {
         String username = extractUsername(token);
 
         boolean isValidToken = tokenRepository.findByJwtToken(token)
-                .map(Token::getIsActive).orElse(false);
+                .map(jwtToken -> !jwtToken.getJwtToken().isEmpty()).orElse(false);
 
         return username.equals(userDetails.getUsername()) && !isTokenExpired(token) && isValidToken;
     }

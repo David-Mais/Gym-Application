@@ -1,18 +1,20 @@
-package com.davidmaisuradze.gymapplication.security;
+package com.davidmaisuradze.gymapplication.service.impl;
 
+import com.davidmaisuradze.gymapplication.dto.security.LoginAttempt;
+import com.davidmaisuradze.gymapplication.service.LoginAttemptService;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Component
-public class LoginAttemptService {
+@Service
+public class LoginAttemptServiceImpl implements LoginAttemptService {
     @Value("${security.login.max-attempts}")
     private int maxAttempts;
     @Value("${security.login.timeout}")
-    private int timeoutMinutes;
+    private int timeoutSeconds;
     private final ConcurrentHashMap<String, LoginAttempt> loginAttempts = new ConcurrentHashMap<>();
 
     public void loginFailed(String username) {
@@ -40,7 +42,7 @@ public class LoginAttemptService {
     public boolean isLockedOut(String username) {
         LoginAttempt attempt = loginAttempts.getOrDefault(username, null);
         if (attempt != null && attempt.getLockoutTime() != null) {
-            Duration duration = Duration.ofMinutes(timeoutMinutes);
+            Duration duration = Duration.ofSeconds(timeoutSeconds);
             return LocalDateTime.now().isBefore(attempt.getLockoutTime().plus(duration));
         }
         return false;

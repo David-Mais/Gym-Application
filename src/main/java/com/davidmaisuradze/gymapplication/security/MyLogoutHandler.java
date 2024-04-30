@@ -1,6 +1,5 @@
 package com.davidmaisuradze.gymapplication.security;
 
-import com.davidmaisuradze.gymapplication.entity.Token;
 import com.davidmaisuradze.gymapplication.repository.TokenRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -11,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class CustomLogoutHandler implements LogoutHandler {
+public class MyLogoutHandler implements LogoutHandler {
     private final TokenRepository tokenRepository;
     @Override
     public void logout(
@@ -27,11 +26,6 @@ public class CustomLogoutHandler implements LogoutHandler {
 
         String token = authHeader.substring(7);
 
-        Token storedToken = tokenRepository.findByJwtToken(token).orElse(null);
-
-        if (storedToken != null) {
-            storedToken.setIsActive(false);
-            tokenRepository.save(storedToken);
-        }
+        tokenRepository.findByJwtToken(token).ifPresent(tokenRepository::delete);
     }
 }

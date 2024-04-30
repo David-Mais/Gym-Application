@@ -9,6 +9,8 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Aspect
 @Component
 @Slf4j
@@ -19,7 +21,15 @@ public class LoggingAspect {
 
     @AfterReturning(pointcut = "restController()", returning = "result")
     public void logAfterReturning(JoinPoint joinPoint, Object result) {
-        log.info("Transaction ID: {}, Endpoint: {}, Response: {}", MDC.get("transactionId"), joinPoint.getSignature().toShortString(), result);
+        String methodName = joinPoint.getSignature().getName();
+        String className = joinPoint.getTarget().getClass().getSimpleName();
+
+        String responseToLog = result.toString().replaceAll("password=[^,]+", "password=***")
+                .replaceAll("token=[^,]+", "token=***");
+
+        log.info("Transaction ID: {}, Endpoint: {}.{}(), Response: {}",
+                UUID.randomUUID(),
+                className, methodName, responseToLog);
     }
 
     @AfterThrowing(pointcut = "restController()", throwing = "e")
